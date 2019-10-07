@@ -11,4 +11,4 @@ if(NOT DEFINED EXCLUDE_LIB_BLIB)
 endif()
 
 # This is how a compiler #define value is specified.
-add_compile_definitions(CONG_PARAM_1="config_param1")
+add_compile_definitions(CONFIG_PARAM_1="config_param1")
