@@ -1,6 +1,6 @@
-#if !defined(ALIB_INCLUDED)
-#define ALIB_INCLUDED
+#if !defined(BLIB_INCLUDED)
+#define BLIB_INCLUDED
 
 extern void print_from_blib();
 
-#endif // BLIB_INCLUDED
+#endif // BÍLIB_INCLUDED
