@@ -14,5 +14,8 @@ cmake_minimum_required (VERSION 3.12.4)
 project (<project_name>)
 ```
 
-## Building
+## Buildings
 Use ```cmake .``` at the top level of the source tree (ie in the directory containing the ```CmakeLists.txt``` file.
+
+## Specifying a #define entry
+Use ```add_compile_definitions(FOO=1)``` to generate a ```-DFOO=1``` on the compiler command line.
