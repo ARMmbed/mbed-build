@@ -5,5 +5,12 @@
 int main(void) {
     print_from_alib();
     print_from_blib();
+
+#if !defined(CONG_PARAM_1)
+    #error CONG_PARAM_1 is not defined
+#endif
+
+    printf("CONFIG_PARAM_1 is '%s'\n", CONFIG_PARAM_1);
+
     return 0;
 }

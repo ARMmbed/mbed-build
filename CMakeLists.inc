@@ -1,7 +1,14 @@
-# Each subdirectory needs to be added individually.
-add_subdirectory (alib)
-add_subdirectory (blib)
-
 add_executable (cmakeTrial main.c)
 
-target_link_libraries (cmakeTrial LINK_PUBLIC alib blib)
+if(NOT DEFINED EXCLUDE_LIB_ALIB)
+    add_subdirectory (alib)
+    target_link_libraries (cmakeTrial LINK_PUBLIC alib)
+endif()
+
+if(NOT DEFINED EXCLUDE_LIB_BLIB)
+    add_subdirectory (blib)
+    target_link_libraries (cmakeTrial LINK_PUBLIC blib)
+endif()
+
+# This is how a compiler #define value is specified.
+add_compile_definitions(CONG_PARAM_1="config_param1")
