@@ -1,0 +1,33 @@
+@startuml
+:src files;
+partition Pre-build {
+:Generate config;
+}
+if () then (compile)
+:Compile
+(custom commands);
+else (export)
+:Export>
+endif
+
+@enduml
+@startuml
+start
+:src files;
+partition Pre-build {
+:Generate config;
+:Generate CMAKE files;
+:Run CMAKE;
+}
+if () then (compile)
+:Compile
+(ninja, make etc);
+else (export)
+:Export>
+endif
+
+stop
+
+@enduml
+
+
