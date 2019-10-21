@@ -23,7 +23,6 @@ From mbed_toolchain.py:
 - if there is configuration data that is the same as the previous
           configuration data, ```mbed_config.h``` is left untouched.
 - if there is new configuration data, ```mbed_config.h``` is overriden.
-
 "        
 
 ### Problem
@@ -39,6 +38,6 @@ Generate a revised ```mbed_config.h``` that is simply a collection of all sub-co
 
 
 # More stuff
-There are two parts to this configurtion story. mbed OS can be considered as a collection of software components/libraries/features and a collection of targets. This lot is combined with a chunk of generic operating system code. 
+There are two parts to this configuration story. mbed OS can be considered as a collection of software components/libraries/features and a collection of targets. This lot is combined with a chunk of generic operating system code. 
 
-When building for a specific target the buld system consults the collection of configuration files and forms a set of configuration parameters with specific values defined.
+When building for a specific target the build system consults the collection of configuration files and forms a set of configuration parameters with specific values defined.
