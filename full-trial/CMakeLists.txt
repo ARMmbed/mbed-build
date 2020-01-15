@@ -113,22 +113,6 @@ INCLUDE_DIRECTORIES(
   mbed-os/targets/TARGET_Freescale/TARGET_MCUXpresso_MCUS/TARGET_MCU_K64F
   mbed-os/targets/TARGET_Freescale/TARGET_MCUXpresso_MCUS
   mbed-os/targets/TARGET_Freescale
-  mbed-os/rtos/source/TARGET_CORTEX/rtx5/RTX/Source
-  mbed-os/rtos/source/TARGET_CORTEX/rtx5/RTX/Include
-  mbed-os/rtos/source/TARGET_CORTEX/rtx5/RTX/Config
-  mbed-os/rtos/source/TARGET_CORTEX/rtx5/RTX
-  mbed-os/rtos/source/TARGET_CORTEX/rtx5/Include
-  mbed-os/rtos/source/TARGET_CORTEX/rtx5
-  mbed-os/rtos/source/TARGET_CORTEX/rtx4
-  mbed-os/rtos/source/TARGET_CORTEX
-  mbed-os/rtos/source
-  mbed-os/rtos
-  mbed-os/platform/source/minimal-printf
-  mbed-os/platform/source/TARGET_CORTEX_M
-  mbed-os/platform/source
-  mbed-os/platform/internal
-  mbed-os/platform/cxxsupport
-  mbed-os/platform
   mbed-os/hal/usb
   mbed-os/hal/storage_abstraction
   mbed-os/hal
@@ -2522,6 +2506,8 @@ ADD_EXECUTABLE(full-trial
   mbed_config.h
   )
 
+add_subdirectory(mbed-os/rtos)
+add_subdirectory(mbed-os/platform)
 add_subdirectory(mbed-os/events)
 
 SET_TARGET_PROPERTIES(full-trial PROPERTIES ENABLE_EXPORTS 1)
