@@ -74,6 +74,8 @@ The mbed build system will need to provide the following to enable the generatio
 The code for these operations must already exist inside the current tools codebase somewhere.
 
 # Development approach
+There is a simple example in ```simple-trial``` that was built to allow some ideas to be prototyped.
+```full-trial``` is a full checkout of a blinky project with the git repositories removed from mbed-os. It now contains experimental changes to add CMake to be trialled on a full mbed build.
 ## What do we already have?
 Start with the existing mbed export for a CMake project. This is pretty crude at the moment; it simply adds every C and H file to the ADD\_EXECUTABLE() section. A INCLUDE\_DIRECTORIES() section is constructed from a recursive traversal of the project tree, adding every directory in the project.
 ADD\_DEFINITIONS() section is filled with definitions derived from the configuration system (these appear to be the same as those in mbed_config.h).
