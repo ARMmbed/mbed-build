@@ -335,8 +335,7 @@ INCLUDE_DIRECTORIES(
   mbed-os/features/cellular/framework
   mbed-os/features/cellular
   mbed-os/features
-  mbed-os/drivers/internal
-  mbed-os/drivers
+  ### drivers
   mbed-os/components/wifi/esp8266-driver/ESP8266
   mbed-os/components/wifi/esp8266-driver
   mbed-os/components/wifi
@@ -2509,6 +2508,7 @@ ADD_EXECUTABLE(full-trial
 add_subdirectory(mbed-os/rtos)
 add_subdirectory(mbed-os/platform)
 add_subdirectory(mbed-os/events)
+add_subdirectory(mbed-os/drivers)
 
 SET_TARGET_PROPERTIES(full-trial PROPERTIES ENABLE_EXPORTS 1)
 # add syslibs dependencies to create the correct linker order
