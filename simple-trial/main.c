@@ -3,6 +3,8 @@
 #include "alib.h"
 #include "blib.h"
 
+#include "clib.h"
+
 int main(void) {
     print_from_alib();
     print_from_blib();
@@ -12,6 +14,8 @@ int main(void) {
 #endif
 
     printf("CONFIG_PARAM_1 is '%s'\n", CONFIG_PARAM_1);
+
+    clib_hello();
 
     return 0;
 }

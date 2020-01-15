@@ -73,3 +73,67 @@ The mbed build system will need to provide the following to enable the generatio
 
 The code for these operations must already exist inside the current tools codebase somewhere.
 
+# Development approach
+## What do we already have?
+Start with the existing mbed export for a CMake project. This is pretty crude at the moment; it simply adds every C and H file to the ADD\_EXECUTABLE() section. A INCLUDE\_DIRECTORIES() section is constructed from a recursive traversal of the project tree, adding every directory in the project.
+ADD\_DEFINITIONS() section is filled with definitions derived from the configuration system (these appear to be the same as those in mbed_config.h).
+
+However, this does produce a valid build.
+
+## How to change
+Look for all those directories that appear to contain components. These should be identifiable as they generally contain a file called ```mbed_lib.json``` at the top-level of their tree. Each of these becomes a library in its own right. Note that the library name is going to be global throughout the project, so it needs to be unique. We need to find a naming scheme that will ensure this.
+
+Replacing these with an appropriate CMakeLists.txt file would then allow that whole tree to be managed as a component. The corresponding directories can then be removed from the directories list, and files removed from the add_executable in favour of the generated archive.
+
+This change can be done over a period of time. The CMakeLists.txt files can be initially generated as placeholders.
+
+### Processing Directories
+There needs to be a CMakeLists.txt file at every level of the hierarchy from root to leaf source file. If a directory contains only other directories then this need only consist of a single line:
+   
+   ```add_subdirectory(name_of_subdir)```
+
+This can be generated...
+
+### Refactoring components
+* Create a CMakeLists.txt file in the component directory next to the existing mbed_lib.json file
+* set a HEADERS variable containing the headers:
+   * ```set(HEADERS f1.h f2.h)```
+
+* set a SOURCES variable containing the sources
+   * ```set(SOURCES f1.cpp f2.cpp)```
+* Register this as a library
+   * ```add_library(libname ${SOURCES})```
+
+## Build times
+This is a comparison of build times for various configurations. In  each case we build blinky with mbed-os 5.15 for the K64F target on a MacBook Pro (2 core).
+
+### Exported cmake build
+Building with the original CMakeLists.txt exported from mbed OS tools using ```mbed export -i eclipse_gcc_arm -m K64F```
+Build command: ```time cmake --build .```
+* real	5m40.395s
+* user	3m25.836s
+* sys	2m0.438s
+
+This does not include the short 10 seconds or so that cmake requires to run the initial ```cmake ..```
+### Original build system with gcc compiler toolchain
+Build command: ```time mbed compile -t GCC_ARM -m K64F```
+* real	2m12.723s
+* user	4m29.475s
+* sys	2m0.357s
+
+### Original build system with armcc6 compiler toolchain
+Build command: ```time mbed compile -t ARMC6 -m K64F```
+* real	1m37.021s
+* user	3m55.278s
+* sys	1m2.505s
+
+
+# Migration
+Looking at the existing exported CMakeLists.txt as a starting point, there are two major sections: INCLUDE_DIRECTORIES() and ADD_EXECUTABLE(). It 
+appears as though INCLUDE_DIRECTORIES() contains every directory within the whole of the mbed-os hierarchy, and ADD_EXECUTABLE() contains every
+header and every source file in the whole of mbed-os.
+
+# Header file migration
+Create a CMakeLists.txt file next to one of the existing mbed_lib.json files. This needs to contain references to the code within that 'library'. 
+Note: Order matters; putting add_subdirectory() call after the top-level includes allows the 'global' mbed_config.h to be found
+* Add 
