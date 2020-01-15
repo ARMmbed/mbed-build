@@ -351,8 +351,6 @@ INCLUDE_DIRECTORIES(
   mbed-os/features/cellular/framework
   mbed-os/features/cellular
   mbed-os/features
-  mbed-os/events/internal
-  mbed-os/events
   mbed-os/drivers/internal
   mbed-os/drivers
   mbed-os/components/wifi/esp8266-driver/ESP8266
@@ -2523,6 +2521,9 @@ ADD_EXECUTABLE(full-trial
   mbed-os/targets/TARGET_Freescale/mbed_rtx.h
   mbed_config.h
   )
+
+add_subdirectory(mbed-os/events)
+
 SET_TARGET_PROPERTIES(full-trial PROPERTIES ENABLE_EXPORTS 1)
 # add syslibs dependencies to create the correct linker order
 TARGET_LINK_LIBRARIES(full-trial -lstdc++ -lsupc++ -lm -lc -lgcc -lnosys)

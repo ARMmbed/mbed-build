@@ -134,6 +134,10 @@ appears as though INCLUDE_DIRECTORIES() contains every directory within the whol
 header and every source file in the whole of mbed-os.
 
 # Header file migration
-Create a CMakeLists.txt file next to one of the existing mbed_lib.json files. This needs to contain references to the code within that 'library'. 
-Note: Order matters; putting add_subdirectory() call after the top-level includes allows the 'global' mbed_config.h to be found
-* Add 
+Each subfolder in mbed-os that contains an mbed_lib.json file is a candidate 'library'. For each of these:
+* Create a CMakeLists.txt file next to the existing mbed_lib.json files. This needs to contain references to the code within that 'library'. 
+* Add a ```target_include_directories()``` section in the new subfolder CmakeLists.txt file. Add to it all of the 
+entries that appear in the ```INCLUDE_DIRECTORIES()``` section in the top-level. Remove these entries from the top level. For the moment all of these header directories are going to be labelled as ```PUBLIC```, but it is likely that many can be hidden in future.
+* Add a ```add_subdirectory()``` call in the top-level to call in the new subfolder. Order matters; putting add_subdirectory() call after the top-level ```INCLUDE_DIRECTORIES()``` allows the 'global' mbed_config.h to be found
+
+Note that this should not alter the build in any way, other than to put the structure in place.
