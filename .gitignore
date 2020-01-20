@@ -1,0 +1,18 @@
+
+# Don't lock the versions of this library or installation gridlock will ensue
+Pipfile.lock
+
+# PyCharm
+.idea/
+
+# macOS
+.DS_Store
+
+# Python
+*.pyc
+__pycache__/
+*.egg-info/
+
+# pytest coverage
+.coverage
+htmlcov/
