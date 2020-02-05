@@ -1,0 +1,5 @@
+target_include_directories ({{program_name}}
+    PUBLIC {% for sub_dir in library.sub_dirs %}
+        {{ sub_dir }}{% endfor %}
+        .
+)
