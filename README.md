@@ -59,7 +59,8 @@ Note that this example generates a build system based on ```make```, but CMake c
 
 ## Fragments
 ### Specifying a library
-Each separate lbrary must have a ```add_subdirectory (alib)``` in the parent cmake file so that the content of the library can be included.
+Each separate component must have a ```add_subdirectory (path/to/library)``` in the parent cmake file so that the content of the 
+component can be included. The ```add_subdirectory``` directive appears to tell CMAKE to expect a ```CMakeLists.txt``` file in that directory.
 
 ### Specifying a #define entry
 Use ```add_compile_definitions(FOO=1)``` to generate a ```-DFOO=1``` on the compiler command line.
@@ -89,25 +90,24 @@ Replacing these with an appropriate CMakeLists.txt file would then allow that wh
 
 This change can be done over a period of time. The CMakeLists.txt files can be initially generated as placeholders.
 
-### Processing Directories
-There needs to be a CMakeLists.txt file at every level of the hierarchy from root to leaf source file. If a directory contains only other directories then this need only consist of a single line:
-   
-   ```add_subdirectory(name_of_subdir)```
-
-This can be generated...
-
 ### Refactoring components
 * Create a CMakeLists.txt file in the component directory next to the existing mbed_lib.json file
-* set a HEADERS variable containing the headers:
-   * ```set(HEADERS f1.h f2.h)```
+* Register this as a library, using all of the source files mentioned in the existing top-level CMakeLists.txt file. The source files need not include headers; and should
+be relative to the top of the library tree.
+   * ```add_library(libname source1 source2...)```
+   
+* Reference the header files exported by this component using ```target_include_directories()```. Note that they will all be PUBLIC at this stage, until reviewed by the mbed-os team
+   
+The top-level ```CMakeLists.txt``` file needs to be modified to include the new component:
 
-* set a SOURCES variable containing the sources
-   * ```set(SOURCES f1.cpp f2.cpp)```
-* Register this as a library
-   * ```add_library(libname ${SOURCES})```
+* Add a ```add_subdirectory(/path/to/component)``` directive below ```include_directories()```. Order matters; putting add_subdirectory() call after 
+the top-level ```include_directories()``` allows the 'global' mbed_config.h to be found
+* Add the name of the new library to the ```target_link_libraries()``` directive.
+* Remove the corresponding file references in the existing ```include_directories()``` directive
+* Remove the corresponding file references in the ```add_executable()``` directive
 
 ## Build times
-This is a comparison of build times for various configurations. In  each case we build blinky with mbed-os 5.15 for the K64F target on a MacBook Pro (2 core).
+This is a comparison of build times for various configurations. In each case we build blinky with mbed-os 5.15 for the K64F target on a MacBook Pro (2 core).
 
 ### Exported cmake build
 Building with the original CMakeLists.txt exported from mbed OS tools using ```mbed export -i eclipse_gcc_arm -m K64F```
@@ -140,6 +140,6 @@ Each subfolder in mbed-os that contains an mbed_lib.json file is a candidate 'li
 * Create a CMakeLists.txt file next to the existing mbed_lib.json files. This needs to contain references to the code within that 'library'. 
 * Add a ```target_include_directories()``` section in the new subfolder CmakeLists.txt file. The target (for now) is the top-level target name from the top-level CMakeLists.txt file. Add to it all of the 
 entries that appear in the ```INCLUDE_DIRECTORIES()``` section in the top-level. Remove these entries from the top level. For the moment all of these header directories are going to be labelled as ```PUBLIC```, but it is likely that many can be hidden in future.
-* Add a ```add_subdirectory()``` call in the top-level to call in the new subfolder. Order matters; putting add_subdirectory() call after the top-level ```INCLUDE_DIRECTORIES()``` allows the 'global' mbed_config.h to be found
+* Add a ```add_subdirectory()``` call in the top-level to call in the new subfolder. 
 
 Note that this should not alter the build in any way, other than to put the structure in place.

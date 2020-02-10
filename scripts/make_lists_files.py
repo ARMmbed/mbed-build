@@ -41,8 +41,12 @@ for library in libraries:
     # Expand the library content
     library.evaluate_content()
 
-    with open(os.path.join(library.root_dir, "CMakeLists.txt"), "w") as cmake_lists_file:
-        cmake_lists_file.write(t.render(program_name=program_name, library=library))
+    cml_file = os.path.join(library.root_dir, "CMakeLists.txt")
+    if os.path.exists(cml_file):
+        with open(cml_file, "w") as cmake_lists_file:
+            cmake_lists_file.write(t.render(program_name=program_name, library=library))
+    else:
+        print(f"Not overwriting {cml_file}")
 
 # Write the top level CMakeLists.txt file
 template_content = ""
