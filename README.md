@@ -6,9 +6,9 @@ Python package containing interfacing to toolchains and CMake preparation
 A folder containing example code to experiment with different CMake control configurations.
 
 ## Top-level structure
-For any CMake project there needs to be one ```CMakeLists.txt``` file at the root of the project tree. This containis information about the project and any rules required to generate the build commands for the final executable. Subordinate software component directories under the root may have their own ```CMakeLists.txt``` file to specify how they are constructed.
+For any CMake project there needs to be one ```CMakeLists.txt``` file at the root of the project tree. This contains information about the project and any rules required to generate the build commands for the final executable. Subordinate software component directories under the root may have their own ```CMakeLists.txt``` file to specify how they are constructed.
 
-In our case we intend to generate a significant amount of the top-level CMake file to handle different target and tolchain combinations. Subordinate library ```CMakeLists.txt``` files are expected to be managed by the code development teams directly.
+In our case we intend to generate a significant amount of the top-level CMake file to handle different target and toolchain combinations. Subordinate library ```CMakeLists.txt``` files are expected to be managed by the code development teams directly.
 
 The top-level ```CMakeLists.txt``` file must contain the following line as a minimum:
 
@@ -116,6 +116,13 @@ the top-level ```include_directories()``` allows the 'global' ```mbed_config.h``
 
 Note that this should not alter the build in any way, other than to put the structure in place.
 
+### Compiler flags
+Suggestion from [here](https://pabloariasal.github.io/2018/02/19/its-time-to-do-cmake-right/) is not to alter ```CMAKE_CXX_FLAGS``` directly. Instead 
+we should be using one of the following directives: 
+
+* ```target_compile_options()``` for options that are required to build the current target
+* ```target_compile_features()``` for options that are to be propagated to users of this target
+
 ## A gotcha
 Creating a separate .inc file for the generated content does not work as expected at the top level. The set() statements have a different effect and do not correctly pick up the cross compiler if they are in an included file. No idea why at the moment.
 
@@ -156,3 +163,4 @@ The version of the operating system for which CMake is to build. See [here](http
 # Resources
 * https://pabloariasal.github.io/2018/02/19/its-time-to-do-cmake-right/
 
+# Existing Export Function
