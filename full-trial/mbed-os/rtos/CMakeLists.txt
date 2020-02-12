@@ -1,13 +1,4 @@
-target_include_directories (full-trial
-    PUBLIC
-        source/TARGET_CORTEX/rtx5/RTX/Source
-        source/TARGET_CORTEX/rtx5/RTX/Include
-        source/TARGET_CORTEX/rtx5/RTX/Config
-        source/TARGET_CORTEX/rtx5/RTX
-        source/TARGET_CORTEX/rtx5/Include
-        source/TARGET_CORTEX/rtx5
-        source/TARGET_CORTEX/rtx4
-        source/TARGET_CORTEX
-        source
-        .
-)
+# This file will be regenerated if it does not already exist. The aim is simply to call in the corresponding
+# CMakeLists.inc file that is always regenerated.
+
+include(CMakeLists-gen.cmake)

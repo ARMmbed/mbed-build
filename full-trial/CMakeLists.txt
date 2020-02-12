@@ -1,0 +1,30 @@
+# This file will be regenerated if it does not already exist. The aim is simply to call in the corresponding
+# CMakeLists.inc file that is always regenerated.
+
+cmake_minimum_required(VERSION 3.9)
+
+set(CMAKE_SYSTEM_NAME Generic)
+#set(CMAKE_SYSTEM_PROCESSOR arm)
+set(CMAKE_CROSSCOMPILING TRUE)
+
+# force compiler settings
+set(CMAKE_C_COMPILER_WORKS TRUE)
+set(CMAKE_CXX_COMPILER_WORKS TRUE)
+
+# force cmake compilers
+set(CMAKE_ASM_COMPILER    "arm-none-eabi-gcc")
+set(CMAKE_C_COMPILER      "arm-none-eabi-gcc")
+set(CMAKE_CXX_COMPILER    "arm-none-eabi-g++")
+set(ELF2BIN               "arm-none-eabi-objcopy")
+
+# if the environment does not specify build type, set to Debug
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE "Debug"
+        CACHE STRING "Choose the type of build, options are: Debug Release RelWithDebInfo MinSizeRel."
+        FORCE)
+endif()
+
+# here starts the project
+project(full-trial C CXX ASM)
+
+include(CMakeLists-gen.cmake)

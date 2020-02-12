@@ -1,9 +1,4 @@
-target_include_directories (full-trial
-    PUBLIC
-        source/minimal-printf
-        source/TARGET_CORTEX_M
-        source
-        internal
-        cxxsupport
-        .
-)
+# This file will be regenerated if it does not already exist. The aim is simply to call in the corresponding
+# CMakeLists.inc file that is always regenerated.
+
+include(CMakeLists-gen.cmake)
