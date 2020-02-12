@@ -6,6 +6,9 @@ from jinja2 import Template
 root_dir = '../full-trial'
 program_name = "full-trial"
 
+OVERWRITE_TOP = True
+OVERWRITE_LIBS = True
+
 
 class Library:
     def __init__(self, root_dir):
@@ -33,7 +36,7 @@ for dir_name, sub_dir_list, file_list in os.walk(root_dir):
         libraries.append(Library(dir_name))
 
 # Read in the two templates...
-with open('library_cmakelists_inc.j2') as t_file:
+with open('library_cmakelists_cmake.j2') as t_file:
     inc_template = Template(t_file.read())
 
 with open('library_cmakelists_txt.j2') as t_file:
@@ -45,28 +48,28 @@ for library in libraries:
     library.evaluate_content()
 
     # The include file can be overwritten every time; it should not be edited
-    cml_file = os.path.join(library.root_dir, "CMakeLists.inc")
+    cml_file = os.path.join(library.root_dir, "CMakeLists-gen.cmake")
     with open(cml_file, "w") as cmake_lists_file:
         cmake_lists_file.write(inc_template.render(program_name=program_name, library=library))
 
     # This file is only written if it doesn't already exist
     cml_file = os.path.join(library.root_dir, "CMakeLists.txt")
-    if os.path.exists(cml_file):
+    if not OVERWRITE_LIBS and os.path.exists(cml_file):
         print(f"Not overwriting {cml_file}")
     else:
         with open(cml_file, "w") as cmake_lists_file:
             cmake_lists_file.write(txt_template.render(program_name=program_name, library=library))
 
 # Regenerate the top level CMakeLists.inc file every time
-with open(os.path.join(root_dir, "CMakeLists.inc"), "w") as top_level_cmake_lists_file:
-    with open('top_cmakelists_inc.j2') as t_file:
+with open(os.path.join(root_dir, "CMakeLists-gen.cmake"), "w") as top_level_cmake_lists_file:
+    with open('top_cmakelists_cmake.j2') as t_file:
         template = Template(t_file.read())
 
     top_level_cmake_lists_file.write(template.render(program_name=program_name))
 
-# Regenerate the top level CMakeLists.txt file if it doesn't already exist
-cml_file = os.path.join(library.root_dir, "CMakeLists.txt")
-if os.path.exists(cml_file):
+# Regenerate the top level CMakeLists.inc file if it doesn't already exist
+cml_file = os.path.join(root_dir, "CMakeLists.txt")
+if not OVERWRITE_TOP and os.path.exists(cml_file):
     print(f"Not overwriting {cml_file}")
 else:
     with open(cml_file, "w") as top_level_cmake_lists_file:

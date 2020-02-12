@@ -11,16 +11,16 @@ for t in $TARGETS
 do
   echo "Exporting for target $t..."
   mbed export -m $t -i cmake_gcc_arm
-  mv CMakeLists.txt example_cmakelists/CMakeLists.txt.$t
+  mv CMakeLists.inc example_cmakelists/CMakeLists.inc.$t
 done
 
 echo "All done"
 
 #mbed export -m NUCLEO_F413ZH -i cmake_gcc_arm
-#mv CMakeLists.txt CMakeLists.txt.NUCLEO_F413ZH
+#mv CMakeLists.inc CMakeLists.inc.NUCLEO_F413ZH
 #mbed export -m DISCO_H747I -i cmake_gcc_arm
-#mv CMakeLists.txt CMakeLists.txt.DISCO_H747I
+#mv CMakeLists.inc CMakeLists.inc.DISCO_H747I
 #mbed export -m CY8CKIT_062_BLE -i cmake_gcc_arm
-#mv CMakeLists.txt CMakeLists.txt.CY8CKIT_062_BLE
+#mv CMakeLists.inc CMakeLists.inc.CY8CKIT_062_BLE
 #mbed export -m K64F -i cmake_gcc_arm
-#mv CMakeLists.txt CMakeLists.txt.K64F
+#mv CMakeLists.inc CMakeLists.inc.K64F

@@ -116,12 +116,16 @@ the top-level ```include_directories()``` allows the 'global' ```mbed_config.h``
 
 Note that this should not alter the build in any way, other than to put the structure in place.
 
+## A gotcha
+Creating a separate .inc file for the generated content does not work as expected at the top level. The set() statements have a different effect and do not correctly pick up the cross compiler if they are in an included file. No idea why at the moment.
+
 ## Build times
 This is a comparison of build times for various configurations. In each case we build blinky with mbed-os 5.15 for the K64F target on a MacBook Pro (2 core). This is the baseline; opefully we might be able to improve on these times by breaking up mbed-os.
 
 ### Exported cmake build
 Building with the original CMakeLists.txt exported from mbed OS tools using ```mbed export -i eclipse_gcc_arm -m K64F```
 Build command: ```time cmake --build .```
+
 * real	5m40.395s
 * user	3m25.836s
 * sys	2m0.438s
@@ -129,13 +133,26 @@ Build command: ```time cmake --build .```
 This does not include the short 10 seconds or so that cmake requires to run the initial ```cmake ..```
 ### Original build system with gcc compiler toolchain
 Build command: ```time mbed compile -t GCC_ARM -m K64F```
+
 * real	2m12.723s
 * user	4m29.475s
 * sys	2m0.357s
 
 ### Original build system with armcc6 compiler toolchain
 Build command: ```time mbed compile -t ARMC6 -m K64F```
+
 * real	1m37.021s
 * user	3m55.278s
 * sys	1m2.505s
+
+# Flags
+### ```CMAKE_CROSSCOMPILING```
+Set to TRUE to indicate that CMake is cross compiling. Note that this need note be set now, since setting ```CMAKE_SYSTEM_NAME``` implies cross compilation. See [here](https://cmake.org/cmake/help/latest/variable/CMAKE_CROSSCOMPILING.html)
+### ```CMAKE_SYSTEM_NAME```
+Set to the name of the operating system for which CMake is building. If set, then also set ```CMAKE_SYSTEM_VERSION```. See [here](https://cmake.org/cmake/help/latest/variable/CMAKE_SYSTEM_NAME.html)
+### ```CMAKE_SYSTEM_VERSION```
+The version of the operating system for which CMake is to build. See [here](https://cmake.org/cmake/help/latest/variable/CMAKE_SYSTEM_VERSION.html)
+
+# Resources
+* https://pabloariasal.github.io/2018/02/19/its-time-to-do-cmake-right/
 
