@@ -2119,7 +2119,6 @@ add_library(mbed_os
   targets/TARGET_Freescale/USBPhyHw.h
   targets/TARGET_Freescale/USBPhy_Kinetis.cpp
   targets/TARGET_Freescale/mbed_rtx.h
-  ../mbed_config.h
   )
 
 target_include_directories(mbed_os
@@ -2413,6 +2412,6 @@ target_include_directories(mbed_os
   cmsis/TARGET_CORTEX_M
   cmsis
   .
-  ..
   )
 
+target_link_libraries(mbed_os PUBLIC gen_config)

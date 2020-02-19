@@ -27,7 +27,7 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 
 # here starts the project
-PROJECT(full-trial C CXX ASM)
+project(full-trial C CXX ASM)
 
 # uncomment below to have a verbose build process
 #set(CMAKE_VERBOSE_MAKEFILE ON)
@@ -108,11 +108,10 @@ add_definitions(
   )
 
 add_subdirectory(mbed-os)
+add_subdirectory(gen-config)
 
+# This is the main application
 add_executable(full-trial main.cpp)
-
-# include the definition for mbed_config.h
-target_include_directories(full-trial PUBLIC .)
 
 set_target_properties(full-trial PROPERTIES ENABLE_EXPORTS 1)
 

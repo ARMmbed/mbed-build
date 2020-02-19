@@ -15,3 +15,9 @@
 * Add a new add_executable(full-trial main.cpp) to th top level makefile to build the main exdcutable.
 * Add mbed_os to the target_link_libraries() directive in the top level. This registers the mbed_os library as a dependency on the full-trial target.
 
+# Separate mbed_config.h
+The above information requires you to include a reference to ../mbed_config.h in mbed-os. This is not right. To
+fix it, move mbed_config.h into a separate directory and make this into a library by adding a new CMakeLists.txt
+file in that directory. Process it by adding add_subdirectory() to the top level. Include the new
+library in the target_link_libraries() section in mbed-os cmake. Now you can remove all references to
+the mbed_config.h file in the cmake files, and the thing will build mbed OS as a library and link.
