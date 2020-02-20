@@ -21,7 +21,7 @@ set(ELF2BIN               "arm-none-eabi-objcopy")
 
 # if the environment does not specify build type, set to Debug
 if(NOT CMAKE_BUILD_TYPE)
-  set(CMAKE_BUILD_TYPE "Debug"
+  set(CMAKE_BUILD_TYPE "RelWithDebInfo"
         CACHE STRING "Choose the type of build, options are: Debug Release RelWithDebInfo MinSizeRel."
         FORCE)
 endif()
@@ -125,8 +125,8 @@ add_custom_command(TARGET full-trial PRE_LINK
                    )
 
 add_custom_command(TARGET full-trial POST_BUILD
-                   COMMAND ${ELF2BIN} -O ihex $<TARGET_FILE:full-trial> $<TARGET_FILE:full-trial>.hex
-                   COMMAND ${CMAKE_COMMAND} -E echo "-- built: $<TARGET_FILE:full-trial>.hex"
+                   COMMAND ${ELF2BIN} -O binary $<TARGET_FILE:full-trial> $<TARGET_FILE:full-trial>.bin
+                   COMMAND ${CMAKE_COMMAND} -E echo "-- built: $<TARGET_FILE:full-trial>.bin"
                   )
 
 
