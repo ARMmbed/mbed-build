@@ -1,4 +1,5 @@
-# executable full-trial
+# Define the mbed_os target library and the source files from which it is constructed.
+# TODO: Check whether the .h files should be included in this list - they are not sources.
 add_library(mbed_os
   cmsis/RTE_Components.h
   cmsis/TARGET_CORTEX_M/arm_math.h
@@ -2411,7 +2412,9 @@ target_include_directories(mbed_os
   components
   cmsis/TARGET_CORTEX_M
   cmsis
-  .
+  .         # This is only really needed for mbed.h
   )
 
+# Mbed OS depends on the configuration data that is in the gen_config target. This is
+# included in from the top-level CMakeLists.txt file
 target_link_libraries(mbed_os PUBLIC gen_config)

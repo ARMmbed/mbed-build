@@ -2,6 +2,7 @@
 # If you would like to add your own targets, create a
 # project.cmake file locally in your project directory.
 
+# TODO: Consider using a later version of CMake here. This is quite old now.
 cmake_minimum_required(VERSION 3.9)
 
 set(CMAKE_SYSTEM_NAME Generic)
@@ -34,12 +35,16 @@ project(full-trial C CXX ASM)
 
 set(LD_SYS_LIBS "-Wl,--start-group -lstdc++ -lsupc++ -lm -lc -lgcc -lnosys  -Wl,--end-group")
 
+# TODO: Advice here is NOT to fiddle with the **_FLAGS variables directly; there is support in CMake for handling this that is
+# TODO: likely to be more toolchain-independent
+
 set(CMAKE_C_FLAGS "-std=gnu11 -Wall -Wextra -Wno-unused-parameter -Wno-missing-field-initializers -fmessage-length=0 -fno-exceptions -ffunction-sections -fdata-sections -funsigned-char -MMD -fno-delete-null-pointer-checks -fomit-frame-pointer -Og -g3 -DMBED_DEBUG -DMBED_TRAP_ERRORS_ENABLED=1 -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=softfp -DMBED_ROM_START=0x0 -DMBED_ROM_SIZE=0x100000 -DMBED_RAM1_START=0x1fff0000 -DMBED_RAM1_SIZE=0x10000 -DMBED_RAM_START=0x20000000 -DMBED_RAM_SIZE=0x30000 -include mbed_config.h")
 set(CMAKE_CXX_FLAGS "-std=gnu++14 -fno-rtti -Wvla -Wall -Wextra -Wno-unused-parameter -Wno-missing-field-initializers -fmessage-length=0 -fno-exceptions -ffunction-sections -fdata-sections -funsigned-char -MMD -fno-delete-null-pointer-checks -fomit-frame-pointer -Og -g3 -DMBED_DEBUG -DMBED_TRAP_ERRORS_ENABLED=1 -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=softfp -DMBED_ROM_START=0x0 -DMBED_ROM_SIZE=0x100000 -DMBED_RAM1_START=0x1fff0000 -DMBED_RAM1_SIZE=0x10000 -DMBED_RAM_START=0x20000000 -DMBED_RAM_SIZE=0x30000  -include mbed_config.h")
 set(CMAKE_ASM_FLAGS "-x assembler-with-cpp -Wall -Wextra -Wno-unused-parameter -Wno-missing-field-initializers -fmessage-length=0 -fno-exceptions -ffunction-sections -fdata-sections -funsigned-char -MMD -fno-delete-null-pointer-checks -fomit-frame-pointer -Og -g3 -DMBED_DEBUG -DMBED_TRAP_ERRORS_ENABLED=1 -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=softfp  -include mbed_config.h")
 set(CMAKE_CXX_LINK_FLAGS "-Wl,--gc-sections -Wl,--wrap,main -Wl,--wrap,__malloc_r -Wl,--wrap,__free_r -Wl,--wrap,__realloc_r -Wl,--wrap,__memalign_r -Wl,--wrap,__calloc_r -Wl,--wrap,exit -Wl,--wrap,atexit -Wl,-n -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=softfp -DMBED_ROM_START=0x0 -DMBED_ROM_SIZE=0x100000 -DMBED_RAM1_START=0x1fff0000 -DMBED_RAM1_SIZE=0x10000 -DMBED_RAM_START=0x20000000 -DMBED_RAM_SIZE=0x30000 -DMBED_BOOT_STACK_SIZE=1024 -DXIP_ENABLE=0 ")
 set(CMAKE_CXX_LINK_FLAGS "${CMAKE_CXX_LINK_FLAGS} ${LD_SYS_LIBS} -T ${CMAKE_BINARY_DIR}/full-trial_pp.link_script.ld")
 
+# TODO: This lot has to be generated from config, so might be better in the config target definition. I've not experimented with that yet.
 add_definitions(
   -DARM_MATH_CM4
   -DCOMPONENT_FLASHIAP=1
@@ -107,15 +112,19 @@ add_definitions(
   -D__MBED__=1
   )
 
+# Reference the two target libraries and process their CMakeLists.txt files...
 add_subdirectory(mbed-os)
 add_subdirectory(gen-config)
 
-# This is the main application
+# This is the main application.
+# TODO: It might be better to separate this into a different library if it becomes complex.
 add_executable(full-trial main.cpp)
 
 set_target_properties(full-trial PROPERTIES ENABLE_EXPORTS 1)
 
 # add syslibs dependencies to create the correct linker order
+# Note how the mbed_os target is included here
+
 target_link_libraries(full-trial mbed_os -lstdc++ -lsupc++ -lm -lc -lgcc -lnosys)
 
 add_custom_command(TARGET full-trial PRE_LINK
