@@ -164,3 +164,13 @@ The version of the operating system for which CMake is to build. See [here](http
 * https://pabloariasal.github.io/2018/02/19/its-time-to-do-cmake-right/
 
 # Existing Export Function
+
+## Problems with existing export template
+
+1. By default the export profile is set to be `debug`. This causes problems running blinky (or any app that uses any waits) due to a problem with this profile.
+    Apparently the options are `Debug Release RelWithDebInfo MinSizeRel` though what the differences between those are I don't yet understand. 
+    Have changed this in the hand-crafted cmake file to `RelWithDebInfo` and Blinky builds as normal. 
+    
+2. The current CMake_gcc exporter has a post build process that converts the elf file to a hex file. I assume this is because the format CLion is expecting is hex. 
+    In order to flash to a board though we need a bin file. We can convert to a bin file instead of hex using the same tool in the compiler, I have updated this in 
+    the handcrafted CMake file.
