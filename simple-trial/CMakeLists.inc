@@ -10,6 +10,10 @@ if(NOT DEFINED EXCLUDE_LIB_BLIB)
     target_link_libraries (cmakeTrial LINK_PUBLIC blib)
 endif()
 
+add_subdirectory (c-lib_with_subdirs)
+target_link_libraries (cmakeTrial LINK_PUBLIC clib)
+
+
 # This is how a compiler #define value is specified.
 add_compile_definitions(CONFIG_PARAM_1="config_param1")
 

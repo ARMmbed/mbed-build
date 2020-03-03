@@ -7,4 +7,6 @@ verify_ssl = true
 jinja2 = "*"
 
 [packages]
-jinja2 = "*"
+
+[requires]
+python_version = "3.7"

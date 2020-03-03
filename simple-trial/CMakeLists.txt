@@ -3,4 +3,4 @@ project (CMAKE_TRIAL)
 
 # set(EXCLUDE_LIB_ALIB TRUE)
 
-include(./CmakeLists.inc)
+include(./CMakeLists.inc)
