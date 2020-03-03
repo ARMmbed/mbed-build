@@ -1,0 +1,14 @@
+# Mbed OS CMake library definition
+
+add_library({{ mbed_library_name }}
+  STATIC
+{%- for source_file in source_files %}
+    {{ source_file }}
+{%- endfor %}
+)
+
+target_include_directories({{ mbed_library_name }} PUBLIC
+{%- for header_directory in header_directories %}
+    {{ header_directory }}
+{%- endfor %}
+)
