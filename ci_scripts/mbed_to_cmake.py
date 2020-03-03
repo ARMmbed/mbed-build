@@ -14,6 +14,8 @@ import jinja2
 
 logger = logging.getLogger(__name__)
 
+EXCLUDE_DIRS = ["tools", "BUILD"]
+
 jinja2_env = jinja2.Environment(
     loader=jinja2.PackageLoader('ci_scripts.mbed_to_cmake', 'templates'),
     autoescape=jinja2.select_autoescape(['html', 'xml'])
@@ -77,7 +79,12 @@ class BuildCMakeLists:
 
     def replace_mbed_lib_files(self):
         print(self._input_dir)
+        exclude_dirs = [os.path.join(self._input_dir, dir) for dir in EXCLUDE_DIRS]
         for directory, sub_directories, file_list in os.walk(self._input_dir):
+            if directory in exclude_dirs:
+                print(f"EXCLUDE {directory}")
+                continue
+
             for file_name in file_list:
                 if file_name.lower() == "mbed_lib.json":
                     self._generate_cmake_list_file(directory, file_name)
