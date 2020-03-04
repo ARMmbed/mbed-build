@@ -1,0 +1,66 @@
+add_library(nfc
+  acore/source/ac_buffer.c
+  acore/source/ac_buffer_builder.c
+  acore/source/ac_buffer_reader.c
+  acore/source/ac_stream.c
+  source/controllers/PN512Driver.cpp
+  source/controllers/PN512SPITransportDriver.cpp
+  source/controllers/PN512TransportDriver.cpp
+  source/nfc/NFCController.cpp
+  source/nfc/NFCControllerDriver.cpp
+  source/nfc/NFCEEPROM.cpp
+  source/nfc/NFCEEPROMDriver.cpp
+  source/nfc/NFCNDEFCapable.cpp
+  source/nfc/NFCRemoteEndpoint.cpp
+  source/nfc/NFCRemoteInitiator.cpp
+  source/nfc/NFCTarget.cpp
+  source/nfc/Type4RemoteInitiator.cpp
+  source/nfc/ndef/MessageBuilder.cpp
+  source/nfc/ndef/MessageParser.cpp
+  source/nfc/ndef/RecordParser.cpp
+  source/nfc/ndef/common/Mime.cpp
+  source/nfc/ndef/common/SimpleMessageParser.cpp
+  source/nfc/ndef/common/Text.cpp
+  source/nfc/ndef/common/URI.cpp
+  source/nfc/ndef/common/util.cpp
+  stack/ndef/ndef.c
+  stack/platform/nfc_scheduler.c
+  stack/platform/nfc_transport.c
+  stack/tech/iso7816/iso7816.c
+  stack/tech/iso7816/iso7816_app.c
+  stack/tech/isodep/isodep_target.c
+  stack/tech/type4/type4_target.c
+  stack/transceiver/pn512/pn512.c
+  stack/transceiver/pn512/pn512_cmd.c
+  stack/transceiver/pn512/pn512_hw.c
+  stack/transceiver/pn512/pn512_irq.c
+  stack/transceiver/pn512/pn512_poll.c
+  stack/transceiver/pn512/pn512_registers.c
+  stack/transceiver/pn512/pn512_rf.c
+  stack/transceiver/pn512/pn512_timer.c
+  stack/transceiver/pn512/pn512_transceive.c
+  stack/transceiver/transceiver.c
+)
+
+target_link_libraries(nfc platform)
+
+target_include_directories(nfc
+    PUBLIC
+        .
+        stack/transceiver/pn512
+        stack/transceiver
+        stack/tech/type4
+        stack/tech/isodep
+        stack/tech/iso7816
+        stack/tech
+        stack/platform
+        stack/ndef
+        stack
+        nfc/ndef/common
+        nfc/ndef
+        nfc
+        controllers
+        acore/acore
+        acore
+        ..
+)

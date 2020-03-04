@@ -1,0 +1,76 @@
+add_library(frameworks
+  TARGET_PSA/pal/pal_attestation_intf.c
+  TARGET_PSA/pal/pal_client_api_empty_intf.c
+  TARGET_PSA/pal/pal_client_api_intf.c
+  TARGET_PSA/pal/pal_internal_trusted_storage_intf.c
+  TARGET_PSA/pal/pal_mbed_os_intf.cpp
+  TARGET_PSA/pal/pal_mbed_os_intf.h
+  TARGET_PSA/pal/pal_protected_storage_intf.c
+  TARGET_PSA/pal_attestation_eat.c
+  TARGET_PSA/val_attestation.c
+  TARGET_PSA/val_greentea.cpp
+  TARGET_PSA/val_interfaces.c
+  TARGET_PSA/val_internal_trusted_storage.c
+  TARGET_PSA/val_protected_storage.c
+  greentea-client/source/greentea_metrics.cpp
+  greentea-client/source/greentea_serial.cpp
+  greentea-client/source/greentea_test_env.cpp
+  mbed-client-cli/source/ns_cmdline.c
+  mbed-client-randlib/source/randLIB.c
+  mbed-coap/source/sn_coap_builder.c
+  mbed-coap/source/sn_coap_header_check.c
+  mbed-coap/source/sn_coap_parser.c
+  mbed-coap/source/sn_coap_protocol.c
+  nanostack-libservice/source/IPv6_fcf_lib/ip_fsc.c
+  nanostack-libservice/source/libBits/common_functions.c
+  nanostack-libservice/source/libList/ns_list.c
+  nanostack-libservice/source/libip4string/ip4tos.c
+  nanostack-libservice/source/libip4string/stoip4.c
+  nanostack-libservice/source/libip6string/ip6tos.c
+  nanostack-libservice/source/libip6string/stoip6.c
+  nanostack-libservice/source/nsdynmemLIB/nsdynmemLIB.c
+  nanostack-libservice/source/nvmHelper/ns_nvm_helper.c
+  unity/source/unity.c
+  utest/mbed-utest-shim.cpp
+  utest/source/unity_handler.cpp
+  utest/source/utest_case.cpp
+  utest/source/utest_default_handlers.cpp
+  utest/source/utest_greentea_handlers.cpp
+  utest/source/utest_harness.cpp
+  utest/source/utest_shim.cpp
+  utest/source/utest_stack_trace.cpp
+  utest/source/utest_types.cpp
+  mbed-trace/source/mbed_trace.c
+)
+
+target_link_libraries(frameworks components)
+target_link_libraries(frameworks storage)
+
+target_include_directories(frameworks
+    PUBLIC
+        .
+        utest/utest
+        utest
+        unity/unity
+        unity
+        nanostack-libservice/mbed-client-libservice/platform
+        nanostack-libservice/mbed-client-libservice
+        nanostack-libservice
+        mbed-trace/mbed-trace
+        mbed-trace/source
+        mbed-trace
+        mbed-coap/source/include
+        mbed-coap/source
+        mbed-coap/mbed-coap
+        mbed-coap
+        mbed-client-randlib/mbed-client-randlib/platform
+        mbed-client-randlib/mbed-client-randlib
+        mbed-client-randlib
+        mbed-client-cli/mbed-client-cli
+        mbed-client-cli
+        greentea-client/greentea-client
+        greentea-client
+        TARGET_PSA/pal
+        TARGET_PSA
+        frameworks
+)

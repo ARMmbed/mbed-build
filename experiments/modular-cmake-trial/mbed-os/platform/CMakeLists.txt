@@ -1,0 +1,65 @@
+add_library(platform
+  cxxsupport/mstd_algorithm
+  cxxsupport/mstd_atomic
+  cxxsupport/mstd_cstddef
+  cxxsupport/mstd_functional
+  cxxsupport/mstd_iterator
+  cxxsupport/mstd_memory
+  cxxsupport/mstd_mutex
+  cxxsupport/mstd_mutex.cpp
+  cxxsupport/mstd_tuple
+  cxxsupport/mstd_type_traits
+  cxxsupport/mstd_utility
+  source/ATCmdParser.cpp
+  source/CThunkBase.cpp
+  source/CallChain.cpp
+  source/CriticalSectionLock.cpp
+  source/DeepSleepLock.cpp
+  source/FileBase.cpp
+  source/FileHandle.cpp
+  source/FilePath.cpp
+  source/FileSystemHandle.cpp
+  source/LocalFileSystem.cpp
+  source/Stream.cpp
+  source/SysTimer.cpp
+  source/TARGET_CORTEX_M/TOOLCHAIN_GCC/except.S
+  source/TARGET_CORTEX_M/mbed_fault_handler.c
+  source/mbed_alloc_wrappers.cpp
+  source/mbed_application.c
+  source/mbed_assert.c
+  source/mbed_atomic_impl.c
+  source/mbed_board.c
+  source/mbed_critical.c
+  source/mbed_error.c
+  source/mbed_error_hist.c
+  source/mbed_interface.c
+  source/mbed_mem_trace.cpp
+  source/mbed_mktime.c
+  source/mbed_mpu_mgmt.c
+  source/mbed_os_timer.cpp
+  source/mbed_poll.cpp
+  source/mbed_power_mgmt.c
+  source/mbed_retarget.cpp
+  source/mbed_rtc_time.cpp
+  source/mbed_sdk_boot.c
+  source/mbed_semihost_api.c
+  source/mbed_stats.c
+  source/mbed_thread.cpp
+  source/mbed_wait_api_no_rtos.c
+  source/mbed_wait_api_rtos.cpp
+  source/minimal-printf/mbed_printf_armlink_overrides.c
+  source/minimal-printf/mbed_printf_implementation.c
+  source/minimal-printf/mbed_printf_wrapper.c
+)
+
+target_link_libraries(platform rtos)
+target_include_directories (platform
+    PUBLIC
+        source/minimal-printf
+        source/TARGET_CORTEX_M
+        source
+        internal
+        cxxsupport
+        .
+        .. # This is bad and we shouldn't have to do this - the imports should be fixed to the correct levels as we add CMake files
+)
