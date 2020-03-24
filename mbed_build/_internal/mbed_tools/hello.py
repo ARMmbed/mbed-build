@@ -7,6 +7,6 @@ import click
 
 
 @click.command()
-def hello():
+def hello() -> None:
     """Prints Hello."""
     click.echo("Hello.")
