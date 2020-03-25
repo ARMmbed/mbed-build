@@ -3,8 +3,10 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 import pathlib
-from pyfakefs.fake_filesystem_unittest import Patcher
 from unittest import TestCase, mock
+
+from pyfakefs.fake_filesystem_unittest import Patcher
+
 from mbed_build._internal.cmake_renderer import _render_cmakelists_template, write_cmakelists_file
 
 

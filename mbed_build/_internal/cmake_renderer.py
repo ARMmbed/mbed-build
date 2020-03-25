@@ -1,5 +1,6 @@
-import jinja2
 import pathlib
+
+import jinja2
 
 TEMPLATES_DIRECTORY = pathlib.Path("_internal", "templates")
 TEMPLATE_NAME = "CMakeLists.tmpl"
