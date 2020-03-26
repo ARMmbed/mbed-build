@@ -10,19 +10,6 @@ TEMPLATES_DIRECTORY = pathlib.Path("_internal", "templates")
 TEMPLATE_NAME = "CMakeLists.tmpl"
 
 
-def _render_cmakelists_template() -> str:
-    """Loads the CMakeLists.txt file template and renders it with the correct details.
-
-    Returns:
-        The contents of the rendered CMakeLists.txt template.
-    """
-
-    env = jinja2.Environment(loader=jinja2.PackageLoader("mbed_build", str(TEMPLATES_DIRECTORY)),)
-    template = env.get_template(TEMPLATE_NAME)
-    context = {"hello": "Hello", "world": "World"}
-    return template.render(context)
-
-
 def write_cmakelists_file(output_directory: str) -> None:
     """Writes out the CMakeLists.txt file to the output directory.
 
@@ -41,3 +28,16 @@ def write_cmakelists_file(output_directory: str) -> None:
 
     output_file = export_directory.joinpath("CMakeLists.txt")
     output_file.write_text(_render_cmakelists_template())
+
+
+def _render_cmakelists_template() -> str:
+    """Loads the CMakeLists.txt file template and renders it with the correct details.
+
+    Returns:
+        The contents of the rendered CMakeLists.txt template.
+    """
+
+    env = jinja2.Environment(loader=jinja2.PackageLoader("mbed_build", str(TEMPLATES_DIRECTORY)),)
+    template = env.get_template(TEMPLATE_NAME)
+    context = {"hello": "Hello", "world": "World"}
+    return template.render(context)
