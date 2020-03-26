@@ -13,6 +13,7 @@ flake8-copyright = "*"
 mypy = ">=0.500"
 pytest = "*"
 pytest-cov = "*"
+pyfakefs = "*"
 wheel = "*"
 mbed-build = {editable = true, path = "."}
 mbed-tools-ci-scripts = "*"
