@@ -13,12 +13,10 @@ from mbed_build._internal import templates
 
 
 class TestExport(TestCase):
-    templates_directory = os.path.dirname(templates.__file__)
-
     def test_export(self):
         # This is needed to have access to the templates directory in Patcher filesystem.
         self.setUpPyfakefs()
-        self.fs.add_real_directory(self.templates_directory)
+        self.fs.add_real_directory(os.path.dirname(templates.__file__))
 
         output_dir = "some_directory"
         mbed_target = "K64F"
