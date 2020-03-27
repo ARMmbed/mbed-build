@@ -5,8 +5,7 @@
 import pathlib
 from typing import List
 
-from mbed_build._internal.cmake_file_writer import write_cmakelists_file
-from mbed_build._internal.cmake_renderer import render_cmakelists_template
+from mbed_build._internal.cmake_file import render_cmakelists_template, write_cmakelists_file
 from mbed_build.exceptions import NotValidExportOutputDirectory
 
 

@@ -7,7 +7,20 @@ from unittest import TestCase
 
 from pyfakefs.fake_filesystem_unittest import Patcher
 
-from mbed_build._internal.cmake_file_writer import write_cmakelists_file
+from mbed_build._internal.cmake_file import render_cmakelists_template, \
+    write_cmakelists_file
+
+
+class TestRendersCMakeListsFile(TestCase):
+    def test_returns_rendered_content(self):
+        target_labels = ["foo", "bar"]
+        toolchain_labels = ["baz"]
+        result = render_cmakelists_template(target_labels, toolchain_labels)
+
+        for label in target_labels:
+            self.assertIn(label, result)
+        for label in toolchain_labels:
+            self.assertIn(label, result)
 
 
 class TestWriteCMakeListsFile(TestCase):
