@@ -1,3 +1,5 @@
+include mbed_build/_internal/templates/*.tmpl
+
 graft mbed_build
 global-exclude *.py[cod] __pycache__ *.so
 global-include *.spdx
