@@ -1,6 +1,7 @@
-ToDo: use the correct definitions in the current versions of dev_cmake branches
-Not currently representative of final output
-
+{#
+    ToDo: use the correct definitions in the current versions of dev_cmake branches
+    Not currently representative of final output
+#}
 set_property(GLOBAL PROPERTY MBED_OS_TARGET_LABELS {% for label in target_labels %}{{label}};{% endfor %})
 
 set_property(GLOBAL PROPERTY MBED_OS_TOOLCHAIN_LABELS {% for label in toolchain_labels %}{{label}};{% endfor %})
