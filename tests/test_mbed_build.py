@@ -7,7 +7,7 @@ from unittest import TestCase, mock
 
 from pyfakefs.fake_filesystem_unittest import Patcher
 
-from mbed_build.exceptions import NotValidExportOutputDirectory
+from mbed_build.exceptions import InvalidExportOutputDirectory
 from mbed_build.mbed_build import generate_cmakelists_file, export_cmakelists_file
 
 
@@ -34,7 +34,7 @@ class TestExportCMakeListsFile(TestCase):
             fake_dir.mkdir(parents=True, exist_ok=True)
             bad_export_dir = pathlib.Path(fake_dir, "some_file.txt")
             bad_export_dir.touch()
-            with self.assertRaises(NotValidExportOutputDirectory):
+            with self.assertRaises(InvalidExportOutputDirectory):
                 export_cmakelists_file(bad_export_dir, "some contents")
 
     @mock.patch("mbed_build.mbed_build.write_cmakelists_file")

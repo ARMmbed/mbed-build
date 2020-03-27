@@ -6,7 +6,7 @@ import pathlib
 from typing import List
 
 from mbed_build._internal.cmake_file import render_cmakelists_template, write_cmakelists_file
-from mbed_build.exceptions import NotValidExportOutputDirectory
+from mbed_build.exceptions import InvalidExportOutputDirectory
 
 
 def generate_cmakelists_file(target_name: str, toolchain_name: str) -> str:
@@ -30,9 +30,12 @@ def export_cmakelists_file(output_directory: pathlib.Path, file_contents: str) -
     Args:
         output_directory: the destination directory for the exported top-level CMakeLists.txt file
         file_contents: the contents of the top-level CMakeLists.txt file
+
+    Raises:
+        InvalidExportOutputDirectory: if provided output directory is invalid
     """
     if output_directory.is_file():
-        raise NotValidExportOutputDirectory("Output directory cannot be a path to a file.")
+        raise InvalidExportOutputDirectory("Output directory cannot be a path to a file.")
     write_cmakelists_file(output_directory, file_contents)
 
 

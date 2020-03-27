@@ -39,7 +39,7 @@ def export(output_directory: str, toolchain: str, mbed_target: str) -> None:
         mbed_target: the build target you are wanting to run your app (eg. K64F)
 
     Raises:
-        NotValidExportOutputDirectory: it's not possible to export to the output directory provided
+        InvalidExportOutputDirectory: it's not possible to export to the output directory provided
     """
     cmake_file_contents = generate_cmakelists_file(mbed_target, toolchain)
     write_cmakelists_file(pathlib.Path(output_directory), cmake_file_contents)

@@ -10,5 +10,5 @@ class MbedBuildError(ToolsError):
     """Base public exception for the mbed-devices package."""
 
 
-class NotValidExportOutputDirectory(MbedBuildError):
-    """The provided output directory is not valid."""
+class InvalidExportOutputDirectory(MbedBuildError):
+    """It is not possible to export to the provided output directory."""
