@@ -16,7 +16,7 @@ class TestExport(TestCase):
     templates_directory = os.path.dirname(templates.__file__)
 
     def test_export(self):
-        """This is needed to have access to the templates directory in Patcher filesystem."""
+        # This is needed to have access to the templates directory in Patcher filesystem.
         self.setUpPyfakefs()
         self.fs.add_real_directory(self.templates_directory)
 
