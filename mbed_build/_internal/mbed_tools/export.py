@@ -21,7 +21,7 @@ from mbed_build.mbed_build import generate_cmakelists_file, write_cmakelists_fil
 @click.option(
     "-t",
     "--toolchain",
-    type=click.Choice(["ARM5", "ARM6", "GCC", "IAR"]),
+    type=click.Choice(["ARM6", "GCC"]),
     required=True,
     help="The toolchain you are using to build your app.",
 )
