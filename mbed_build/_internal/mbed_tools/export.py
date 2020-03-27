@@ -13,7 +13,7 @@ from mbed_build.mbed_build import generate_cmakelists_file, write_cmakelists_fil
 @click.command()
 @click.option(
     "-o",
-    "--output_directory",
+    "--output-directory",
     type=click.Path(),
     required=True,
     help="Destination for exported top-level CMakeLists.txt file.",
