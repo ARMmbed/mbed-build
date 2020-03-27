@@ -14,7 +14,7 @@ TEMPLATE_NAME = "CMakeLists.tmpl"
 def render_cmakelists_template(target_labels: List[str], toolchain_labels: List[str]) -> str:
     """Loads the CMakeLists.txt file template and renders it with the correct details.
 
-    Arguments:
+    Args:
         target_labels: the target-specific magic mbed-os directory names that need to be included in the build
         toolchain_labels: the toolchain-specific magic mbed-os directory names that need to be included in the build
     Returns:
