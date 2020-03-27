@@ -15,12 +15,11 @@ from mbed_build._internal import templates
 class TestExport(TestCase):
     templates_directory = os.path.dirname(templates.__file__)
 
-    def setUp(self):
+    def test_export(self):
         """This is needed to have access to the templates directory in Patcher filesystem."""
         self.setUpPyfakefs()
         self.fs.add_real_directory(self.templates_directory)
 
-    def test_export(self):
         output_dir = "some_directory"
         mbed_target = "K64F"
         mbed_toolchain = "GCC"
