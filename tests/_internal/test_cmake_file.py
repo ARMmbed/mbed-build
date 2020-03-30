@@ -7,8 +7,7 @@ from unittest import TestCase
 
 from pyfakefs.fake_filesystem_unittest import Patcher
 
-from mbed_build._internal.cmake_file import render_cmakelists_template, \
-    write_cmakelists_file
+from mbed_build._internal.cmake_file import render_cmakelists_template, write_cmakelists_file
 
 
 class TestRendersCMakeListsFile(TestCase):
