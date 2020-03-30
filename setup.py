@@ -38,7 +38,7 @@ setup(
     description="Core Build Tools for Mbed OS",
     keywords="Arm Mbed OS MbedOS Arm Mbed OS MbedOS build compile link cmake",
     include_package_data=True,
-    install_requires=["python-dotenv", "Click==7.0", "Jinja2"],
+    install_requires=["python-dotenv", "Click==7.0", "Jinja2", "mbed-targets", "mbed-tools-lib"],
     license="Apache 2.0",
     long_description_content_type="text/markdown",
     long_description=long_description,
