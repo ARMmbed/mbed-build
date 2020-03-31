@@ -4,10 +4,7 @@
 #
 from pathlib import Path
 from fnmatch import fnmatch
-from typing import Callable, Iterable
-
-
-ExcludeCallable = Callable[[Path], bool]
+from typing import Iterable
 
 
 def find_files(file_name: str, directory: str) -> Iterable[Path]:
