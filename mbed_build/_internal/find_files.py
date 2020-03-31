@@ -18,10 +18,10 @@ def exclude_using_mbedignore(mbedignore_file: Path, files: Iterable[Path]) -> It
     TODO: improve docs - mention that rules are rooted in mbedignore and use unix file matching
     """
     patterns = _build_mbedignore_patterns(mbedignore_file)
-    return (file for file in files if not _matches_mbedignore_patterns(file, patterns))
+    return [file for file in files if not _matches_mbedignore_patterns(file, patterns)]
 
 
-def exclude_not_labelled(label_type: str, label_values: Iterable[str], files: Iterable[Path]) -> Iterable[Path]:
+def exclude_not_labelled(label_type: str, allowed_label_values: Iterable[str], files: Iterable[Path]) -> Iterable[Path]:
     """Filters out given Path objects using target labelling rules.
 
     We distinguish three label types: TARGET, COMPONENT, FEATURE.
@@ -38,7 +38,14 @@ def exclude_not_labelled(label_type: str, label_values: Iterable[str], files: It
        ... ])
        >>> print(filtered)
     """
-    return (file for file in files if not _is_labelled_for_different_value(file, label_type, label_values))
+
+    result = []
+    allowed_values = set(allowed_label_values)
+    for file in files:
+        label_values = set(_extract_label_values(file, label_type))
+        if label_values.issubset(allowed_values):
+            result.append(file)
+    return result
 
 
 def _build_mbedignore_patterns(mbedignore_file: Path) -> Iterable[str]:
@@ -54,7 +61,9 @@ def _matches_mbedignore_patterns(file: Path, patterns: Iterable[str]) -> bool:
     return any(fnmatch(stringified, pattern) for pattern in patterns)
 
 
-def _is_labelled_for_different_value(file: Path, label_type: str, label_values: Iterable[str]) -> bool:
-    allowed_labels = set(f"{label_type}_{label_value}" for label_value in label_values)
-    paths_parts_with_label = set(part for part in file.parts if label_type in part)
-    return paths_parts_with_label.issubset(allowed_labels)
+def _is_labelled(file: Path, label_type: str) -> bool:
+    return f"{label_type}_" in str(file)
+
+
+def _extract_label_values(file: Path, label_type: str) -> Iterable[str]:
+    return (part for part in file.parts if label_type in part)

@@ -70,16 +70,19 @@ class TestExcludeNotLabelled(TestCase):
         paths = [
             Path("mbed-os", "TARGET_BAR", "some_file.c"),
             Path("mbed-os", "COMPONENT_X", "header.h"),
-            Path("mbed-os", "COMPONENT_X", "header.h"),
+            Path("mbed-os", "COMPONENT_X", "TARGET_BAZ", "some_file.c"),
             Path("README.md"),
         ]
 
         excluded_paths = [
             Path("mbed-os", "TARGET_FOO", "some_file.c"),
             Path("mbed-os", "TARGET_FOO", "nested", "other_file.c"),
+            Path("mbed-os", "TARGET_BAR", "TARGET_FOO", "other_file.c"),
         ]
 
-        subject = exclude_not_labelled(label_type="TARGET", label_values=["FOO"], files=(paths + excluded_paths))
+        subject = exclude_not_labelled(
+            label_type="TARGET", allowed_label_values=["BAR", "BAZ"], files=(paths + excluded_paths)
+        )
 
         for path in subject:
             self.assertIn(path, paths, f"{path} should be excluded")
