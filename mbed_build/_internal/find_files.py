@@ -22,22 +22,23 @@ def find_files(file_name: str, directory: str, exclude: Iterable[ExcludeCallable
     """
     found_files = Path(directory).rglob(file_name)
 
-    def is_excluded(file):
+    def is_excluded(file: Path) -> bool:
         return any(fn(file) for fn in exclude)
 
     return (file for file in found_files if not is_excluded(file))
 
 
-def exclude_listed_in_mbedignore(path_to_ignore_file: Path) -> bool:
+def exclude_listed_in_mbedignore(mbedignore_file: Path) -> ExcludeCallable:
     """Builds a callable which filters out given Path objects based on `.mbedignore` rules."""
-    lines = path_to_ignore_file.read_text().splitlines()
+    lines = mbedignore_file.read_text().splitlines()
     pattern_lines = (line for line in lines if line.strip() and not line.startswith("#"))
-    ignore_root = path_to_ignore_file.parent
+    ignore_root = mbedignore_file.parent
 
     patterns = tuple(str(ignore_root.joinpath(pattern)) for pattern in pattern_lines)
 
-    def is_excluded(file: Path):
-        is_ignored = any(fnmatch(file, pattern) for pattern in patterns)
+    def is_excluded(file: Path) -> bool:
+        stringified = str(file)
+        is_ignored = any(fnmatch(stringified, pattern) for pattern in patterns)
         return is_ignored
 
     return is_excluded
