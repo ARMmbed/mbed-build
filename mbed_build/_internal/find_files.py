@@ -10,35 +10,25 @@ from typing import Callable, Iterable
 ExcludeCallable = Callable[[Path], bool]
 
 
-def find_files(file_name: str, directory: str, exclude: Iterable[ExcludeCallable] = []) -> Iterable[Path]:
-    """Recursively find files under given directory.
-
-    Additional filtering will be applied using exclude rules passed in.
-
-    Args:
-        file_name: The name of the file to find.
-        directory: Directory where to look for files.
-        exclude: Callables which return True if given pathlib.Path should be filtered out
-    """
-    found_files = Path(directory).rglob(file_name)
-
-    def is_excluded(file: Path) -> bool:
-        return any(fn(file) for fn in exclude)
-
-    return (file for file in found_files if not is_excluded(file))
+def find_files(file_name: str, directory: str) -> Iterable[Path]:
+    """Recursively find files under given directory."""
+    return Path(directory).rglob(file_name)
 
 
-def exclude_listed_in_mbedignore(mbedignore_file: Path) -> ExcludeCallable:
-    """Builds a callable which filters out given Path objects based on `.mbedignore` rules."""
+def exclude_using_mbedignore(mbedignore_file: Path, files: Iterable[Path]) -> Iterable[Path]:
+    """Filters out given Path objects based on `.mbedignore` rules."""
+    patterns = _build_mbedignore_patterns(mbedignore_file)
+    return (file for file in files if not _matches_patterns(file, patterns))
+
+
+def _build_mbedignore_patterns(mbedignore_file: Path) -> Iterable[str]:
     lines = mbedignore_file.read_text().splitlines()
     pattern_lines = (line for line in lines if line.strip() and not line.startswith("#"))
     ignore_root = mbedignore_file.parent
-
     patterns = tuple(str(ignore_root.joinpath(pattern)) for pattern in pattern_lines)
+    return patterns
 
-    def is_excluded(file: Path) -> bool:
-        stringified = str(file)
-        is_ignored = any(fnmatch(stringified, pattern) for pattern in patterns)
-        return is_ignored
 
-    return is_excluded
+def _matches_patterns(file: Path, patterns: Iterable[str]) -> bool:
+    stringified = str(file)
+    return any(fnmatch(stringified, pattern) for pattern in patterns)
