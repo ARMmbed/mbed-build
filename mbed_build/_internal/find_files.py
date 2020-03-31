@@ -10,8 +10,17 @@ from typing import Callable, Iterable
 ExcludeCallable = Callable[[Path], bool]
 
 
-def find_files(file_name: str, root_dir: str, exclude: Iterable[ExcludeCallable] = []) -> Iterable[Path]:
-    found_files = Path(root_dir).rglob(file_name)
+def find_files(file_name: str, directory: str, exclude: Iterable[ExcludeCallable] = []) -> Iterable[Path]:
+    """Recursively find files under given directory.
+
+    Additional filtering will be applied using exclude rules passed in.
+
+    Args:
+        file_name: The name of the file to find.
+        directory: Directory where to look for files.
+        exclude: Callables which return True if given pathlib.Path should be filtered out
+    """
+    found_files = Path(directory).rglob(file_name)
 
     def is_excluded(file):
         return any(fn(file) for fn in exclude)
@@ -20,6 +29,7 @@ def find_files(file_name: str, root_dir: str, exclude: Iterable[ExcludeCallable]
 
 
 def exclude_listed_in_mbedignore(path_to_ignore_file: Path) -> bool:
+    """Builds a callable which filters out given Path objects based on `.mbedignore` rules."""
     lines = path_to_ignore_file.read_text().splitlines()
     pattern_lines = (line for line in lines if line.strip() and not line.startswith("#"))
     ignore_root = path_to_ignore_file.parent

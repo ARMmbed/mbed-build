@@ -20,7 +20,7 @@ class TestFindFiles(TestCase):
         for file in files:
             fs.create_file(file)
 
-        subject = find_files("file.txt", root_dir="root")
+        subject = find_files("file.txt", directory="root")
 
         for file in files:
             self.assertIn(file, subject)
@@ -40,7 +40,7 @@ class TestFindFiles(TestCase):
         def matches_hidden(file):
             return "hidden" in str(file)
 
-        subject = find_files("file.txt", root_dir="root", exclude=[matches_ignore_me, matches_hidden])
+        subject = find_files("file.txt", directory="root", exclude=[matches_ignore_me, matches_hidden])
 
         self.assertIn(file, subject)
         self.assertNotIn(ignored_file_1, subject)
