@@ -24,7 +24,7 @@ class TestFindFiles(TestCase):
         for file in files:
             fs.create_file(file)
 
-        subject = find_files("file.txt", directory="root")
+        subject = find_files("file.txt", directory=Path("root"))
 
         for file in files:
             self.assertIn(file, subject)

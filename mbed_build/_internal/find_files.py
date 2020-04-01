@@ -7,9 +7,9 @@ from fnmatch import fnmatch
 from typing import Iterable
 
 
-def find_files(file_name: str, directory: str) -> Iterable[Path]:
+def find_files(file_name: str, directory: Path) -> Iterable[Path]:
     """Recursively find files matching name under given directory."""
-    return Path(directory).rglob(file_name)
+    return directory.rglob(file_name)
 
 
 def exclude_using_mbedignore(mbedignore_path: Path, paths: Iterable[Path]) -> Iterable[Path]:
