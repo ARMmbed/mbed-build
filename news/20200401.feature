@@ -1,0 +1,1 @@
+Initial mbed_lib.json discovery respecting .mbedignore
