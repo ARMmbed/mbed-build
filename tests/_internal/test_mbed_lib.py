@@ -4,7 +4,7 @@
 #
 from pathlib import Path
 from pyfakefs.fake_filesystem_unittest import patchfs
-from unittest import TestCase, mock
+from unittest import TestCase
 
 from mbed_build._internal.mbed_lib import find_mbed_lib_files
 
@@ -38,7 +38,6 @@ class TestFindMbedLibFiles(TestCase):
         )
         for path in mbed_lib_paths + ignored_mbed_lib_paths:
             fs.create_file(path)
-
         mbedignore_path = Path("root", "foo", ".mbedignore")
         mbedignore_contents = """
 ignored_1/*
