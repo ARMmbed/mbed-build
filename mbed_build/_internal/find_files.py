@@ -8,62 +8,72 @@ from typing import Iterable
 
 
 def find_files(file_name: str, directory: str) -> Iterable[Path]:
-    """Recursively find files under given directory."""
+    """Recursively find files matching name under given directory."""
     return Path(directory).rglob(file_name)
 
 
-def exclude_using_mbedignore(mbedignore_file: Path, files: Iterable[Path]) -> Iterable[Path]:
-    """Filters out given Path objects based on `.mbedignore` rules.
+def exclude_using_mbedignore(mbedignore_path: Path, paths: Iterable[Path]) -> Iterable[Path]:
+    """Filter out given paths based on rules found in .mbedignore file.
 
-    TODO: improve docs - mention that rules are rooted in mbedignore and use unix file matching
+    Patterns in .mbedignore use unix shell-style wildcards (fnmatch). It means
+    that functionality, although similar is different to that found in
+    .gitignore and friends.
+
+    Args:
+        mbedignore_file: Path to .mbedignore.
+        paths: Paths to filter.
     """
-    patterns = _build_mbedignore_patterns(mbedignore_file)
-    return [file for file in files if not _matches_mbedignore_patterns(file, patterns)]
+    patterns = _build_mbedignore_patterns(mbedignore_path)
+    return [path for path in paths if not _matches_mbedignore_patterns(path, patterns)]
 
 
-def exclude_not_labelled(label_type: str, allowed_label_values: Iterable[str], files: Iterable[Path]) -> Iterable[Path]:
-    """Filters out given Path objects using target labelling rules.
+def exclude_not_labelled(label_type: str, allowed_label_values: Iterable[str], paths: Iterable[Path]) -> Iterable[Path]:
+    """Filter out given path objects using path labelling rules.
+
+    If a path is labelled with given type, but contains label value which is
+    not allowed, it will be filtered out.
 
     We distinguish three label types: TARGET, COMPONENT, FEATURE.
 
     An example of labelled path is "/mbed-os/rtos/source/TARGET_CORTEX/mbed_lib.json",
     where label type is "TARGET" and label value is "CORTEX".
 
-    This function will filter out labelled paths that don't have matching values for given type.
-
-       >>> exclude_not_labelled(label_type="COMPONENT", labels=["BAR"], files=[
-       ...   pathlib.Path("/COMPONENT_FOO/COMPONENT_BAR/foo.txt"),
-       ...   pathlib.Path("/COMPONENT_BAZ/bar.txt"),
-       ...   pathlib.Path("/TARGET_X/x.txt"),
-       ... ])
-       >>> print(filtered)
+    Args:
+        label_type: Type of label.
+        allowed_label_values: Labels which are allowed for given type.
+        paths: Paths to filter.
     """
-
     result = []
     allowed_values = set(allowed_label_values)
-    for file in files:
-        label_values = set(_extract_label_values(file, label_type))
+    for path in paths:
+        label_values = set(_extract_label_values(path, label_type))
         if label_values.issubset(allowed_values):
-            result.append(file)
+            result.append(path)
     return result
 
 
-def _build_mbedignore_patterns(mbedignore_file: Path) -> Iterable[str]:
-    lines = mbedignore_file.read_text().splitlines()
+def _build_mbedignore_patterns(mbedignore_path: Path) -> Iterable[str]:
+    """Return patterns extracted from .mbedignore file.
+
+    Filters out commented out and empty lines.
+    Prefixes each rule with the directory location of the .mbedignore file.
+
+    Args:
+        mbedignore_path: Path to .mbedignore.
+    """
+    lines = mbedignore_path.read_text().splitlines()
     pattern_lines = (line for line in lines if line.strip() and not line.startswith("#"))
-    ignore_root = mbedignore_file.parent
+    ignore_root = mbedignore_path.parent
     patterns = tuple(str(ignore_root.joinpath(pattern)) for pattern in pattern_lines)
     return patterns
 
 
-def _matches_mbedignore_patterns(file: Path, patterns: Iterable[str]) -> bool:
-    stringified = str(file)
+def _matches_mbedignore_patterns(path: Path, patterns: Iterable[str]) -> bool:
+    """Check if given path matches one of the .mbedignore patterns."""
+    stringified = str(path)
     return any(fnmatch(stringified, pattern) for pattern in patterns)
 
 
-def _is_labelled(file: Path, label_type: str) -> bool:
-    return f"{label_type}_" in str(file)
-
-
-def _extract_label_values(file: Path, label_type: str) -> Iterable[str]:
-    return (part for part in file.parts if label_type in part)
+def _extract_label_values(path: Path, label_type: str) -> Iterable[str]:
+    """Find label values of given type in path."""
+    return (part for part in path.parts if label_type in part)

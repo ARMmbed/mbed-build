@@ -41,8 +41,8 @@ hidden.txt
 */stubs/*
 stubs/*
 """
-        mbed_ignore = Path("project", ".mbedignore")
-        fs.create_file(mbed_ignore, contents=mbedignore_contents)
+        mbedignore_path = Path("project", ".mbedignore")
+        fs.create_file(mbedignore_path, contents=mbedignore_contents)
 
         paths = [
             Path("outside_of_project", "hidden.txt"),
@@ -58,7 +58,7 @@ stubs/*
             Path("project", "file.py"),
         ]
 
-        subject = exclude_using_mbedignore(mbed_ignore, paths + excluded_paths)
+        subject = exclude_using_mbedignore(mbedignore_path, paths + excluded_paths)
 
         for path in subject:
             self.assertIn(path, paths, f"{path} should be excluded")
@@ -81,7 +81,7 @@ class TestExcludeNotLabelled(TestCase):
         ]
 
         subject = exclude_not_labelled(
-            label_type="TARGET", allowed_label_values=["BAR", "BAZ"], files=(paths + excluded_paths)
+            label_type="TARGET", allowed_label_values=["BAR", "BAZ"], paths=(paths + excluded_paths)
         )
 
         for path in subject:
