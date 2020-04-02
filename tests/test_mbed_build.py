@@ -6,24 +6,24 @@ import pathlib
 from unittest import TestCase, mock
 
 from pyfakefs.fake_filesystem_unittest import Patcher
-
 from mbed_build.exceptions import InvalidExportOutputDirectory
 from mbed_build.mbed_build import generate_cmakelists_file, export_cmakelists_file
 
 
 class TestGenerateCMakeListsFile(TestCase):
-    @mock.patch("mbed_build.mbed_build._fetch_target_labels")
     @mock.patch("mbed_build.mbed_build._fetch_toolchain_labels")
     @mock.patch("mbed_build.mbed_build.render_cmakelists_template")
-    def test_correct_arguments_passed(self, render_cmakelists_template, _fetch_toolchain_labels, _fetch_target_labels):
-        target_name = "Target"
+    def test_correct_arguments_passed(self, render_cmakelists_template, _fetch_toolchain_labels):
+        target_build_attributes = mock.Mock()
         toolchain_name = "GCC"
-        generate_cmakelists_file(target_name, toolchain_name)
+        generate_cmakelists_file(target_build_attributes, toolchain_name)
 
-        _fetch_target_labels.assert_called_once_with(target_name)
         _fetch_toolchain_labels.assert_called_once_with(toolchain_name)
         render_cmakelists_template.assert_called_once_with(
-            _fetch_target_labels.return_value, _fetch_toolchain_labels.return_value
+            target_build_attributes.labels,
+            target_build_attributes.features,
+            target_build_attributes.components,
+            _fetch_toolchain_labels.return_value,
         )
 
 

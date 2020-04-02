@@ -5,6 +5,7 @@
 import pathlib
 import os
 
+from unittest import mock
 from click.testing import CliRunner
 from pyfakefs.fake_filesystem_unittest import TestCase
 
@@ -13,20 +14,28 @@ from mbed_build._internal import templates
 
 
 class TestExport(TestCase):
-    def test_export(self):
+    @mock.patch("mbed_build._internal.mbed_tools.export.get_build_attributes_by_board_type")
+    def test_export(self, mock_get_build_attributes):
         # This is needed to have access to the templates directory in Patcher filesystem.
         self.setUpPyfakefs()
         self.fs.add_real_directory(os.path.dirname(templates.__file__))
 
+        mock_build_attributes = mock.Mock()
+        mock_build_attributes.labels = frozenset(["label"])
+        mock_build_attributes.features = frozenset(["feature"])
+        mock_build_attributes.components = frozenset(["component"])
+        mock_get_build_attributes.return_value = mock_build_attributes
+
         output_dir = "some_directory"
+        target_json_path = "targets.json"
         mbed_target = "K64F"
         mbed_toolchain = "GCC"
 
         runner = CliRunner()
-        result = runner.invoke(export, ["-o", output_dir, "-t", mbed_toolchain, "-m", mbed_target])
+        result = runner.invoke(
+            export, ["-o", output_dir, "-t", mbed_toolchain, "-m", mbed_target, "-p", target_json_path]
+        )
         self.assertEqual(result.exit_code, 0)
 
         exported_file = pathlib.Path(output_dir, "CMakeLists.txt")
-        text = exported_file.read_text()
-        self.assertIn(mbed_target, text)
-        self.assertIn(mbed_toolchain, text)
+        self.assertTrue(exported_file.is_file())
