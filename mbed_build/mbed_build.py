@@ -2,6 +2,7 @@
 # Copyright (C) 2020 Arm Mbed. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
+"""Module to generate application's CMake file."""
 import pathlib
 from typing import List
 

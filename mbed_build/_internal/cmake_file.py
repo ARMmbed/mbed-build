@@ -2,6 +2,7 @@
 # Copyright (C) 2020 Arm Mbed. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
+"""Module in charge of CMake file generation."""
 import pathlib
 from typing import List
 
@@ -17,10 +18,10 @@ def render_cmakelists_template(target_labels: List[str], toolchain_labels: List[
     Args:
         target_labels: the target-specific magic mbed-os directory names that need to be included in the build
         toolchain_labels: the toolchain-specific magic mbed-os directory names that need to be included in the build
+
     Returns:
         The contents of the rendered CMake file.
     """
-
     env = jinja2.Environment(loader=jinja2.PackageLoader("mbed_build", str(TEMPLATES_DIRECTORY)),)
     template = env.get_template(TEMPLATE_NAME)
     context = {"target_labels": target_labels, "toolchain_labels": toolchain_labels}
