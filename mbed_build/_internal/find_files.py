@@ -2,6 +2,7 @@
 # Copyright (C) 2020 Arm Mbed. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
+"""File scanner."""
 from pathlib import Path
 from fnmatch import fnmatch
 from typing import Iterable
@@ -22,6 +23,9 @@ def exclude_using_mbedignore(mbedignore_path: Path, paths: Iterable[Path]) -> It
     Args:
         mbedignore_file: Path to .mbedignore.
         paths: Paths to filter.
+
+    Returns:
+        List of paths.
     """
     patterns = _build_mbedignore_patterns(mbedignore_path)
     return [path for path in paths if not _matches_mbedignore_patterns(path, patterns)]
