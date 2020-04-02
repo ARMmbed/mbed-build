@@ -14,8 +14,8 @@ def find_files(file_name: str, directory: Path) -> Iterable[Path]:
     return directory.rglob(file_name)
 
 
-def exclude_using_mbedignore(mbedignore_path: Path, paths: Iterable[Path]) -> Iterable[Path]:
-    """Filter out given paths based on rules found in .mbedignore file.
+def exclude_using_mbedignore(directory: Path, paths: Iterable[Path]) -> Iterable[Path]:
+    """Filter out given paths based on rules found in .mbedignore files.
 
     Patterns in .mbedignore use unix shell-style wildcards (fnmatch). It means
     that functionality, although similar is different to that found in
@@ -28,8 +28,12 @@ def exclude_using_mbedignore(mbedignore_path: Path, paths: Iterable[Path]) -> It
     Returns:
         List of paths.
     """
-    patterns = _build_mbedignore_patterns(mbedignore_path)
-    return [path for path in paths if not _matches_mbedignore_patterns(path, patterns)]
+    local_paths = paths[:]
+    mbedignore_paths = find_files(".mbedignore", directory)
+    for mbedignore_path in mbedignore_paths:
+        patterns = _build_mbedignore_patterns(mbedignore_path)
+        local_paths = [path for path in paths if not _matches_mbedignore_patterns(path, patterns)]
+    return local_paths
 
 
 def exclude_using_target_labels(mbed_program_directory, board_type, paths):

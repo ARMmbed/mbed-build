@@ -35,6 +35,7 @@ class TestFindFiles(TestCase):
 class TestExcludeUsingMbedignore(TestCase):
     @patchfs
     def test_excludes_files_ignored_by_mbedignore(self, fs):
+        project_path = Path("project")
         mbedignore_contents = """
 *.py
 hidden.txt
@@ -43,7 +44,7 @@ hidden.txt
 */stubs/*
 stubs/*
 """
-        mbedignore_path = Path("project", ".mbedignore")
+        mbedignore_path = project_path.joinpath(".mbedignore")
         fs.create_file(mbedignore_path, contents=mbedignore_contents)
 
         paths = [
@@ -60,7 +61,7 @@ stubs/*
             Path("project", "file.py"),
         ]
 
-        subject = exclude_using_mbedignore(mbedignore_path, paths + excluded_paths)
+        subject = exclude_using_mbedignore(project_path, paths + excluded_paths)
 
         for path in subject:
             self.assertIn(path, paths, f"{path} should be excluded")
