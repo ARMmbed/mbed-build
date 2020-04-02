@@ -36,7 +36,13 @@ def exclude_using_mbedignore(directory: Path, paths: Iterable[Path]) -> Iterable
 
 
 def exclude_using_target_labels(mbed_program_directory: Path, board_type: str, paths: Iterable[Path]) -> Iterable[Path]:
-    """Filter out given paths using target labels."""
+    """Filter out given paths using target labels retrieved from mbed-targets.
+
+    Args:
+        mbed_program_directory: Path to mbed program, used by mbed-targets to retrieve target build attributes.
+        board_type: Board type, used by mbed-targets to retrieve target build attributes.
+        paths: Paths to filter.
+    """
     build_attributes = get_build_attributes_by_board_type(board_type, mbed_program_directory)
     paths = exclude_using_labels("TARGET", build_attributes.labels, paths)
     paths = exclude_using_labels("FEATURE", build_attributes.features, paths)
