@@ -64,13 +64,7 @@ def exclude_using_labels(label_type: str, allowed_label_values: Iterable[str], p
          allowed_label_values: Labels which are allowed for given type.
          paths: Paths to filter.
      """
-    result = []
-    allowed_values = set(allowed_label_values)
-    for path in paths:
-        label_values = set(_extract_label_values(path, label_type))
-        if label_values.issubset(allowed_values):
-            result.append(path)
-    return result
+    return (path for path in paths if _matches_label_rules(path, label_type, set(allowed_label_values)))
 
 
 def _build_mbedignore_patterns(mbedignore_path: Path) -> Iterable[str]:
@@ -95,6 +89,7 @@ def _matches_mbedignore_patterns(path: Path, patterns: Iterable[str]) -> bool:
     return any(fnmatch(stringified, pattern) for pattern in patterns)
 
 
-def _extract_label_values(path: Path, label_type: str) -> Iterable[str]:
-    """Find label values of given type in path."""
-    return (part for part in path.parts if label_type in part)
+def _matches_label_rules(path: Path, label_type: str, allowed_label_values: set) -> bool:
+    """Check if given path contains only allowed values for a given label type."""
+    label_values = set(part for part in path.parts if label_type in part)
+    return label_values.issubset(allowed_label_values)
