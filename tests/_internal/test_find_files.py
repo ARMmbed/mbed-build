@@ -30,7 +30,7 @@ class TestFindFiles(TestCase):
             self.assertIn(file, subject)
 
 
-class TestExcludeListedInMbedignore(TestCase):
+class TestExcludeUsingMbedignore(TestCase):
     @patchfs
     def test_excludes_files_ignored_by_mbedignore(self, fs):
         mbedignore_contents = """
