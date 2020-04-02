@@ -6,6 +6,7 @@
 from pathlib import Path
 from fnmatch import fnmatch
 from typing import Iterable
+from mbed_targets import get_build_attributes_by_board_type
 
 
 def find_files(file_name: str, directory: Path) -> Iterable[Path]:
@@ -29,6 +30,15 @@ def exclude_using_mbedignore(mbedignore_path: Path, paths: Iterable[Path]) -> It
     """
     patterns = _build_mbedignore_patterns(mbedignore_path)
     return [path for path in paths if not _matches_mbedignore_patterns(path, patterns)]
+
+
+def exclude_using_target_labels(mbed_program_directory, board_type, paths):
+    """Filter out given paths using target labels."""
+    build_attributes = get_build_attributes_by_board_type(board_type, mbed_program_directory)
+    paths = exclude_using_labels("TARGET", build_attributes.labels, paths)
+    paths = exclude_using_labels("FEATURE", build_attributes.features, paths)
+    paths = exclude_using_labels("COMPONENT", build_attributes.components, paths)
+    return paths
 
 
 def exclude_using_labels(label_type: str, allowed_label_values: Iterable[str], paths: Iterable[Path]) -> Iterable[Path]:

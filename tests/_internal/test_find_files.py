@@ -2,13 +2,15 @@
 # Copyright (C) 2020 Arm Mbed. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
-from unittest import TestCase
+from unittest import TestCase, mock
 from pathlib import Path
 from pyfakefs.fake_filesystem_unittest import patchfs
+from mbed_targets import MbedTargetBuildAttributes
 
 from mbed_build._internal.find_files import (
     find_files,
     exclude_using_mbedignore,
+    exclude_using_target_labels,
     exclude_using_labels,
 )
 
@@ -62,6 +64,36 @@ stubs/*
 
         for path in subject:
             self.assertIn(path, paths, f"{path} should be excluded")
+
+
+class TestExcludeUsingTargetLabels(TestCase):
+    @mock.patch("mbed_build._internal.find_files.get_build_attributes_by_board_type", autospec=True)
+    @mock.patch("mbed_build._internal.find_files.exclude_using_labels", autospec=True)
+    def test_excludes_paths_using_target_labels(self, exclude_using_labels, get_build_attributes_by_board_type):
+        build_attributes = mock.Mock(
+            MbedTargetBuildAttributes, labels={"TARGET"}, features={"FEATURE"}, components={"COMPONENT"}
+        )  # Zero interface safety here, dataclasses don't support spec_set
+        get_build_attributes_by_board_type.return_value = build_attributes
+        after_target_filtering = [Path("filtered_using_targets")]
+        after_feature_filtering = [Path("filtered_using_features")]
+        after_component_filtering = [Path("filtered_using_components")]
+        exclude_using_labels.side_effect = [after_target_filtering, after_feature_filtering, after_component_filtering]
+        mbed_program_directory = Path("some-path")
+        board_type = "A_TYPE"
+        paths = [Path("mbed_lib.json")]
+
+        subject = exclude_using_target_labels(mbed_program_directory, board_type, paths)
+
+        self.assertEqual(subject, after_component_filtering)
+        get_build_attributes_by_board_type.assert_called_once_with(board_type, mbed_program_directory)
+        self.assertEqual(
+            exclude_using_labels.mock_calls,
+            [
+                mock.call("TARGET", build_attributes.labels, paths),
+                mock.call("FEATURE", build_attributes.features, after_target_filtering),
+                mock.call("COMPONENT", build_attributes.components, after_feature_filtering),
+            ],
+        )
 
 
 class TestExcludeUsingLabels(TestCase):
