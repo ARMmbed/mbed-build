@@ -6,6 +6,8 @@
 from pathlib import Path
 from typing import Dict, Iterable
 
+from mbed_targets import get_build_attributes_by_board_type
+
 from mbed_build._internal.find_files import (
     find_files,
     exclude_using_mbedignore,
@@ -31,13 +33,17 @@ def find_mbed_lib_files(mbed_program_directory: Path, board_type: str) -> Iterab
         mbed_lib_paths = exclude_using_mbedignore(mbedignore_path, mbed_lib_paths)
 
     target_labels = _get_all_target_labels(mbed_program_directory, board_type)
-    if target_labels:
-        for label_type, allowed_label_values in target_labels.items():
-            mbed_lib_paths = exclude_not_labelled(label_type, allowed_label_values, mbed_lib_paths)
+    for label_type, allowed_label_values in target_labels.items():
+        mbed_lib_paths = exclude_not_labelled(label_type, allowed_label_values, mbed_lib_paths)
 
     return mbed_lib_paths
 
 
 def _get_all_target_labels(mbed_program_directory: Path, board_type: str) -> Dict:
-    """TODO."""
-    pass
+    """Return all labels for a given target, grouped by type."""
+    build_attributes = get_build_attributes_by_board_type(board_type, mbed_program_directory)
+    return {
+        "TARGET": build_attributes.labels,
+        "FEATURE": build_attributes.features,
+        "COMPONENT": build_attributes.components,
+    }
