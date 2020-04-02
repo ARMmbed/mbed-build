@@ -66,7 +66,6 @@ stubs/*
 
 class TestExcludeUsingLabels(TestCase):
     def test_excludes_files_not_matching_label(self):
-
         paths = [
             Path("mbed-os", "TARGET_BAR", "some_file.c"),
             Path("mbed-os", "COMPONENT_X", "header.h"),
