@@ -9,7 +9,7 @@ from pyfakefs.fake_filesystem_unittest import patchfs
 from mbed_build._internal.find_files import (
     find_files,
     exclude_using_mbedignore,
-    exclude_not_labelled,
+    exclude_using_labels,
 )
 
 
@@ -64,7 +64,7 @@ stubs/*
             self.assertIn(path, paths, f"{path} should be excluded")
 
 
-class TestExcludeNotLabelled(TestCase):
+class TestExcludeUsingLabels(TestCase):
     def test_excludes_files_not_matching_label(self):
 
         paths = [
@@ -80,7 +80,7 @@ class TestExcludeNotLabelled(TestCase):
             Path("mbed-os", "TARGET_BAR", "TARGET_FOO", "other_file.c"),
         ]
 
-        subject = exclude_not_labelled(
+        subject = exclude_using_labels(
             label_type="TARGET", allowed_label_values=["BAR", "BAZ"], paths=(paths + excluded_paths)
         )
 

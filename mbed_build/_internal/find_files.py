@@ -31,7 +31,7 @@ def exclude_using_mbedignore(mbedignore_path: Path, paths: Iterable[Path]) -> It
     return [path for path in paths if not _matches_mbedignore_patterns(path, patterns)]
 
 
-def exclude_not_labelled(label_type: str, allowed_label_values: Iterable[str], paths: Iterable[Path]) -> Iterable[Path]:
+def exclude_using_labels(label_type: str, allowed_label_values: Iterable[str], paths: Iterable[Path]) -> Iterable[Path]:
     """Filter out given path objects using path labelling rules.
 
      If a path is labelled with given type, but contains label value which is
