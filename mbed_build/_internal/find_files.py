@@ -28,12 +28,11 @@ def exclude_using_mbedignore(directory: Path, paths: Iterable[Path]) -> Iterable
     Returns:
         List of paths.
     """
-    local_paths = paths[:]
     mbedignore_paths = find_files(".mbedignore", directory)
     for mbedignore_path in mbedignore_paths:
         patterns = _build_mbedignore_patterns(mbedignore_path)
-        local_paths = [path for path in paths if not _matches_mbedignore_patterns(path, patterns)]
-    return local_paths
+        paths = (path for path in paths if not _matches_mbedignore_patterns(path, patterns))
+    return paths
 
 
 def exclude_using_target_labels(mbed_program_directory, board_type, paths):
