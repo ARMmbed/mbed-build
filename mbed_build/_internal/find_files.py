@@ -61,12 +61,23 @@ def exclude_using_labels(label_type: str, allowed_label_values: Iterable[str], p
     An example of labelled path is "/mbed-os/rtos/source/TARGET_CORTEX/mbed_lib.json",
     where label type is "TARGET" and label value is "CORTEX".
 
+    For example, given a label type "FEATURE" and allowed values ["FOO"]:
+    - "/path/FEATURE_FOO/somefile.txt" will not be filtered out
+    - "/path/FEATURE_BAZ/somefile.txt" will be filtered out
+    - "/path/FEATURE_FOO/FEATURE_BAR/somefile.txt" will be filtered out
+
     Args:
         label_type: Type of label.
         allowed_label_values: Labels which are allowed for given type.
         paths: Paths to filter.
     """
-    return [path for path in paths if _matches_label_rules(path, label_type, set(allowed_label_values))]
+    result = []
+    allowed_labels = set(f"{label_type}_{label_value}" for label_value in allowed_label_values)
+    for path in paths:
+        labels = set(part for part in path.parts if label_type in part)
+        if labels.issubset(allowed_labels):
+            result.append(path)
+    return result
 
 
 def _build_mbedignore_patterns(mbedignore_path: Path) -> Iterable[str]:
@@ -89,10 +100,3 @@ def _matches_mbedignore_patterns(path: Path, patterns: Iterable[str]) -> bool:
     """Check if given path matches one of the .mbedignore patterns."""
     stringified = str(path)
     return any(fnmatch(stringified, pattern) for pattern in patterns)
-
-
-def _matches_label_rules(path: Path, label_type: str, allowed_label_values: set) -> bool:
-    """Check if given path contains only allowed values for a given label type."""
-    allowed_label_values = set(f"{label_type}_{label_value}" for label_value in allowed_label_values)
-    label_values = set(part for part in path.parts if label_type in part)
-    return label_values.issubset(allowed_label_values)
