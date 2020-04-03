@@ -6,15 +6,21 @@
 from pathlib import Path
 from typing import Iterable
 
-from mbed_build._internal.find_files import find_files, exclude_using_mbedignore
+from mbed_build._internal.find_files import (
+    find_files,
+    exclude_using_mbedignore,
+    exclude_using_target_labels,
+)
 
 
-def find_mbed_lib_files(directory: Path) -> Iterable[Path]:
-    """Finds all mbed lib files."""
-    mbed_lib_paths = find_files("mbed_lib.json", directory)
+def find_mbed_lib_files(mbed_program_directory: Path, board_type: str) -> Iterable[Path]:
+    """Return paths to all mbed_lib.json for a given target.
 
-    mbedignore_paths = find_files(".mbedignore", directory)
-    for mbedignore_path in mbedignore_paths:
-        mbed_lib_paths = exclude_using_mbedignore(mbedignore_path, mbed_lib_paths)
-
+    Args:
+        mbed_program_directory: Location of mbed program
+        board_type: Name of the target to filter files for
+    """
+    mbed_lib_paths = find_files("mbed_lib.json", mbed_program_directory)
+    mbed_lib_paths = exclude_using_mbedignore(mbed_program_directory, mbed_lib_paths)
+    mbed_lib_paths = exclude_using_target_labels(mbed_program_directory, board_type, mbed_lib_paths)
     return mbed_lib_paths
