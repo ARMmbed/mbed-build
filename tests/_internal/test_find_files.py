@@ -35,15 +35,18 @@ class TestExcludeUsingMbedignore(TestCase):
     @patchfs
     def test_excludes_files_ignored_by_mbedignore(self, fs):
         project_path = Path("project")
-        fs.create_file(project_path.joinpath(".mbedignore"), contents="""
+        fs.create_file(
+            project_path.joinpath(".mbedignore"),
+            contents="""
 *.py
 hidden.txt
 
 */test/*
 */stubs/*
 stubs/*
-""")
-        fs.create_file(project_path.joinpath("isolated" , ".mbedignore"), contents="*")
+""",
+        )
+        fs.create_file(project_path.joinpath("isolated", ".mbedignore"), contents="*")
 
         paths = [
             Path("foo.py"),
@@ -56,7 +59,7 @@ stubs/*
             Path("project", "stubs", "file.xls"),
             Path("project", "hidden.txt"),
             Path("project", "file.py"),
-            Path("project", "isolated", "file.c")
+            Path("project", "isolated", "file.c"),
         ]
 
         subject = exclude_using_mbedignore(project_path, paths + excluded_paths)
