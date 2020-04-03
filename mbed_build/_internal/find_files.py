@@ -15,7 +15,7 @@ def find_files(file_name: str, directory: Path) -> Iterable[Path]:
 
 
 _LEGACY_DIRS = [
-    "TEST",
+    "TESTS",
     "TEST_APPS",
 ]
 
