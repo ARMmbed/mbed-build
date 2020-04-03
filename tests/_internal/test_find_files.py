@@ -18,18 +18,17 @@ from mbed_build._internal.find_files import (
 class TestFindFiles(TestCase):
     @patchfs
     def test_finds_files_by_name_in_given_root(self, fs):
-        files = (
+        files = [
             Path("root", "folder_1", "file.txt"),
             Path("root", "folder_1", "folder_1_1", "file.txt"),
             Path("root", "folder_2", "file.txt"),
-        )
+        ]
         for file in files:
             fs.create_file(file)
 
         subject = find_files("file.txt", directory=Path("root"))
 
-        for file in files:
-            self.assertIn(file, subject)
+        self.assertEqual(list(subject), files)
 
 
 class TestExcludeUsingMbedignore(TestCase):
@@ -63,8 +62,7 @@ stubs/*
 
         subject = exclude_using_mbedignore(project_path, paths + excluded_paths)
 
-        for path in subject:
-            self.assertIn(path, paths, f"{path} should be excluded")
+        self.assertEqual(list(subject), paths)
 
 
 class TestExcludeUsingTargetLabels(TestCase):
@@ -116,5 +114,4 @@ class TestExcludeUsingLabels(TestCase):
             label_type="TARGET", allowed_label_values=["BAR", "BAZ"], paths=(paths + excluded_paths)
         )
 
-        for path in subject:
-            self.assertIn(path, paths, f"{path} should be excluded")
+        self.assertEqual(list(subject), paths)
