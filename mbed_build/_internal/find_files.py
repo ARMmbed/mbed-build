@@ -28,11 +28,12 @@ def exclude_using_mbedignore(directory: Path, paths: Iterable[Path]) -> Iterable
     Returns:
         List of paths.
     """
+    result = list(paths)
     mbedignore_paths = find_files(".mbedignore", directory)
     for mbedignore_path in mbedignore_paths:
         patterns = _build_mbedignore_patterns(mbedignore_path)
-        paths = (path for path in paths if not _matches_mbedignore_patterns(path, patterns))
-    return paths
+        result = [path for path in result if not _matches_mbedignore_patterns(path, patterns)]
+    return result
 
 
 def exclude_using_target_labels(mbed_program_directory: Path, board_type: str, paths: Iterable[Path]) -> Iterable[Path]:
@@ -44,10 +45,11 @@ def exclude_using_target_labels(mbed_program_directory: Path, board_type: str, p
         paths: Paths to filter.
     """
     build_attributes = get_build_attributes_by_board_type(board_type, mbed_program_directory)
-    paths = exclude_using_labels("TARGET", build_attributes.labels, paths)
-    paths = exclude_using_labels("FEATURE", build_attributes.features, paths)
-    paths = exclude_using_labels("COMPONENT", build_attributes.components, paths)
-    return paths
+    result = list(paths)
+    result = exclude_using_labels("TARGET", build_attributes.labels, result)
+    result = exclude_using_labels("FEATURE", build_attributes.features, result)
+    result = exclude_using_labels("COMPONENT", build_attributes.components, result)
+    return result
 
 
 def exclude_using_labels(label_type: str, allowed_label_values: Iterable[str], paths: Iterable[Path]) -> Iterable[Path]:
@@ -64,7 +66,7 @@ def exclude_using_labels(label_type: str, allowed_label_values: Iterable[str], p
         allowed_label_values: Labels which are allowed for given type.
         paths: Paths to filter.
     """
-    return (path for path in paths if _matches_label_rules(path, label_type, set(allowed_label_values)))
+    return [path for path in paths if _matches_label_rules(path, label_type, set(allowed_label_values))]
 
 
 def _build_mbedignore_patterns(mbedignore_path: Path) -> Iterable[str]:
