@@ -9,6 +9,7 @@ from mbed_targets import MbedTargetBuildAttributes
 
 from mbed_build._internal.find_files import (
     find_files,
+    exclude_legacy_directories,
     exclude_using_mbedignore,
     exclude_using_target_labels,
     exclude_using_labels,
@@ -63,6 +64,22 @@ stubs/*
         ]
 
         subject = exclude_using_mbedignore(project_path, paths + excluded_paths)
+
+        self.assertEqual(list(subject), paths)
+
+
+class TestExcludeLegacyDirectories(TestCase):
+    def test_excludes_known_legacy_directories(self):
+        paths = [
+            Path("mbed-os", "subdir", "some_file.c"),
+        ]
+
+        ignored_paths = [
+            Path("mbed-os", "TESTS", "some_file.c"),
+            Path("mbed-os", "TEST_APPS", "some_file.c"),
+        ]
+
+        subject = exclude_legacy_directories(paths + ignored_paths)
 
         self.assertEqual(list(subject), paths)
 

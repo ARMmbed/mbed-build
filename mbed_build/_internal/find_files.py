@@ -14,6 +14,20 @@ def find_files(file_name: str, directory: Path) -> Iterable[Path]:
     return directory.rglob(file_name)
 
 
+_LEGACY_DIRS = [
+    "TEST",
+    "TEST_APPS",
+]
+
+
+def exclude_legacy_directories(paths: Iterable[Path]) -> List[Path]:
+    """Filter out given paths using legacy directory list.
+
+    WARNING: This should be removed when mbed-os is cleaned up
+    """
+    return [path for path in paths if not any(legacy_dir in str(path) for legacy_dir in _LEGACY_DIRS)]
+
+
 def exclude_using_mbedignore(directory: Path, paths: Iterable[Path]) -> List[Path]:
     """Filter out given paths based on rules found in .mbedignore files.
 
