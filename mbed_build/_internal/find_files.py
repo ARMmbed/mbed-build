@@ -53,17 +53,17 @@ def exclude_using_target_labels(mbed_program_directory: Path, board_type: str, p
 def exclude_using_labels(label_type: str, allowed_label_values: Iterable[str], paths: Iterable[Path]) -> Iterable[Path]:
     """Filter out given path objects using path labelling rules.
 
-     If a path is labelled with given type, but contains label value which is
-     not allowed, it will be filtered out.
+    If a path is labelled with given type, but contains label value which is
+    not allowed, it will be filtered out.
 
-     An example of labelled path is "/mbed-os/rtos/source/TARGET_CORTEX/mbed_lib.json",
-     where label type is "TARGET" and label value is "CORTEX".
+    An example of labelled path is "/mbed-os/rtos/source/TARGET_CORTEX/mbed_lib.json",
+    where label type is "TARGET" and label value is "CORTEX".
 
-     Args:
-         label_type: Type of label.
-         allowed_label_values: Labels which are allowed for given type.
-         paths: Paths to filter.
-     """
+    Args:
+        label_type: Type of label.
+        allowed_label_values: Labels which are allowed for given type.
+        paths: Paths to filter.
+    """
     return (path for path in paths if _matches_label_rules(path, label_type, set(allowed_label_values)))
 
 
