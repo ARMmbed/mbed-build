@@ -5,7 +5,7 @@
 """File scanner."""
 from pathlib import Path
 from fnmatch import fnmatch
-from typing import Iterable
+from typing import Iterable, List
 from mbed_targets import get_build_attributes_by_board_type
 
 
@@ -14,7 +14,7 @@ def find_files(file_name: str, directory: Path) -> Iterable[Path]:
     return directory.rglob(file_name)
 
 
-def exclude_using_mbedignore(directory: Path, paths: Iterable[Path]) -> Iterable[Path]:
+def exclude_using_mbedignore(directory: Path, paths: Iterable[Path]) -> List[Path]:
     """Filter out given paths based on rules found in .mbedignore files.
 
     Patterns in .mbedignore use unix shell-style wildcards (fnmatch). It means
@@ -36,7 +36,7 @@ def exclude_using_mbedignore(directory: Path, paths: Iterable[Path]) -> Iterable
     return result
 
 
-def exclude_using_target_labels(mbed_program_directory: Path, board_type: str, paths: Iterable[Path]) -> Iterable[Path]:
+def exclude_using_target_labels(mbed_program_directory: Path, board_type: str, paths: Iterable[Path]) -> List[Path]:
     """Filter out given paths using target labels retrieved from mbed-targets.
 
     Args:
@@ -52,7 +52,7 @@ def exclude_using_target_labels(mbed_program_directory: Path, board_type: str, p
     return result
 
 
-def exclude_using_labels(label_type: str, allowed_label_values: Iterable[str], paths: Iterable[Path]) -> Iterable[Path]:
+def exclude_using_labels(label_type: str, allowed_label_values: Iterable[str], paths: Iterable[Path]) -> List[Path]:
     """Filter out given path objects using path labelling rules.
 
     If a path is labelled with given type, but contains label value which is
