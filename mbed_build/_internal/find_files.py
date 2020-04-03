@@ -91,5 +91,6 @@ def _matches_mbedignore_patterns(path: Path, patterns: Iterable[str]) -> bool:
 
 def _matches_label_rules(path: Path, label_type: str, allowed_label_values: set) -> bool:
     """Check if given path contains only allowed values for a given label type."""
+    allowed_label_values = set(f"{label_type}_{label_value}" for label_value in allowed_label_values)
     label_values = set(part for part in path.parts if label_type in part)
     return label_values.issubset(allowed_label_values)

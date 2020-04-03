@@ -111,7 +111,7 @@ class TestExcludeUsingLabels(TestCase):
         ]
 
         subject = exclude_using_labels(
-            label_type="TARGET", allowed_label_values=["BAR", "BAZ"], paths=(paths + excluded_paths)
+            label_type="TARGET", allowed_label_values={"BAR", "BAZ"}, paths=(paths + excluded_paths)
         )
 
         self.assertEqual(list(subject), paths)
