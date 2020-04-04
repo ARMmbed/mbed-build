@@ -1,6 +1,8 @@
 from pathlib import Path
 import fnmatch
 
+from typing import Iterable, Tuple
+
 
 def find_files(filename, directory, allowed_labels):
     filters = [
@@ -20,16 +22,38 @@ class ExcludeUsingLabels:
         return labels.issubset(self._allowed_labels)
 
 
-class ExcludeMatchingMbedignore:
-    def __init__(self, patterns):
+class MbedignoreFilter:
+    """Filter out given paths based on rules found in .mbedignore files.
+
+    Patterns in .mbedignore use unix shell-style wildcards (fnmatch). It means
+    that functionality, although similar is different to that found in
+    .gitignore and friends.
+    """
+
+    def __init__(self, patterns: Tuple[str]):
+        """Initialise the filter attributes.
+
+        Args:
+            patterns: List of patterns from .mbedignore to filter against.
+        """
         self._patterns = patterns
 
-    def __call__(self, path):
+    @property
+    def patterns(self) -> Tuple[str]:
+        """Return patterns used for filtering."""
+        return self._patterns
+
+    def __call__(self, path: Path) -> bool:
+        """Return True if given path doesn't match .mbedignore patterns."""
         stringified = str(path)
-        return not any(fnmatch.fnmatch(stringified, pattern) for pattern in self._patterns)
+        return not any(fnmatch.fnmatch(stringified, pattern) for pattern in self.patterns)
 
     @classmethod
-    def from_file(cls, mbedignore_path):
+    def from_file(cls, mbedignore_path: Path) -> "MbedignoreFilter":
+        """Return new instance with patterns read from .mbedignore file.
+
+        Constructed patterns are rooted in the directory of .mbedignore file.
+        """
         lines = mbedignore_path.read_text().splitlines()
         pattern_lines = (line for line in lines if line.strip() and not line.startswith("#"))
         ignore_root = mbedignore_path.parent
@@ -44,7 +68,7 @@ def _find_files(filename, directory, filters):
     children = list(directory.iterdir())
     mbedignore = Path(directory, ".mbedignore")
     if mbedignore in children:
-        filters.append(ExcludeMatchingMbedignore.from_file(mbedignore))
+        filters.append(MbedignoreFilter.from_file(mbedignore))
 
     filtered_children = (child for child in children if all(f(child) for f in filters))
 

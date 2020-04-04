@@ -4,7 +4,7 @@ from tempfile import TemporaryDirectory
 from unittest import TestCase
 from typing import Iterable
 
-from mbed_build._internal.new_find_files import find_files, ExcludeMatchingMbedignore
+from mbed_build._internal.new_find_files import find_files, MbedignoreFilter
 
 
 @contextlib.contextmanager
@@ -73,21 +73,35 @@ class TestListFiles(TestCase):
             self.assertIn(Path(directory, path), subject)
 
 
-class TestExcludeUsingMbedignore(TestCase):
+class TestMbedignoreFilter(TestCase):
     def test_matches_files_by_name(self):
-        subject = ExcludeMatchingMbedignore(("*.py",))
+        subject = MbedignoreFilter(("*.py",))
 
         self.assertFalse(subject("file.py"))
         self.assertFalse(subject("nested/file.py"))
         self.assertTrue(subject("file.txt"))
 
     def test_matches_wildcards(self):
-        subject = ExcludeMatchingMbedignore(("*/test/*",))
+        subject = MbedignoreFilter(("*/test/*",))
 
         self.assertFalse(subject("foo/test/bar.txt"))
         self.assertFalse(subject("bar/test/other/file.py"))
         self.assertTrue(subject("file.txt"))
 
     def test_from_file(self):
-        # TODO:
-        pass
+        with TemporaryDirectory() as temp_directory:
+            mbedignore = Path(temp_directory, ".mbedignore")
+            mbedignore.write_text(
+                """
+# Comment
+
+foo/*.txt
+*.py
+"""
+            )
+
+            subject = MbedignoreFilter.from_file(mbedignore)
+
+            self.assertEqual(
+                subject.patterns, (str(Path(temp_directory, "foo/*.txt")), str(Path(temp_directory, "*.py")),)
+            )
