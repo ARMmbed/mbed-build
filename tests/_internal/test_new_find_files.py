@@ -4,7 +4,7 @@ from tempfile import TemporaryDirectory
 from unittest import TestCase
 from typing import Iterable
 
-from mbed_build._internal.new_find_files import list_files, ExcludeMatchingMbedignore
+from mbed_build._internal.new_find_files import find_files, ExcludeMatchingMbedignore
 
 
 @contextlib.contextmanager
@@ -31,12 +31,12 @@ class TestListFiles(TestCase):
             Path("sub_directory", "not_interested.txt"),
         ]
 
-        with create_files(matching_paths + excluded_paths) as program_directory:
-            subject = list_files("file.txt", program_directory)
+        with create_files(matching_paths + excluded_paths) as directory:
+            subject = find_files("file.txt", directory, {})
 
         self.assertEqual(len(subject), len(matching_paths))
         for path in matching_paths:
-            self.assertIn(Path(program_directory, path), subject)
+            self.assertIn(Path(directory, path), subject)
 
     def test_respects_mbedignore(self):
         matching_paths = [
@@ -46,15 +46,31 @@ class TestListFiles(TestCase):
             Path("foo", "file.txt"),
             Path("bar", "file.txt"),
         ]
-        with create_files(matching_paths + excluded_paths) as program_directory:
-            Path(program_directory, ".mbedignore").write_text("foo/*")
-            Path(program_directory, "bar", ".mbedignore").write_text("*")
+        with create_files(matching_paths + excluded_paths) as directory:
+            Path(directory, ".mbedignore").write_text("foo/*")
+            Path(directory, "bar", ".mbedignore").write_text("*")
 
-            subject = list_files("file.txt", program_directory)
+            subject = find_files("file.txt", directory, {})
 
         self.assertEqual(len(subject), len(matching_paths))
         for path in matching_paths:
-            self.assertIn(Path(program_directory, path), subject)
+            self.assertIn(Path(directory, path), subject)
+
+    def test_respects_label_rules(self):
+        matching_paths = [
+            Path("somedir", "TARGET_FOO", "file.txt"),
+        ]
+        excluded_paths = [
+            Path("TARGET_FOO", "TARGET_BAR", "file.txt"),
+            Path("TARGET_X", "file.txt"),
+        ]
+
+        with create_files(matching_paths + excluded_paths) as directory:
+            subject = find_files("file.txt", directory, {"TARGET": ["FOO"]})
+
+        self.assertEqual(len(subject), len(matching_paths))
+        for path in matching_paths:
+            self.assertIn(Path(directory, path), subject)
 
 
 class TestExcludeUsingMbedignore(TestCase):

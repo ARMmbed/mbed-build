@@ -2,13 +2,14 @@ import os
 from pathlib import Path
 import fnmatch
 
-from mbed_targets import get_build_attributes_by_board_type
 
-
-def list_files(desired_filename, program_directory):
+def find_files(desired_filename, directory, allowed_labels):
     result = []
     filters = []
-    for dirpath, dirnames, filenames in os.walk(program_directory):
+    for label_type, allowed_label_values in allowed_labels.items():
+        filters.append(ExcludeUsingLabels(label_type, allowed_label_values))
+
+    for dirpath, dirnames, filenames in os.walk(directory):
         if ".mbedignore" in filenames:
             filters.append(ExcludeMatchingMbedignore.from_file(Path(dirpath, ".mbedignore")))
 
@@ -25,35 +26,14 @@ def list_files(desired_filename, program_directory):
     return result
 
 
-class MatchFilename:
-    def __init__(self, filename):
-        self._filename = filename
+class ExcludeUsingLabels:
+    def __init__(self, label_type, allowed_label_values):
+        self._label_type = label_type
+        self._allowed_labels = set(f"{label_type}_{label_value}" for label_value in allowed_label_values)
 
     def __call__(self, path):
-        return path.name == self._filename
-
-
-# class ExcludeUsingTargetLabels:
-#     def __init__(self, mbed_program_directory, board_type):
-#         build_attributes = get_build_attributes_by_board_type(board_type, mbed_program_directory)
-#         self._filters = [
-#             ExcludeUsingLabels("TARGET", build_attributes.labels),
-#             ExcludeUsingLabels("FEATURE", build_attributes.features),
-#             ExcludeUsingLabels("COMPONENT", build_attributes.components),
-#         ]
-
-#     def __call__(self, path):
-#         return all(f(path) for f in self._filters)
-
-
-# class ExcludeUsingLabels:
-#     def __init__(self, label_type, allowed_label_values):
-#         self._label_type = label_type
-#         self._allowed_labels = set(f"{label_type}_{label_value}" for label_value in allowed_label_values)
-
-#     def __call__(self, path):
-#         labels = set(part for part in path.parts if self._label_type in part)
-#         return labels.issubset(self._allowed_labels)
+        labels = set(part for part in path.parts if self._label_type in part)
+        return labels.issubset(self._allowed_labels)
 
 
 class ExcludeMatchingMbedignore:
