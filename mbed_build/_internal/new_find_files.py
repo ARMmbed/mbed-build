@@ -10,27 +10,6 @@ def find_files(filename, directory, allowed_labels):
     return _find_files(filename, directory, filters)
 
 
-def _find_files(filename, directory, filters):
-    filters = filters[:]
-    result = []
-
-    children = list(directory.iterdir())
-    mbedignore = Path(directory, ".mbedignore")
-    if mbedignore in children:
-        filters.append(ExcludeMatchingMbedignore.from_file(mbedignore))
-
-    filtered_children = (child for child in children if all(f(child) for f in filters))
-
-    for child in filtered_children:
-        if child.is_dir():
-            result += _find_files(filename, child, filters)
-
-        if child.is_file() and child.name == filename:
-            result.append(child)
-
-    return result
-
-
 class ExcludeUsingLabels:
     def __init__(self, label_type, allowed_label_values):
         self._label_type = label_type
@@ -56,3 +35,24 @@ class ExcludeMatchingMbedignore:
         ignore_root = mbedignore_path.parent
         patterns = tuple(str(ignore_root.joinpath(pattern)) for pattern in pattern_lines)
         return cls(patterns)
+
+
+def _find_files(filename, directory, filters):
+    filters = filters[:]
+    result = []
+
+    children = list(directory.iterdir())
+    mbedignore = Path(directory, ".mbedignore")
+    if mbedignore in children:
+        filters.append(ExcludeMatchingMbedignore.from_file(mbedignore))
+
+    filtered_children = (child for child in children if all(f(child) for f in filters))
+
+    for child in filtered_children:
+        if child.is_dir():
+            result += _find_files(filename, child, filters)
+
+        if child.is_file() and child.name == filename:
+            result.append(child)
+
+    return result
