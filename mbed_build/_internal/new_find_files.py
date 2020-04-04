@@ -1,5 +1,4 @@
 import os
-import collections
 from pathlib import Path
 import fnmatch
 
@@ -7,12 +6,10 @@ from mbed_targets import get_build_attributes_by_board_type
 
 
 def list_files(desired_filename, program_directory):
-    filters = []
     result = []
-
+    filters = []
     for dirpath, dirnames, filenames in os.walk(program_directory):
         if ".mbedignore" in filenames:
-            # Prepend to filters, as .mbedignore should match more paths to filter out
             filters.append(ExcludeMatchingMbedignore.from_file(Path(dirpath, ".mbedignore")))
 
         if not all(f(Path(dirpath)) for f in filters):
@@ -25,7 +22,6 @@ def list_files(desired_filename, program_directory):
 
             if desired_filename == filename:
                 result.append(Path(dirpath, filename))
-
     return result
 
 
