@@ -1,7 +1,7 @@
 from pathlib import Path
 import fnmatch
 
-from typing import Iterable, Tuple
+from typing import Callable, Iterable, List, Tuple
 
 
 def find_files(filename, directory, allowed_labels):
@@ -81,14 +81,13 @@ class MbedignoreFilter:
         return cls(patterns)
 
 
-def _find_files(filename, directory, filters):
-    filters = filters[:]
+def _find_files(filename: str, directory: Path, filters: Iterable[Callable]) -> List[Path]:
     result = []
 
     children = list(directory.iterdir())
     mbedignore = Path(directory, ".mbedignore")
     if mbedignore in children:
-        filters.append(MbedignoreFilter.from_file(mbedignore))
+        filters = filters + [MbedignoreFilter.from_file(mbedignore)]
 
     filtered_children = (child for child in children if all(f(child) for f in filters))
 
