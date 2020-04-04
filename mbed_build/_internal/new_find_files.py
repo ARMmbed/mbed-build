@@ -4,25 +4,31 @@ import fnmatch
 
 
 def find_files(desired_filename, directory, allowed_labels):
+    filters = [
+        ExcludeUsingLabels(label_type, allowed_label_values)
+        for label_type, allowed_label_values in allowed_labels.items()
+    ]
+    return _find_files(desired_filename, directory, filters)
+
+
+def _find_files(desired_filename, directory, filters):
+    filters = filters[:]
     result = []
-    filters = []
-    for label_type, allowed_label_values in allowed_labels.items():
-        filters.append(ExcludeUsingLabels(label_type, allowed_label_values))
 
-    for dirpath, dirnames, filenames in os.walk(directory):
-        if ".mbedignore" in filenames:
-            filters.append(ExcludeMatchingMbedignore.from_file(Path(dirpath, ".mbedignore")))
+    children = list(directory.iterdir())
+    mbedignore = Path(directory, ".mbedignore")
+    if mbedignore in children:
+        filters.append(ExcludeMatchingMbedignore.from_file(mbedignore))
 
-        if not all(f(Path(dirpath)) for f in filters):
-            continue
+    filtered_children = (child for child in children if all(f(child) for f in filters))
 
-        for filename in filenames:
-            file_path = Path(dirpath, filename)
-            if not all(f(file_path) for f in filters):
-                continue
+    for child in filtered_children:
+        if child.is_dir():
+            result += _find_files(desired_filename, child, filters)
 
-            if desired_filename == filename:
-                result.append(Path(dirpath, filename))
+        if child.is_file() and child.name == desired_filename:
+            result.append(child)
+
     return result
 
 
