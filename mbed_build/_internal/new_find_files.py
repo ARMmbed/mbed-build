@@ -2,15 +2,15 @@ from pathlib import Path
 import fnmatch
 
 
-def find_files(desired_filename, directory, allowed_labels):
+def find_files(filename, directory, allowed_labels):
     filters = [
         ExcludeUsingLabels(label_type, allowed_label_values)
         for label_type, allowed_label_values in allowed_labels.items()
     ]
-    return _find_files(desired_filename, directory, filters)
+    return _find_files(filename, directory, filters)
 
 
-def _find_files(desired_filename, directory, filters):
+def _find_files(filename, directory, filters):
     filters = filters[:]
     result = []
 
@@ -23,9 +23,9 @@ def _find_files(desired_filename, directory, filters):
 
     for child in filtered_children:
         if child.is_dir():
-            result += _find_files(desired_filename, child, filters)
+            result += _find_files(filename, child, filters)
 
-        if child.is_file() and child.name == desired_filename:
+        if child.is_file() and child.name == filename:
             result.append(child)
 
     return result
