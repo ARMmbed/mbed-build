@@ -6,18 +6,38 @@ from typing import Iterable, Tuple
 
 def find_files(filename, directory, allowed_labels):
     filters = [
-        ExcludeUsingLabels(label_type, allowed_label_values)
-        for label_type, allowed_label_values in allowed_labels.items()
+        LabelFilter(label_type, allowed_label_values) for label_type, allowed_label_values in allowed_labels.items()
     ]
     return _find_files(filename, directory, filters)
 
 
-class ExcludeUsingLabels:
-    def __init__(self, label_type, allowed_label_values):
+class LabelFilter:
+    """Filter out given paths using path labelling rules.
+
+    If a path is labelled with given type, but contains label value which is
+    not allowed, it will be filtered out.
+
+    An example of labelled path is "/mbed-os/rtos/source/TARGET_CORTEX/mbed_lib.json",
+    where label type is "TARGET" and label value is "CORTEX".
+
+    For example, given a label type "FEATURE" and allowed values ["FOO"]:
+    - "/path/FEATURE_FOO/somefile.txt" will not be filtered out
+    - "/path/FEATURE_BAZ/somefile.txt" will be filtered out
+    - "/path/FEATURE_FOO/FEATURE_BAR/somefile.txt" will be filtered out
+    """
+
+    def __init__(self, label_type: str, allowed_label_values: Iterable[str]):
+        """Initialise the filter attributes.
+
+        Args:
+            label_type: Type of the label to filter with. In filtered paths, it prefixes the value.
+            allowed_label_values: Values which are allowed for the given label type.
+        """
         self._label_type = label_type
         self._allowed_labels = set(f"{label_type}_{label_value}" for label_value in allowed_label_values)
 
-    def __call__(self, path):
+    def __call__(self, path: Path) -> bool:
+        """Return True if given path only contains allowed labels."""
         labels = set(part for part in path.parts if self._label_type in part)
         return labels.issubset(self._allowed_labels)
 

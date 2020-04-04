@@ -4,7 +4,7 @@ from tempfile import TemporaryDirectory
 from unittest import TestCase
 from typing import Iterable
 
-from mbed_build._internal.new_find_files import find_files, MbedignoreFilter
+from mbed_build._internal.new_find_files import find_files, MbedignoreFilter, LabelFilter
 
 
 @contextlib.contextmanager
@@ -105,3 +105,19 @@ foo/*.txt
             self.assertEqual(
                 subject.patterns, (str(Path(temp_directory, "foo/*.txt")), str(Path(temp_directory, "*.py")),)
             )
+
+
+class TestLabelFilter(TestCase):
+    def test_matches_paths_not_following_label_rules(self):
+        subject = LabelFilter("TARGET", ["BAR", "BAZ"])
+
+        self.assertFalse(subject(Path("mbed-os", "TARGET_FOO", "some_file.c")))
+        self.assertFalse(subject(Path("mbed-os", "TARGET_BAR", "TARGET_FOO", "other_file.c")))
+
+    def test_does_not_match_paths_following_label_rules(self):
+        subject = LabelFilter("TARGET", ["BAR", "BAZ"])
+
+        self.assertTrue(subject(Path("mbed-os", "TARGET_BAR", "some_file.c")))
+        self.assertTrue(subject(Path("mbed-os", "COMPONENT_X", "header.h")))
+        self.assertTrue(subject(Path("mbed-os", "COMPONENT_X", "TARGET_BAZ", "some_file.c")))
+        self.assertTrue(subject(Path("README.md")))
