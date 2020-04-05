@@ -22,18 +22,25 @@ def find_files(filename: str, directory: Path, filters: Iterable[Callable] = Non
 
     result = []
 
+    # Directories and files to process
     children = list(directory.iterdir())
+
+    # If .mbedignore is one of the children, we need to add it to filter list,
+    # as it might contain rules for currently processed directory, as well as its descendats.
     mbedignore = Path(directory, ".mbedignore")
     if mbedignore in children:
         filters = filters + [MbedignoreFilter.from_file(mbedignore)]
 
+    # Remove files and directories that don't match current set of filters
     filtered_children = (child for child in children if all(f(child) for f in filters))
 
     for child in filtered_children:
         if child.is_dir():
+            # If processed child is a directory, recurse with current set of filters
             result += find_files(filename, child, filters)
 
         if child.is_file() and child.name == filename:
+            # We've got a match
             result.append(child)
 
     return result
