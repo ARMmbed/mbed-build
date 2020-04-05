@@ -107,7 +107,7 @@ foo/*.txt
             subject = MbedignoreFilter.from_file(mbedignore)
 
             self.assertEqual(
-                subject.patterns, (str(Path(temp_directory, "foo/*.txt")), str(Path(temp_directory, "*.py")),)
+                subject._patterns, (str(Path(temp_directory, "foo/*.txt")), str(Path(temp_directory, "*.py")),)
             )
 
 

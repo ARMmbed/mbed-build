@@ -86,15 +86,10 @@ class MbedignoreFilter:
         """
         self._patterns = patterns
 
-    @property
-    def patterns(self) -> Tuple[str]:
-        """Return patterns used for filtering."""
-        return self._patterns
-
     def __call__(self, path: Path) -> bool:
         """Return True if given path doesn't match .mbedignore patterns - should not be filtered out."""
         stringified = str(path)
-        return not any(fnmatch.fnmatch(stringified, pattern) for pattern in self.patterns)
+        return not any(fnmatch.fnmatch(stringified, pattern) for pattern in self._patterns)
 
     @classmethod
     def from_file(cls, mbedignore_path: Path) -> "MbedignoreFilter":
