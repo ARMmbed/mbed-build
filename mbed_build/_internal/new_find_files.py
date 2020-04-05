@@ -1,7 +1,8 @@
 from pathlib import Path
 import fnmatch
-
 from typing import Callable, Iterable, Tuple
+
+from mbed_targets import get_build_attributes_by_board_type
 
 
 def find_files(filename: str, directory: Path, filters: Iterable[Callable] = None):
@@ -46,6 +47,26 @@ def find_files(filename: str, directory: Path, filters: Iterable[Callable] = Non
     return result
 
 
+class BoardLabelFilter:
+    """Filter out given paths using path labelling rules specific to a board."""
+
+    def __init__(self, board_type, mbed_program_directory):
+        """Initialise filter attributes.
+
+        Allowed label data will be retrieved from `mbed-targets`.
+        """
+        build_attributes = get_build_attributes_by_board_type(board_type, mbed_program_directory)
+        self._label_filters = [
+            LabelFilter("TARGET", build_attributes.labels),
+            LabelFilter("FEATURE", build_attributes.features),
+            LabelFilter("COMPONENT", build_attributes.components),
+        ]
+
+    def __call__(self, path: Path) -> bool:
+        """Return True if given path contains only allowed labels - should not be filtered out."""
+        return all(f(path) for f in self._label_filters)
+
+
 class LabelFilter:
     """Filter out given paths using path labelling rules.
 
@@ -72,7 +93,7 @@ class LabelFilter:
         self._allowed_labels = set(f"{label_type}_{label_value}" for label_value in allowed_label_values)
 
     def __call__(self, path: Path) -> bool:
-        """Return True if given path only contains allowed labels - should not be filtered out."""
+        """Return True if given path contains only allowed labels - should not be filtered out."""
         labels = set(part for part in path.parts if self._label_type in part)
         return labels.issubset(self._allowed_labels)
 
