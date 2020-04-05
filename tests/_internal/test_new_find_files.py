@@ -32,7 +32,7 @@ class TestListFiles(TestCase):
         ]
 
         with create_files(matching_paths + excluded_paths) as directory:
-            subject = find_files("file.txt", directory, {})
+            subject = find_files("file.txt", directory)
 
         self.assertEqual(len(subject), len(matching_paths))
         for path in matching_paths:
@@ -50,23 +50,27 @@ class TestListFiles(TestCase):
             Path(directory, ".mbedignore").write_text("foo/*")
             Path(directory, "bar", ".mbedignore").write_text("*")
 
-            subject = find_files("file.txt", directory, {})
+            subject = find_files("file.txt", directory)
 
         self.assertEqual(len(subject), len(matching_paths))
         for path in matching_paths:
             self.assertIn(Path(directory, path), subject)
 
-    def test_respects_label_rules(self):
+    def test_respects_given_filters(self):
         matching_paths = [
-            Path("somedir", "TARGET_FOO", "file.txt"),
+            Path("foo", "file.txt"),
+            Path("hello", "world", "file.txt"),
         ]
         excluded_paths = [
-            Path("TARGET_FOO", "TARGET_BAR", "file.txt"),
-            Path("TARGET_X", "file.txt"),
+            Path("bar", "file.txt"),
+            Path("foo", "foo-bar", "file.txt"),
         ]
 
+        def my_filter(path):
+            return "bar" not in str(path)
+
         with create_files(matching_paths + excluded_paths) as directory:
-            subject = find_files("file.txt", directory, {"TARGET": ["FOO"]})
+            subject = find_files("file.txt", directory, [my_filter])
 
         self.assertEqual(len(subject), len(matching_paths))
         for path in matching_paths:

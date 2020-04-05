@@ -1,14 +1,42 @@
 from pathlib import Path
 import fnmatch
 
-from typing import Callable, Iterable, List, Tuple
+from typing import Callable, Iterable, Tuple
 
 
-def find_files(filename, directory, allowed_labels):
-    filters = [
-        LabelFilter(label_type, allowed_label_values) for label_type, allowed_label_values in allowed_labels.items()
-    ]
-    return _find_files(filename, directory, filters)
+def find_files(filename: str, directory: Path, filters: Iterable[Callable] = None):
+    """Recursively find files by name under a given directory.
+
+    This function automatically applies rules from .mbedignore files found during traversal.
+
+    Args:
+        filename: Name of the file to look for.
+        directory: Location where search starts.
+        filters: Optional list of exclude filters to apply.
+
+    TODO: mention that filters cut quickly - directory won't be recursed into if it's filtered out
+    Maybe they should be called exclusions?
+    """
+    if filters is None:
+        filters = []
+
+    result = []
+
+    children = list(directory.iterdir())
+    mbedignore = Path(directory, ".mbedignore")
+    if mbedignore in children:
+        filters = filters + [MbedignoreFilter.from_file(mbedignore)]
+
+    filtered_children = (child for child in children if all(f(child) for f in filters))
+
+    for child in filtered_children:
+        if child.is_dir():
+            result += find_files(filename, child, filters)
+
+        if child.is_file() and child.name == filename:
+            result.append(child)
+
+    return result
 
 
 class LabelFilter:
@@ -79,23 +107,3 @@ class MbedignoreFilter:
         ignore_root = mbedignore_path.parent
         patterns = tuple(str(ignore_root.joinpath(pattern)) for pattern in pattern_lines)
         return cls(patterns)
-
-
-def _find_files(filename: str, directory: Path, filters: Iterable[Callable]) -> List[Path]:
-    result = []
-
-    children = list(directory.iterdir())
-    mbedignore = Path(directory, ".mbedignore")
-    if mbedignore in children:
-        filters = filters + [MbedignoreFilter.from_file(mbedignore)]
-
-    filtered_children = (child for child in children if all(f(child) for f in filters))
-
-    for child in filtered_children:
-        if child.is_dir():
-            result += _find_files(filename, child, filters)
-
-        if child.is_file() and child.name == filename:
-            result.append(child)
-
-    return result
