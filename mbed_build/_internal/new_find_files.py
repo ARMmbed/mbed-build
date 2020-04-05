@@ -1,11 +1,11 @@
 from pathlib import Path
 import fnmatch
-from typing import Callable, Iterable, Tuple
+from typing import Callable, Iterable, Optional, List, Tuple
 
 from mbed_targets import get_build_attributes_by_board_type
 
 
-def find_files(filename: str, directory: Path, filters: Iterable[Callable] = None):
+def find_files(filename: str, directory: Path, filters: Optional[List[Callable]] = None) -> List[Path]:
     """Recursively find files by name under a given directory.
 
     This function automatically applies rules from .mbedignore files found during traversal.
@@ -21,7 +21,7 @@ def find_files(filename: str, directory: Path, filters: Iterable[Callable] = Non
     if filters is None:
         filters = []
 
-    result = []
+    result: List[Path] = []
 
     # Directories and files to process
     children = list(directory.iterdir())
@@ -50,7 +50,7 @@ def find_files(filename: str, directory: Path, filters: Iterable[Callable] = Non
 class BoardLabelFilter:
     """Filter out given paths using path labelling rules specific to a board."""
 
-    def __init__(self, board_type, mbed_program_directory):
+    def __init__(self, board_type: str, mbed_program_directory: Path):
         """Initialise filter attributes.
 
         Allowed label data will be retrieved from `mbed-targets`.
@@ -106,7 +106,7 @@ class MbedignoreFilter:
     .gitignore and friends.
     """
 
-    def __init__(self, patterns: Tuple[str]):
+    def __init__(self, patterns: Tuple[str, ...]):
         """Initialise the filter attributes.
 
         Args:
