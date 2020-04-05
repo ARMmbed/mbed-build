@@ -9,13 +9,13 @@ def find_files(filename: str, directory: Path, filters: Iterable[Callable] = Non
 
     This function automatically applies rules from .mbedignore files found during traversal.
 
+    It is important to realise that applied filters are "greedy". The moment a directory is filtered out,
+    its children won't be traversed.
+
     Args:
         filename: Name of the file to look for.
         directory: Location where search starts.
         filters: Optional list of exclude filters to apply.
-
-    TODO: mention that filters cut quickly - directory won't be recursed into if it's filtered out
-    Maybe they should be called exclusions?
     """
     if filters is None:
         filters = []
@@ -65,7 +65,7 @@ class LabelFilter:
         self._allowed_labels = set(f"{label_type}_{label_value}" for label_value in allowed_label_values)
 
     def __call__(self, path: Path) -> bool:
-        """Return True if given path only contains allowed labels."""
+        """Return True if given path only contains allowed labels - should not be filtered out."""
         labels = set(part for part in path.parts if self._label_type in part)
         return labels.issubset(self._allowed_labels)
 
@@ -92,7 +92,7 @@ class MbedignoreFilter:
         return self._patterns
 
     def __call__(self, path: Path) -> bool:
-        """Return True if given path doesn't match .mbedignore patterns."""
+        """Return True if given path doesn't match .mbedignore patterns - should not be filtered out."""
         stringified = str(path)
         return not any(fnmatch.fnmatch(stringified, pattern) for pattern in self.patterns)
 
