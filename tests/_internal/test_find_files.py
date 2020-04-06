@@ -22,7 +22,7 @@ def create_files(files: Iterable[Path]):
             file_directory = file_path.parent
             file_directory.mkdir(parents=True, exist_ok=True)
             file_path.touch()
-        yield Path(temp_directory)
+        yield temp_directory
 
 
 class TestListFiles(TestCase):
