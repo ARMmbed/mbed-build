@@ -32,7 +32,7 @@ def find_files(filename: str, directory: Path, filters: Optional[List[Callable]]
     children = list(directory.iterdir())
 
     # If .mbedignore is one of the children, we need to add it to filter list,
-    # as it might contain rules for currently processed directory, as well as its descendats.
+    # as it might contain rules for currently processed directory, as well as its descendants.
     mbedignore = Path(directory, ".mbedignore")
     if mbedignore in children:
         filters = filters + [MbedignoreFilter.from_file(mbedignore)]
