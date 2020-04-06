@@ -2,118 +2,166 @@
 # Copyright (C) 2020 Arm Mbed. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
-from unittest import TestCase, mock
+import contextlib
 from pathlib import Path
-from pyfakefs.fake_filesystem_unittest import patchfs
+from tempfile import TemporaryDirectory
+from unittest import TestCase, mock
+from typing import Iterable
+
 from mbed_targets import MbedTargetBuildAttributes
 
-from mbed_build._internal.find_files import (
-    find_files,
-    exclude_using_mbedignore,
-    exclude_using_target_labels,
-    exclude_using_labels,
-)
+from mbed_build._internal.find_files import find_files, MbedignoreFilter, LabelFilter, BoardLabelFilter
 
 
-class TestFindFiles(TestCase):
-    @patchfs
-    def test_finds_files_by_name_in_given_root(self, fs):
-        files = [
-            Path("root", "folder_1", "file.txt"),
-            Path("root", "folder_1", "folder_1_1", "file.txt"),
-            Path("root", "folder_2", "file.txt"),
-        ]
+@contextlib.contextmanager
+def create_files(files: Iterable[Path]):
+    with TemporaryDirectory() as temp_directory:
+        temp_directory = Path(temp_directory)
         for file in files:
-            fs.create_file(file)
+            file_path = temp_directory / file
+            file_directory = file_path.parent
+            file_directory.mkdir(parents=True, exist_ok=True)
+            file_path.touch()
+        yield temp_directory
 
-        subject = find_files("file.txt", directory=Path("root"))
 
-        self.assertEqual(list(subject), files)
-
-
-class TestExcludeUsingMbedignore(TestCase):
-    @patchfs
-    def test_excludes_files_ignored_by_mbedignore(self, fs):
-        project_path = Path("project")
-        fs.create_file(
-            project_path.joinpath(".mbedignore"),
-            contents="""
-*.py
-hidden.txt
-
-*/test/*
-*/stubs/*
-stubs/*
-""",
-        )
-        fs.create_file(project_path.joinpath("isolated", ".mbedignore"), contents="*")
-
-        paths = [
-            Path("foo.py"),
-            Path("project", "test", "foo.html"),
+class TestListFiles(TestCase):
+    def test_finds_files_by_name(self):
+        matching_paths = [
+            Path("file.txt"),
+            Path("sub_directory", "file.txt"),
         ]
-
         excluded_paths = [
-            Path("project", "nested", "test", "file.doc"),
-            Path("project", "nested", "stubs", "file.xls"),
-            Path("project", "stubs", "file.xls"),
-            Path("project", "hidden.txt"),
-            Path("project", "file.py"),
-            Path("project", "isolated", "file.c"),
+            Path("not_interested.txt"),
+            Path("sub_directory", "not_interested.txt"),
         ]
 
-        subject = exclude_using_mbedignore(project_path, paths + excluded_paths)
+        with create_files(matching_paths + excluded_paths) as directory:
+            subject = find_files("file.txt", directory)
 
-        self.assertEqual(list(subject), paths)
+        self.assertEqual(len(subject), len(matching_paths))
+        for path in matching_paths:
+            self.assertIn(Path(directory, path), subject)
+
+    def test_respects_mbedignore(self):
+        matching_paths = [
+            Path("file.txt"),
+        ]
+        excluded_paths = [
+            Path("foo", "file.txt"),
+            Path("bar", "file.txt"),
+        ]
+        with create_files(matching_paths + excluded_paths) as directory:
+            Path(directory, ".mbedignore").write_text("foo/*")
+            Path(directory, "bar", ".mbedignore").write_text("*")
+
+            subject = find_files("file.txt", directory)
+
+        self.assertEqual(len(subject), len(matching_paths))
+        for path in matching_paths:
+            self.assertIn(Path(directory, path), subject)
+
+    def test_respects_given_filters(self):
+        matching_paths = [
+            Path("foo", "file.txt"),
+            Path("hello", "world", "file.txt"),
+        ]
+        excluded_paths = [
+            Path("bar", "file.txt"),
+            Path("foo", "foo-bar", "file.txt"),
+        ]
+
+        def my_filter(path):
+            return "bar" not in str(path)
+
+        with create_files(matching_paths + excluded_paths) as directory:
+            subject = find_files("file.txt", directory, [my_filter])
+
+        self.assertEqual(len(subject), len(matching_paths))
+        for path in matching_paths:
+            self.assertIn(Path(directory, path), subject)
 
 
-class TestExcludeUsingTargetLabels(TestCase):
-    @mock.patch("mbed_build._internal.find_files.get_build_attributes_by_board_type", autospec=True)
-    @mock.patch("mbed_build._internal.find_files.exclude_using_labels", autospec=True)
-    def test_excludes_paths_using_target_labels(self, exclude_using_labels, get_build_attributes_by_board_type):
+@mock.patch("mbed_build._internal.find_files.get_build_attributes_by_board_type", autospec=True)
+class TestBoardLabelFilter(TestCase):
+    def test_matches_paths_not_following_board_label_rules(self, get_build_attributes_by_board_type):
         build_attributes = mock.Mock(
-            MbedTargetBuildAttributes, labels={"TARGET"}, features={"FEATURE"}, components={"COMPONENT"}
+            MbedTargetBuildAttributes, labels={"T"}, features={"F"}, components={"C"}
         )  # Zero interface safety here, dataclasses don't support spec_set
         get_build_attributes_by_board_type.return_value = build_attributes
-        after_target_filtering = [Path("filtered_using_targets")]
-        after_feature_filtering = [Path("filtered_using_features")]
-        after_component_filtering = [Path("filtered_using_components")]
-        exclude_using_labels.side_effect = [after_target_filtering, after_feature_filtering, after_component_filtering]
-        mbed_program_directory = Path("some-path")
-        board_type = "A_TYPE"
-        paths = [Path("mbed_lib.json")]
+        mbed_program_directory = Path("some-program")
+        board_type = "K64F"
 
-        subject = exclude_using_target_labels(mbed_program_directory, board_type, paths)
+        subject = BoardLabelFilter(board_type, mbed_program_directory)
 
-        self.assertEqual(subject, after_component_filtering)
-        get_build_attributes_by_board_type.assert_called_once_with(board_type, mbed_program_directory)
-        self.assertEqual(
-            exclude_using_labels.mock_calls,
-            [
-                mock.call("TARGET", build_attributes.labels, paths),
-                mock.call("FEATURE", build_attributes.features, after_target_filtering),
-                mock.call("COMPONENT", build_attributes.components, after_feature_filtering),
-            ],
-        )
+        self.assertFalse(subject(Path("TARGET_X")))
+        self.assertFalse(subject(Path("TARGET_T", "FEATURE_X")))
+        self.assertFalse(subject(Path("TARGET_T", "FEATURE_F", "COMPONENT_X")))
+
+        get_build_attributes_by_board_type.assert_called_with(board_type, mbed_program_directory)
+
+    def test_does_not_match_paths_following_board_label_rules(self, get_build_attributes_by_board_type):
+        build_attributes = mock.Mock(
+            MbedTargetBuildAttributes, labels={"T"}, features={"F"}, components={"C"}
+        )  # Zero interface safety here, dataclasses don't support spec_set
+        get_build_attributes_by_board_type.return_value = build_attributes
+        mbed_program_directory = Path("some-program")
+        board_type = "K64F"
+
+        subject = BoardLabelFilter(board_type, mbed_program_directory)
+
+        self.assertTrue(subject(Path("TARGET_T")))
+        self.assertTrue(subject(Path("TARGET_T", "FEATURE_F")))
+        self.assertTrue(subject(Path("TARGET_T", "FEATURE_F", "COMPONENT_C")))
+
+        get_build_attributes_by_board_type.assert_called_with(board_type, mbed_program_directory)
 
 
-class TestExcludeUsingLabels(TestCase):
-    def test_excludes_files_not_matching_label(self):
-        paths = [
-            Path("mbed-os", "TARGET_BAR", "some_file.c"),
-            Path("mbed-os", "COMPONENT_X", "header.h"),
-            Path("mbed-os", "COMPONENT_X", "TARGET_BAZ", "some_file.c"),
-            Path("README.md"),
-        ]
+class TestLabelFilter(TestCase):
+    def test_matches_paths_not_following_label_rules(self):
+        subject = LabelFilter("TARGET", ["BAR", "BAZ"])
 
-        excluded_paths = [
-            Path("mbed-os", "TARGET_FOO", "some_file.c"),
-            Path("mbed-os", "TARGET_FOO", "nested", "other_file.c"),
-            Path("mbed-os", "TARGET_BAR", "TARGET_FOO", "other_file.c"),
-        ]
+        self.assertFalse(subject(Path("mbed-os", "TARGET_FOO", "some_file.c")))
+        self.assertFalse(subject(Path("mbed-os", "TARGET_BAR", "TARGET_FOO", "other_file.c")))
 
-        subject = exclude_using_labels(
-            label_type="TARGET", allowed_label_values={"BAR", "BAZ"}, paths=(paths + excluded_paths)
-        )
+    def test_does_not_match_paths_following_label_rules(self):
+        subject = LabelFilter("TARGET", ["BAR", "BAZ"])
 
-        self.assertEqual(list(subject), paths)
+        self.assertTrue(subject(Path("mbed-os", "TARGET_BAR", "some_file.c")))
+        self.assertTrue(subject(Path("mbed-os", "COMPONENT_X", "header.h")))
+        self.assertTrue(subject(Path("mbed-os", "COMPONENT_X", "TARGET_BAZ", "some_file.c")))
+        self.assertTrue(subject(Path("README.md")))
+
+
+class TestMbedignoreFilter(TestCase):
+    def test_matches_files_by_name(self):
+        subject = MbedignoreFilter(("*.py",))
+
+        self.assertFalse(subject("file.py"))
+        self.assertFalse(subject("nested/file.py"))
+        self.assertTrue(subject("file.txt"))
+
+    def test_matches_wildcards(self):
+        subject = MbedignoreFilter(("*/test/*",))
+
+        self.assertFalse(subject("foo/test/bar.txt"))
+        self.assertFalse(subject("bar/test/other/file.py"))
+        self.assertTrue(subject("file.txt"))
+
+    def test_from_file(self):
+        with TemporaryDirectory() as temp_directory:
+            mbedignore = Path(temp_directory, ".mbedignore")
+            mbedignore.write_text(
+                """
+# Comment
+
+foo/*.txt
+*.py
+"""
+            )
+
+            subject = MbedignoreFilter.from_file(mbedignore)
+
+            self.assertEqual(
+                subject._patterns, (str(Path(temp_directory, "foo/*.txt")), str(Path(temp_directory, "*.py")),)
+            )
