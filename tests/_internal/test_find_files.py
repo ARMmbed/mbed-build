@@ -20,8 +20,7 @@ def create_files(files: Iterable[Path]):
         for file in files:
             file_path = temp_directory / file
             file_directory = file_path.parent
-            if not file_directory.exists():
-                file_directory.mkdir(parents=True)
+            file_directory.mkdir(parents=True, exist_ok=True)
             file_path.touch()
         yield Path(temp_directory)
 
