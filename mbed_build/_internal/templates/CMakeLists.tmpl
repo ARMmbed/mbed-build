@@ -8,4 +8,4 @@ set_property(GLOBAL PROPERTY MBED_OS_FEATURE_LABELS {% for label in feature_labe
 
 set_property(GLOBAL PROPERTY MBED_OS_COMPONENT_LABELS {% for label in component_labels %}{{label}};{% endfor %})
 
-set_property(GLOBAL PROPERTY MBED_OS_TOOLCHAIN_LABELS {% for label in toolchain_labels %}{{label}};{% endfor %})
+set_property(GLOBAL PROPERTY MBED_OS_TOOLCHAIN_LABELS {{ toolchain_name }})

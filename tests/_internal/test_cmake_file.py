@@ -15,10 +15,10 @@ class TestRendersCMakeListsFile(TestCase):
         target_labels = ["foo", "bar"]
         feature_labels = ["foo", "bar"]
         component_labels = ["foo", "bar"]
-        toolchain_labels = ["baz"]
-        result = render_cmakelists_template(target_labels, feature_labels, component_labels, toolchain_labels)
+        toolchain_name = "baz"
+        result = render_cmakelists_template(target_labels, feature_labels, component_labels, toolchain_name)
 
-        for label in target_labels + feature_labels + component_labels + toolchain_labels:
+        for label in target_labels + feature_labels + component_labels + [toolchain_name]:
             self.assertIn(label, result)
 
 

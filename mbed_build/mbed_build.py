@@ -24,12 +24,11 @@ def generate_cmakelists_file(mbed_target: str, mbed_os_path: str, toolchain_name
         A string of rendered contents for the file.
     """
     target_build_attributes = get_build_attributes_by_board_type(mbed_target, mbed_os_path)
-    toolchain_labels = _fetch_toolchain_labels(toolchain_name)
     return render_cmakelists_template(
         target_build_attributes.labels,
         target_build_attributes.features,
         target_build_attributes.components,
-        toolchain_labels,
+        toolchain_name,
     )
 
 
@@ -46,8 +45,3 @@ def export_cmakelists_file(output_directory: pathlib.Path, file_contents: str) -
     if output_directory.is_file():
         raise InvalidExportOutputDirectory("Output directory cannot be a path to a file.")
     write_cmakelists_file(output_directory, file_contents)
-
-
-def _fetch_toolchain_labels(toolchain_name: str) -> Iterable[str]:
-    # ToDo: Hook this up to return toolchain-specific labels
-    return [toolchain_name]
