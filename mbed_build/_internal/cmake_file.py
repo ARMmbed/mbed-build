@@ -13,10 +13,7 @@ TEMPLATE_NAME = "CMakeLists.tmpl"
 
 
 def render_cmakelists_template(
-    target_labels: Iterable[str],
-    feature_labels: Iterable[str],
-    component_labels: Iterable[str],
-    toolchain_labels: Iterable[str],
+    target_labels: Iterable[str], feature_labels: Iterable[str], component_labels: Iterable[str], toolchain_name: str,
 ) -> str:
     """Loads the CMakeLists.txt file template and renders it with the correct details.
 
@@ -24,7 +21,7 @@ def render_cmakelists_template(
         target_labels: target-specific magic mbed-os directory names that need to be included in the build
         feature_labels: target-specific magic mbed-os feature directory names that need to be included in the build
         component_labels: target-specific magic mbed-os component directory names that need to be included in the build
-        toolchain_labels: the toolchain-specific magic mbed-os directory names that need to be included in the build
+        toolchain_name: the toolchain-specific magic mbed-os directory name that need to be included in the build
 
     Returns:
         The contents of the rendered CMake file.
@@ -35,7 +32,7 @@ def render_cmakelists_template(
         "target_labels": target_labels,
         "feature_labels": feature_labels,
         "component_labels": component_labels,
-        "toolchain_labels": toolchain_labels,
+        "toolchain_name": toolchain_name,
     }
     return template.render(context)
 
