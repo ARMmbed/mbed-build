@@ -13,11 +13,17 @@ from mbed_build.mbed_build import generate_cmakelists_file, export_cmakelists_fi
 class TestGenerateCMakeListsFile(TestCase):
     @mock.patch("mbed_build.mbed_build._fetch_toolchain_labels")
     @mock.patch("mbed_build.mbed_build.render_cmakelists_template")
-    def test_correct_arguments_passed(self, render_cmakelists_template, _fetch_toolchain_labels):
+    @mock.patch("mbed_build.mbed_build.get_build_attributes_by_board_type")
+    def test_correct_arguments_passed(self, get_build_attributes_by_board_type, render_cmakelists_template, _fetch_toolchain_labels):
         target_build_attributes = mock.Mock()
+        get_build_attributes_by_board_type.return_value = target_build_attributes
+        mbed_target = "K64F"
+        mbed_os_path = "mbed-os"
         toolchain_name = "GCC"
-        generate_cmakelists_file(target_build_attributes, toolchain_name)
 
+        generate_cmakelists_file(mbed_target, mbed_os_path, toolchain_name)
+
+        get_build_attributes_by_board_type.assert_called_once_with(mbed_target, mbed_os_path)
         _fetch_toolchain_labels.assert_called_once_with(toolchain_name)
         render_cmakelists_template.assert_called_once_with(
             target_build_attributes.labels,

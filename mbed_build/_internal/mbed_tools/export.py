@@ -6,7 +6,6 @@
 import pathlib
 
 import click
-from mbed_targets import get_build_attributes_by_board_type
 
 from mbed_build.mbed_build import generate_cmakelists_file, write_cmakelists_file
 
@@ -44,6 +43,5 @@ def export(output_directory: str, toolchain: str, mbed_target: str, mbed_os_path
     Raises:
         InvalidExportOutputDirectory: it's not possible to export to the output directory provided
     """
-    target_build_attributes = get_build_attributes_by_board_type(mbed_target, mbed_os_path)
-    cmake_file_contents = generate_cmakelists_file(target_build_attributes, toolchain)
+    cmake_file_contents = generate_cmakelists_file(mbed_target, mbed_os_path, toolchain)
     write_cmakelists_file(pathlib.Path(output_directory), cmake_file_contents)

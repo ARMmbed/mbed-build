@@ -5,21 +5,25 @@
 """Module to generate application's CMake file."""
 import pathlib
 from typing import Iterable
-from mbed_targets.mbed_target_build_attributes import MbedTargetBuildAttributes
+
+from mbed_targets import get_build_attributes_by_board_type
+
 from mbed_build._internal.cmake_file import render_cmakelists_template, write_cmakelists_file
 from mbed_build.exceptions import InvalidExportOutputDirectory
 
 
-def generate_cmakelists_file(target_build_attributes: MbedTargetBuildAttributes, toolchain_name: str) -> str:
+def generate_cmakelists_file(mbed_target: str, mbed_os_path: str, toolchain_name: str) -> str:
     """Generate the top-level CMakeLists.txt file containing the correct definitions for a build.
 
     Args:
-        target_build_attributes: the build attributes for the target the application is being built for
+        mbed_target: the target the application is being built for
+        mbed_os_path: the path to the project's copy of the Mbed OS library
         toolchain_name: the toolchain to be used to build the application
 
     Returns:
         A string of rendered contents for the file.
     """
+    target_build_attributes = get_build_attributes_by_board_type(mbed_target, mbed_os_path)
     toolchain_labels = _fetch_toolchain_labels(toolchain_name)
     return render_cmakelists_template(
         target_build_attributes.labels,

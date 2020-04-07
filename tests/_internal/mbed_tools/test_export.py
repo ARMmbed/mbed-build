@@ -14,28 +14,26 @@ from mbed_build._internal import templates
 
 
 class TestExport(TestCase):
-    @mock.patch("mbed_build._internal.mbed_tools.export.get_build_attributes_by_board_type")
-    def test_export(self, mock_get_build_attributes):
+    @mock.patch("mbed_build._internal.mbed_tools.export.generate_cmakelists_file")
+    def test_export(self, mock_generate_cmakelists_file):
         # This is needed to have access to the templates directory in Patcher filesystem.
         self.setUpPyfakefs()
         self.fs.add_real_directory(os.path.dirname(templates.__file__))
 
-        mock_build_attributes = mock.Mock()
-        mock_build_attributes.labels = frozenset(["label"])
-        mock_build_attributes.features = frozenset(["feature"])
-        mock_build_attributes.components = frozenset(["component"])
-        mock_get_build_attributes.return_value = mock_build_attributes
+        mock_file_contents = "Hello world"
+        mock_generate_cmakelists_file.return_value = mock_file_contents
 
-        output_dir = "some_directory"
+        output_dir = "some-directory"
         mbed_os_path = "mbed-os"
         mbed_target = "K64F"
-        mbed_toolchain = "GCC"
+        toolchain = "GCC"
 
         runner = CliRunner()
         result = runner.invoke(
-            export, ["-o", output_dir, "-t", mbed_toolchain, "-m", mbed_target, "-p", mbed_os_path]
+            export, ["-o", output_dir, "-t", toolchain, "-m", mbed_target, "-p", mbed_os_path]
         )
         self.assertEqual(result.exit_code, 0)
+        mock_generate_cmakelists_file.assert_called_once_with(mbed_target, mbed_os_path, toolchain)
 
         exported_file = pathlib.Path(output_dir, "CMakeLists.txt")
-        self.assertTrue(exported_file.is_file())
+        self.assertEqual(exported_file.read_text(), mock_file_contents)
