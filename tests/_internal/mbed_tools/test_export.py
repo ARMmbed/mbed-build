@@ -27,13 +27,13 @@ class TestExport(TestCase):
         mock_get_build_attributes.return_value = mock_build_attributes
 
         output_dir = "some_directory"
-        target_json_path = "targets.json"
+        mbed_os_path = "mbed-os"
         mbed_target = "K64F"
         mbed_toolchain = "GCC"
 
         runner = CliRunner()
         result = runner.invoke(
-            export, ["-o", output_dir, "-t", mbed_toolchain, "-m", mbed_target, "-p", target_json_path]
+            export, ["-o", output_dir, "-t", mbed_toolchain, "-m", mbed_target, "-p", mbed_os_path]
         )
         self.assertEqual(result.exit_code, 0)
 
