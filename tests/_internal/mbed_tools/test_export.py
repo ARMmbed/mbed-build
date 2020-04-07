@@ -29,9 +29,7 @@ class TestExport(TestCase):
         toolchain = "GCC"
 
         runner = CliRunner()
-        result = runner.invoke(
-            export, ["-o", output_dir, "-t", toolchain, "-m", mbed_target, "-p", mbed_os_path]
-        )
+        result = runner.invoke(export, ["-o", output_dir, "-t", toolchain, "-m", mbed_target, "-p", mbed_os_path])
         self.assertEqual(result.exit_code, 0)
         mock_generate_cmakelists_file.assert_called_once_with(mbed_target, mbed_os_path, toolchain)
 
