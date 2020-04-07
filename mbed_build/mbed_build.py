@@ -4,7 +4,6 @@
 #
 """Module to generate application's CMake file."""
 import pathlib
-from typing import Iterable
 
 from mbed_targets import get_build_attributes_by_board_type
 

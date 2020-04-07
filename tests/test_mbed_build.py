@@ -13,9 +13,7 @@ from mbed_build.mbed_build import generate_cmakelists_file, export_cmakelists_fi
 class TestGenerateCMakeListsFile(TestCase):
     @mock.patch("mbed_build.mbed_build.render_cmakelists_template")
     @mock.patch("mbed_build.mbed_build.get_build_attributes_by_board_type")
-    def test_correct_arguments_passed(
-        self, get_build_attributes_by_board_type, render_cmakelists_template
-    ):
+    def test_correct_arguments_passed(self, get_build_attributes_by_board_type, render_cmakelists_template):
         target_build_attributes = mock.Mock()
         get_build_attributes_by_board_type.return_value = target_build_attributes
         mbed_target = "K64F"

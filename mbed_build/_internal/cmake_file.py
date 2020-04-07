@@ -13,10 +13,7 @@ TEMPLATE_NAME = "CMakeLists.tmpl"
 
 
 def render_cmakelists_template(
-    target_labels: Iterable[str],
-    feature_labels: Iterable[str],
-    component_labels: Iterable[str],
-    toolchain_name: str,
+    target_labels: Iterable[str], feature_labels: Iterable[str], component_labels: Iterable[str], toolchain_name: str,
 ) -> str:
     """Loads the CMakeLists.txt file template and renders it with the correct details.
 
