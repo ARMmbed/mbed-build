@@ -2,10 +2,10 @@
     ToDo: use the correct definitions in the current versions of dev_cmake branches
     Not currently representative of final output
 #}
-set_property(GLOBAL PROPERTY MBED_OS_TARGET_LABELS {% for label in target_labels %}{{label}};{% endfor %})
+set_property(GLOBAL PROPERTY MBED_OS_TARGET_KEYS {% for label in target_labels %}{{label}};{% endfor %})
 
-set_property(GLOBAL PROPERTY MBED_OS_FEATURE_LABELS {% for label in feature_labels %}{{label}};{% endfor %})
+set_property(GLOBAL PROPERTY MBED_OS_FEATURE_KEYS {% for label in feature_labels %}{{label}};{% endfor %})
 
-set_property(GLOBAL PROPERTY MBED_OS_COMPONENT_LABELS {% for label in component_labels %}{{label}};{% endfor %})
+set_property(GLOBAL PROPERTY MBED_OS_COMPONENT_KEYS {% for label in component_labels %}{{label}};{% endfor %})
 
-set_property(GLOBAL PROPERTY MBED_OS_TOOLCHAIN_LABELS {{ toolchain_name }})
+set_property(GLOBAL PROPERTY MBED_OS_TOOLCHAIN {{ toolchain_name }})
