@@ -3,30 +3,29 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 import pathlib
-import os
+from unittest import TestCase, mock
 
 from click.testing import CliRunner
-from pyfakefs.fake_filesystem_unittest import TestCase
 
 from mbed_build._internal.mbed_tools.export import export
-from mbed_build._internal import templates
 
 
 class TestExport(TestCase):
-    def test_export(self):
-        # This is needed to have access to the templates directory in Patcher filesystem.
-        self.setUpPyfakefs()
-        self.fs.add_real_directory(os.path.dirname(templates.__file__))
-
-        output_dir = "some_directory"
+    @mock.patch("mbed_build._internal.mbed_tools.export.generate_cmakelists_file")
+    @mock.patch("mbed_build._internal.mbed_tools.export.write_cmakelists_file")
+    def test_export(self, mock_write_cmakelists_file, mock_generate_cmakelists_file):
+        mock_file_contents = "Hello world"
+        mock_generate_cmakelists_file.return_value = mock_file_contents
+        output_dir = "some-directory"
+        mbed_os_path = "mbed-os"
         mbed_target = "K64F"
-        mbed_toolchain = "GCC"
+        toolchain = "GCC"
 
         runner = CliRunner()
-        result = runner.invoke(export, ["-o", output_dir, "-t", mbed_toolchain, "-m", mbed_target])
-        self.assertEqual(result.exit_code, 0)
+        result = runner.invoke(export, ["-o", output_dir, "-t", toolchain, "-m", mbed_target, "-p", mbed_os_path])
 
-        exported_file = pathlib.Path(output_dir, "CMakeLists.txt")
-        text = exported_file.read_text()
-        self.assertIn(mbed_target, text)
-        self.assertIn(mbed_toolchain, text)
+        self.assertEqual(result.exit_code, 0)
+        mock_generate_cmakelists_file.assert_called_once_with(mbed_target, mbed_os_path, toolchain)
+        mock_write_cmakelists_file.assert_called_once_with(
+            pathlib.Path(output_dir), mock_generate_cmakelists_file.return_value
+        )

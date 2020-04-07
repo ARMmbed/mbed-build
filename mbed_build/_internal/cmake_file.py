@@ -4,7 +4,7 @@
 #
 """Module in charge of CMake file generation."""
 import pathlib
-from typing import List
+from typing import Iterable
 
 import jinja2
 
@@ -12,11 +12,18 @@ TEMPLATES_DIRECTORY = pathlib.Path("_internal", "templates")
 TEMPLATE_NAME = "CMakeLists.tmpl"
 
 
-def render_cmakelists_template(target_labels: List[str], toolchain_labels: List[str]) -> str:
+def render_cmakelists_template(
+    target_labels: Iterable[str],
+    feature_labels: Iterable[str],
+    component_labels: Iterable[str],
+    toolchain_labels: Iterable[str],
+) -> str:
     """Loads the CMakeLists.txt file template and renders it with the correct details.
 
     Args:
-        target_labels: the target-specific magic mbed-os directory names that need to be included in the build
+        target_labels: target-specific magic mbed-os directory names that need to be included in the build
+        feature_labels: target-specific magic mbed-os feature directory names that need to be included in the build
+        component_labels: target-specific magic mbed-os component directory names that need to be included in the build
         toolchain_labels: the toolchain-specific magic mbed-os directory names that need to be included in the build
 
     Returns:
@@ -24,7 +31,12 @@ def render_cmakelists_template(target_labels: List[str], toolchain_labels: List[
     """
     env = jinja2.Environment(loader=jinja2.PackageLoader("mbed_build", str(TEMPLATES_DIRECTORY)),)
     template = env.get_template(TEMPLATE_NAME)
-    context = {"target_labels": target_labels, "toolchain_labels": toolchain_labels}
+    context = {
+        "target_labels": target_labels,
+        "feature_labels": feature_labels,
+        "component_labels": component_labels,
+        "toolchain_labels": toolchain_labels,
+    }
     return template.render(context)
 
 
