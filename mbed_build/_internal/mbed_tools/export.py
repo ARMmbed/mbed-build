@@ -47,4 +47,4 @@ def export(output_directory: str, toolchain: str, mbed_target: str, project_path
     """
     cmake_file_contents = generate_cmakelists_file(mbed_target, project_path, toolchain)
     write_cmakelists_file(pathlib.Path(output_directory), cmake_file_contents)
-    click.echo(f"The program-level CMake file has been exported to f{str(output_directory)}")
+    click.echo(f"The program-level CMake file has been successfully exported to directory '{str(output_directory)}'")
