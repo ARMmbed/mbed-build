@@ -26,8 +26,8 @@ from mbed_build.mbed_build import generate_cmakelists_file, write_cmakelists_fil
     help="The toolchain you are using to build your app.",
 )
 @click.option("-m", "--mbed_target", required=True, help="A build target for an Mbed-enabled device, eg. K64F")
-@click.option("-p", "--mbed-os-path", required=True, help="Path to local Mbed OS library")
-def export(output_directory: str, toolchain: str, mbed_target: str, mbed_os_path: str) -> None:
+@click.option("-p", "--project-path", required=True, help="Path to local Mbed project")
+def export(output_directory: str, toolchain: str, mbed_target: str, project_path: str) -> None:
     """Exports a top-level CMakeLists.txt file to the specified directory.
 
     The parameters set in the CMake file will be dependent on the combination of
@@ -38,10 +38,10 @@ def export(output_directory: str, toolchain: str, mbed_target: str, mbed_os_path
         output_directory: where the top-level CMakeLists.txt should be exported to
         toolchain: the toolchain you are using to build your app (eg. GCC, ARM5 etc.)
         mbed_target: the build target you are wanting to run your app (eg. K64F)
-        mbed_os_path: the path to the project's copy of the Mbed OS library
+        project_path: the path to the local Mbed project
 
     Raises:
         InvalidExportOutputDirectory: it's not possible to export to the output directory provided
     """
-    cmake_file_contents = generate_cmakelists_file(mbed_target, mbed_os_path, toolchain)
+    cmake_file_contents = generate_cmakelists_file(mbed_target, project_path, toolchain)
     write_cmakelists_file(pathlib.Path(output_directory), cmake_file_contents)

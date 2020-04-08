@@ -11,18 +11,18 @@ from mbed_build._internal.cmake_file import render_cmakelists_template, write_cm
 from mbed_build.exceptions import InvalidExportOutputDirectory
 
 
-def generate_cmakelists_file(mbed_target: str, mbed_os_path: str, toolchain_name: str) -> str:
+def generate_cmakelists_file(mbed_target: str, project_path: str, toolchain_name: str) -> str:
     """Generate the top-level CMakeLists.txt file containing the correct definitions for a build.
 
     Args:
         mbed_target: the target the application is being built for
-        mbed_os_path: the path to the project's copy of the Mbed OS library
+        project_path: the path to the local Mbed project
         toolchain_name: the toolchain to be used to build the application
 
     Returns:
         A string of rendered contents for the file.
     """
-    target_build_attributes = get_build_attributes_by_board_type(mbed_target, mbed_os_path)
+    target_build_attributes = get_build_attributes_by_board_type(mbed_target, project_path)
     return render_cmakelists_template(
         target_build_attributes.labels,
         target_build_attributes.features,

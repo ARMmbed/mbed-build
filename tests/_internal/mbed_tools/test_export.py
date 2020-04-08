@@ -17,15 +17,15 @@ class TestExport(TestCase):
         mock_file_contents = "Hello world"
         mock_generate_cmakelists_file.return_value = mock_file_contents
         output_dir = "some-directory"
-        mbed_os_path = "mbed-os"
+        project_path = "blinky"
         mbed_target = "K64F"
         toolchain = "GCC"
 
         runner = CliRunner()
-        result = runner.invoke(export, ["-o", output_dir, "-t", toolchain, "-m", mbed_target, "-p", mbed_os_path])
+        result = runner.invoke(export, ["-o", output_dir, "-t", toolchain, "-m", mbed_target, "-p", project_path])
 
         self.assertEqual(result.exit_code, 0)
-        mock_generate_cmakelists_file.assert_called_once_with(mbed_target, mbed_os_path, toolchain)
+        mock_generate_cmakelists_file.assert_called_once_with(mbed_target, project_path, toolchain)
         mock_write_cmakelists_file.assert_called_once_with(
             pathlib.Path(output_dir), mock_generate_cmakelists_file.return_value
         )

@@ -17,12 +17,12 @@ class TestGenerateCMakeListsFile(TestCase):
         target_build_attributes = mock.Mock()
         get_build_attributes_by_board_type.return_value = target_build_attributes
         mbed_target = "K64F"
-        mbed_os_path = "mbed-os"
+        project_path = "blinky"
         toolchain_name = "GCC"
 
-        generate_cmakelists_file(mbed_target, mbed_os_path, toolchain_name)
+        generate_cmakelists_file(mbed_target, project_path, toolchain_name)
 
-        get_build_attributes_by_board_type.assert_called_once_with(mbed_target, mbed_os_path)
+        get_build_attributes_by_board_type.assert_called_once_with(mbed_target, project_path)
         render_cmakelists_template.assert_called_once_with(
             target_build_attributes.labels,
             target_build_attributes.features,
