@@ -26,7 +26,9 @@ from mbed_build.mbed_build import generate_cmakelists_file, write_cmakelists_fil
     help="The toolchain you are using to build your app.",
 )
 @click.option("-m", "--mbed_target", required=True, help="A build target for an Mbed-enabled device, eg. K64F")
-@click.option("-p", "--project-path", required=True, help="Path to local Mbed project")
+@click.option(
+    "-p", "--project-path", default=".", help="Path to local Mbed project. By default is the current working directory."
+)
 def export(output_directory: str, toolchain: str, mbed_target: str, project_path: str) -> None:
     """Exports a top-level CMakeLists.txt file to the specified directory.
 
