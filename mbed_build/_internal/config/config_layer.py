@@ -6,9 +6,8 @@
 from dataclasses import dataclass
 from typing import Iterable
 
-from mbed_build._internal.config.config_layer_action import ConfigLayerAction
+from mbed_build._internal.config.config_action import ConfigAction
 from mbed_build._internal.config.config_source import ConfigSource
-
 
 # Fix circular dependency problem
 from typing import TYPE_CHECKING
@@ -19,28 +18,32 @@ if TYPE_CHECKING:
 
 @dataclass
 class ConfigLayer:
-    """ConfigLayer lists actions which can be applied to Config instance in order to modify its contents."""
+    """ConfigLayer is a simple container of actions which can be used to build Config."""
 
-    actions: Iterable[ConfigLayerAction]
+    actions: Iterable[ConfigAction]
 
     def apply(self, config: "Config") -> "Config":
-        """Apply all layers actions to the Config."""
+        """Apply all actions to the Config."""
         for action in self.actions:
             config = action.apply(config)
         return config
 
     @classmethod
-    def from_config_source(cls, config_source: ConfigSource) -> "ConfigLayer":
-        """Return new instance of ConfigLayer, with actions built from ConfigSource."""
+    def from_config_source(cls, config_source: ConfigSource, target_labels: Iterable[str]) -> "ConfigLayer":
+        """Return new instance of ConfigLayer built from ConfigSource data.
+
+        This method translates data found in ConfigSource into ConfigActions specific to target.
+        """
         actions_from_config = [
-            ConfigLayerAction.from_config_entry(name=name, value=value) for name, value in config_source.config.items()
+            ConfigAction.from_config_entry(key=key, data=data) for key, data in config_source.config.items()
         ]
 
         actions_from_target_overrides = []
+        allowed_target_labels = ["*"] + target_labels
         for target_label, overrides in config_source.target_overrides.items():
-            for name, value in overrides.items():
-                actions_from_target_overrides.append(
-                    ConfigLayerAction.from_target_override_entry(name=name, value=value)
+            if target_label in allowed_target_labels:
+                actions_from_target_overrides.extend(
+                    ConfigAction.from_target_override_entry(key=key, data=data) for key, data in overrides.items()
                 )
 
         return cls(actions_from_config + actions_from_target_overrides)

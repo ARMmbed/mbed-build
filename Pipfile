@@ -6,6 +6,7 @@ verify_ssl = true
 [dev-packages]
 black = "*"
 coverage = "*"
+factory_boy = "*"
 flake8 = "*"
 flake8-docstrings = "*"
 flake8-black = "*"

@@ -6,7 +6,7 @@ from unittest import TestCase, mock
 
 from mbed_build._internal.config.config import Config
 from mbed_build._internal.config.config_layer import ConfigLayer
-from mbed_build._internal.config.config_layer_action import ConfigLayerAction
+from mbed_build._internal.config.config_action import ConfigAction
 from tests._internal.config.factories import ConfigSourceFactory
 
 
@@ -25,19 +25,24 @@ class TestApply(TestCase):
 
 class TestFromConfigSource(TestCase):
     def test_creates_config_layer_with_actions_from_config_source(self):
-        config_source = ConfigSourceFactory()
+        config_source = ConfigSourceFactory(
+            config={"foo": True},
+            target_overrides={
+                "*": {"bar": 1},
+                "TARGET": {"baz": "maybe"},
+                "NOT_THIS_TARGET": {"xyz": "should not be included"},
+            },
+        )
 
-        subject = ConfigLayer.from_config_source(config_source)
+        subject = ConfigLayer.from_config_source(config_source, ["TARGET"])
 
-        actions_from_config = [
-            ConfigLayerAction.from_config_entry(name=name, value=value) for name, value in config_source.config.items()
-        ]
-
-        actions_from_target_overrides = []
-        for target_label, overrides in config_source.target_overrides.items():
-            for name, value in overrides.items():
-                actions_from_target_overrides.append(
-                    ConfigLayerAction.from_target_override_entry(name=name, value=value)
-                )
-
-        self.assertEqual(subject, ConfigLayer(actions=(actions_from_config + actions_from_target_overrides)))
+        self.assertEqual(
+            subject,
+            ConfigLayer(
+                actions=[
+                    ConfigAction.from_config_entry(key="foo", data=True),
+                    ConfigAction.from_target_override_entry(key="bar", data=1),
+                    ConfigAction.from_target_override_entry(key="baz", data="maybe"),
+                ]
+            ),
+        )
