@@ -4,12 +4,9 @@
 #
 """This module contains config actions, which will mutate configuration.
 
-Config actions are built from entries found in JSON files known to be used
-in MbedOS: targets.json, mbed_lib.json, mbed_app.json.
+Config actions are built from entries found in JSON files used by MbedOS applications.
 Some of those entries aren't simple overrides, but involve more complex operations
 like addition or removal of items from lists.
-Wrapping them in self contained actions provides a nice abstraction where the knowledge
-of how each config entry affects the overall configuration is self contained.
 """
 from abc import ABC, abstractmethod, abstractclassmethod
 from dataclasses import dataclass
