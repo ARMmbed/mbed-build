@@ -11,9 +11,10 @@ from mbed_build._internal.mbed_tools.export import export
 
 
 class TestExport(TestCase):
+    @mock.patch("mbed_build._internal.mbed_tools.export.click.echo")
     @mock.patch("mbed_build._internal.mbed_tools.export.generate_cmakelists_file")
     @mock.patch("mbed_build._internal.mbed_tools.export.write_cmakelists_file")
-    def test_export(self, mock_write_cmakelists_file, mock_generate_cmakelists_file):
+    def test_export(self, mock_write_cmakelists_file, mock_generate_cmakelists_file, mock_echo):
         mock_file_contents = "Hello world"
         mock_generate_cmakelists_file.return_value = mock_file_contents
         output_dir = "some-directory"
@@ -29,10 +30,14 @@ class TestExport(TestCase):
         mock_write_cmakelists_file.assert_called_once_with(
             pathlib.Path(output_dir), mock_generate_cmakelists_file.return_value
         )
+        mock_echo.assert_called_once_with(
+            f"The program-level CMake file has been successfully exported to directory '{str(output_dir)}'"
+        )
 
+    @mock.patch("mbed_build._internal.mbed_tools.export.click.echo")
     @mock.patch("mbed_build._internal.mbed_tools.export.generate_cmakelists_file")
     @mock.patch("mbed_build._internal.mbed_tools.export.write_cmakelists_file")
-    def test_export_default_project_path(self, mock_write_cmakelists_file, mock_generate_cmakelists_file):
+    def test_export_default_project_path(self, mock_write_cmakelists_file, mock_generate_cmakelists_file, mock_echo):
         mock_file_contents = "Hello world"
         mock_generate_cmakelists_file.return_value = mock_file_contents
         output_dir = "some-directory"
@@ -46,4 +51,7 @@ class TestExport(TestCase):
         mock_generate_cmakelists_file.assert_called_once_with(mbed_target, ".", toolchain)
         mock_write_cmakelists_file.assert_called_once_with(
             pathlib.Path(output_dir), mock_generate_cmakelists_file.return_value
+        )
+        mock_echo.assert_called_once_with(
+            f"The program-level CMake file has been successfully exported to directory '{str(output_dir)}'"
         )
