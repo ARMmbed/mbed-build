@@ -7,7 +7,7 @@ from pathlib import Path
 import fnmatch
 from typing import Callable, Iterable, Optional, List, Tuple
 
-from mbed_targets import get_build_attributes_by_board_type
+from mbed_targets import get_target_by_board_type
 
 
 def find_files(filename: str, directory: Path, filters: Optional[List[Callable]] = None) -> List[Path]:
@@ -60,11 +60,11 @@ class BoardLabelFilter:
 
         Allowed label data will be retrieved from `mbed-targets`.
         """
-        build_attributes = get_build_attributes_by_board_type(board_type, mbed_program_directory)
+        target = get_target_by_board_type(board_type, mbed_program_directory)
         self._label_filters = [
-            LabelFilter("TARGET", build_attributes.labels),
-            LabelFilter("FEATURE", build_attributes.features),
-            LabelFilter("COMPONENT", build_attributes.components),
+            LabelFilter("TARGET", target.labels),
+            LabelFilter("FEATURE", target.features),
+            LabelFilter("COMPONENT", target.components),
         ]
 
     def __call__(self, path: Path) -> bool:
