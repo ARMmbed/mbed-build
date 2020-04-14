@@ -27,7 +27,11 @@ from mbed_build.mbed_build import generate_cmakelists_file, write_cmakelists_fil
 )
 @click.option("-m", "--mbed_target", required=True, help="A build target for an Mbed-enabled device, eg. K64F")
 @click.option(
-    "-p", "--project-path", default=".", help="Path to local Mbed project. By default is the current working directory."
+    "-p",
+    "--project-path",
+    type=click.Path(),
+    default=".",
+    help="Path to local Mbed project. By default is the current working directory.",
 )
 def export(output_directory: str, toolchain: str, mbed_target: str, project_path: str) -> None:
     """Exports a top-level CMakeLists.txt file to the specified directory.
@@ -47,3 +51,4 @@ def export(output_directory: str, toolchain: str, mbed_target: str, project_path
     """
     cmake_file_contents = generate_cmakelists_file(mbed_target, project_path, toolchain)
     write_cmakelists_file(pathlib.Path(output_directory), cmake_file_contents)
+    click.echo(f"The program-level CMake file has been successfully exported to directory '{str(output_directory)}'")
