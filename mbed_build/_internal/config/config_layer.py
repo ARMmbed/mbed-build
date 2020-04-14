@@ -4,7 +4,7 @@
 #
 """Layered approach to applying config sources to Config class."""
 from dataclasses import dataclass
-from typing import Iterable
+from typing import Iterable, List
 
 from mbed_build._internal.config.config_action import ConfigAction
 from mbed_build._internal.config.config_source import ConfigSource
@@ -29,7 +29,7 @@ class ConfigLayer:
         return config
 
     @classmethod
-    def from_config_source(cls, config_source: ConfigSource, target_labels: Iterable[str]) -> "ConfigLayer":
+    def from_config_source(cls, config_source: ConfigSource, target_labels: List[str]) -> "ConfigLayer":
         """Return new instance of ConfigLayer built from ConfigSource data.
 
         This method translates data found in ConfigSource into ConfigActions specific to target.
@@ -38,7 +38,7 @@ class ConfigLayer:
             ConfigAction.from_config_entry(key=key, data=data) for key, data in config_source.config.items()
         ]
 
-        actions_from_target_overrides = []
+        actions_from_target_overrides: List[ConfigAction] = []
         allowed_target_labels = ["*"] + target_labels
         for target_label, overrides in config_source.target_overrides.items():
             if target_label in allowed_target_labels:
