@@ -50,5 +50,8 @@ def export(output_directory: str, toolchain: str, mbed_target: str, project_path
         InvalidExportOutputDirectory: it's not possible to export to the output directory provided
     """
     cmake_file_contents = generate_cmakelists_file(mbed_target, project_path, toolchain)
-    write_cmakelists_file(pathlib.Path(output_directory), cmake_file_contents)
-    click.echo(f"The program-level CMake file has been successfully exported to directory '{str(output_directory)}'")
+    cmake_file_path = write_cmakelists_file(pathlib.Path(output_directory), cmake_file_contents)
+    if cmake_file_path.is_file() and cmake_file_path.read_text() == cmake_file_contents:
+        click.echo(
+            f"The program-level CMake file has been successfully exported to directory '{str(output_directory)}'"
+        )
