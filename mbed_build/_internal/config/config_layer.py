@@ -21,7 +21,12 @@ if TYPE_CHECKING:
 
 @dataclass
 class ConfigLayer:
-    """ConfigLayer is a simple container of modifiers which can be used to build Config."""
+    """ConfigLayer is a simple container of modifiers which can be used to build Config.
+
+    This class has two purposes:
+    - translate ConfigSource into a list of modifiers which can be applied to the Config
+    - track the origin of incoming changes
+    """
 
     actions: Iterable[Callable]
 
