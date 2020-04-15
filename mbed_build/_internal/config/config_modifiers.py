@@ -30,10 +30,7 @@ class SetConfigValue:
         """Mutate config by overwriting existing entry with new data."""
         existing = config["settings"].get(self.key)
         if existing:
-            config["settings"][self.key] = {
-                "value": self.value,
-                "help": existing["help"],
-            }
+            config["settings"][self.key]["value"] = self.value
         else:
             config["settings"][self.key] = {
                 "value": self.value,
