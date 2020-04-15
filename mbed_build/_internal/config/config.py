@@ -3,7 +3,8 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 """Build configuration abstraction layer."""
-from typing import Any, Dict, List, Optional, TypedDict
+from typing import Any, Dict, List, Optional
+from typing_extensions import TypedDict
 
 from mbed_build._internal.config.config_layer import ConfigLayer
 
