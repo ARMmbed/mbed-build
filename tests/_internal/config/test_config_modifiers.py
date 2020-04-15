@@ -12,7 +12,7 @@ from mbed_build._internal.config.config_modifiers import (
 )
 
 
-class TestBuildActionFromConfigEntry(TestCase):
+class TestBuildModifierFromConfigEntry(TestCase):
     def test_builds_set_config_value_instance(self):
         subject = build_modifier_from_config_entry("some-key", 123)
 
@@ -21,7 +21,7 @@ class TestBuildActionFromConfigEntry(TestCase):
         )
 
 
-class TestBuildActionFromTargetOverrideEntry(TestCase):
+class TestBuildModifierFromTargetOverrideEntry(TestCase):
     def test_builds_set_config_value_instance(self):
         subject = build_modifier_from_target_override_entry("some-key", 123)
 
@@ -43,17 +43,17 @@ class TestSetConfigValue(TestCase):
 
     def test_sets_new_value(self):
         config = Config()
-        action = SetConfigValue(key="foo", value="value", help="help")
+        modifier = SetConfigValue(key="foo", value="value", help="help")
 
-        config = action(config)
+        config = modifier(config)
 
         self.assertEqual(config.settings["foo"], {"value": "value", "help": "help"})
 
     def test_overwrites_existing_value(self):
         config = Config()
         config.settings["bar"] = {"value": "swag", "help": "please help"}
-        action = SetConfigValue(key="bar", value=123, help=None)
+        modifier = SetConfigValue(key="bar", value=123, help=None)
 
-        config = action(config)
+        config = modifier(config)
 
         self.assertEqual(config.settings["bar"], {"value": 123, "help": "please help"})

@@ -14,20 +14,20 @@ from tests._internal.config.factories import ConfigSourceFactory
 
 
 class TestApply(TestCase):
-    def test_applies_all_actions_to_config(self):
-        action_1 = mock.Mock()
-        action_2 = mock.Mock()
+    def test_applies_all_modifiers_to_config(self):
+        modifier_1 = mock.Mock()
+        modifier_2 = mock.Mock()
         config = Config()
 
-        subject = ConfigLayer(actions=[action_1, action_2]).apply(config)
+        subject = ConfigLayer(modifiers=[modifier_1, modifier_2]).apply(config)
 
-        self.assertEqual(subject, action_2.return_value)
-        action_1.assert_called_once_with(config)
-        action_2.assert_called_once_with(action_1.return_value)
+        self.assertEqual(subject, modifier_2.return_value)
+        modifier_1.assert_called_once_with(config)
+        modifier_2.assert_called_once_with(modifier_1.return_value)
 
 
 class TestFromConfigSource(TestCase):
-    def test_creates_config_layer_with_actions_from_config_source(self):
+    def test_creates_config_layer_with_modifiers_from_config_source(self):
         config_source = ConfigSourceFactory(
             config={"foo": True},
             target_overrides={
@@ -42,7 +42,7 @@ class TestFromConfigSource(TestCase):
         self.assertEqual(
             subject,
             ConfigLayer(
-                actions=[
+                modifiers=[
                     build_modifier_from_config_entry(key="foo", data=True),
                     build_modifier_from_target_override_entry(key="bar", data=1),
                     build_modifier_from_target_override_entry(key="baz", data="maybe"),

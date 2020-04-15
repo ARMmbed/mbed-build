@@ -28,12 +28,12 @@ class ConfigLayer:
     - track the origin of incoming changes
     """
 
-    actions: Iterable[Callable]
+    modifiers: Iterable[Callable]
 
     def apply(self, config: "Config") -> "Config":
-        """Apply all actions to the Config."""
-        for action in self.actions:
-            config = action(config)
+        """Apply all modifiers to the Config."""
+        for modifier in self.modifiers:
+            config = modifier(config)
         return config
 
     @classmethod
@@ -42,16 +42,16 @@ class ConfigLayer:
 
         This method translates data found in ConfigSource into modifiers specific to the given target.
         """
-        actions_from_config = [
+        modifiers_from_config = [
             build_modifier_from_config_entry(key=key, data=data) for key, data in config_source.config.items()
         ]
 
-        actions_from_target_overrides: List[Callable] = []
+        modifiers_from_target_overrides: List[Callable] = []
         allowed_target_labels = ["*"] + target_labels
         for target_label, overrides in config_source.target_overrides.items():
             if target_label in allowed_target_labels:
-                actions_from_target_overrides.extend(
+                modifiers_from_target_overrides.extend(
                     build_modifier_from_target_override_entry(key=key, data=data) for key, data in overrides.items()
                 )
 
-        return cls(actions_from_config + actions_from_target_overrides)
+        return cls(modifiers_from_config + modifiers_from_target_overrides)
