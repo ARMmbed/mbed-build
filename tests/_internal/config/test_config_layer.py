@@ -4,20 +4,19 @@
 #
 from unittest import TestCase, mock
 
-from mbed_build._internal.config.config import Config
 from mbed_build._internal.config.config_layer import ConfigLayer
 from mbed_build._internal.config.config_modifiers import (
     build_modifier_from_config_entry,
     build_modifier_from_target_override_entry,
 )
-from tests._internal.config.factories import ConfigSourceFactory
+from tests._internal.config.factories import ConfigSourceFactory, ConfigFactory
 
 
 class TestApply(TestCase):
     def test_applies_all_modifiers_to_config(self):
         modifier_1 = mock.Mock()
         modifier_2 = mock.Mock()
-        config = Config()
+        config = ConfigFactory()
         config_layer = ConfigLayer(modifiers=[modifier_1, modifier_2], config_source=ConfigSourceFactory())
 
         subject = config_layer.apply(config)

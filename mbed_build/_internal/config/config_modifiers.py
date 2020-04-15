@@ -26,14 +26,19 @@ class SetConfigValue:
     value: Any
     help: Optional[str]
 
-    def __call__(self, config: "Config") -> "Config":
+    def __call__(self, config: "Config") -> None:
         """Mutate config by overwriting existing entry with new data."""
-        existing = config.settings.get(self.key, {})
-        override = {"value": self.value}
-        if self.help:
-            override["help"] = self.help
-        config.settings[self.key] = {**existing, **override}
-        return config
+        existing = config["settings"].get(self.key)
+        if existing:
+            config["settings"][self.key] = {
+                "value": self.value,
+                "help": existing["help"],
+            }
+        else:
+            config["settings"][self.key] = {
+                "value": self.value,
+                "help": self.help,
+            }
 
     @classmethod
     def build(cls, key: str, data: Any) -> "SetConfigValue":
@@ -59,6 +64,6 @@ def build_modifier_from_config_entry(key: str, data: Any) -> Callable:
 
 
 def build_modifier_from_target_override_entry(key: str, data: Any) -> Callable:
-    """Target overrides come in three shapes: addition, removal and override."""
+    """TODO."""
     # TODO: handle add/remove cumulative overrides
     return SetConfigValue.build(key, data)
