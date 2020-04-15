@@ -6,9 +6,9 @@ from unittest import TestCase, mock
 
 from mbed_build._internal.config.config import Config
 from mbed_build._internal.config.config_layer import ConfigLayer
-from mbed_build._internal.config.config_action import (
-    build_action_from_config_entry,
-    build_action_from_target_override_entry,
+from mbed_build._internal.config.config_modifiers import (
+    build_modifier_from_config_entry,
+    build_modifier_from_target_override_entry,
 )
 from tests._internal.config.factories import ConfigSourceFactory
 
@@ -43,9 +43,9 @@ class TestFromConfigSource(TestCase):
             subject,
             ConfigLayer(
                 actions=[
-                    build_action_from_config_entry(key="foo", data=True),
-                    build_action_from_target_override_entry(key="bar", data=1),
-                    build_action_from_target_override_entry(key="baz", data="maybe"),
+                    build_modifier_from_config_entry(key="foo", data=True),
+                    build_modifier_from_target_override_entry(key="bar", data=1),
+                    build_modifier_from_target_override_entry(key="baz", data="maybe"),
                 ]
             ),
         )

@@ -2,9 +2,9 @@
 # Copyright (C) 2020 Arm Mbed. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
-"""This module contains config actions, which will mutate configuration.
+"""This module contains config modifiers, which will mutate configuration.
 
-Config actions are built from entries found in JSON files used by MbedOS applications.
+Config modifiers are built from entries found in JSON files used by MbedOS applications.
 Some of those entries aren't simple overrides, but involve more complex operations
 like addition or removal of items from lists.
 """
@@ -53,11 +53,11 @@ class SetConfigValue:
         return cls(key=key, value=value, help=help)
 
 
-def build_action_from_config_entry(key: str, data: Any) -> Callable:
-    """Config entries overwrite existing settings."""
+def build_modifier_from_config_entry(key: str, data: Any) -> Callable:
+    """Config entries overwrite existing settings - build SetConfigValue modifier."""
     return SetConfigValue.build(key, data)
 
 
-def build_action_from_target_override_entry(key: str, data: Any) -> Callable:
+def build_modifier_from_target_override_entry(key: str, data: Any) -> Callable:
     """Target overrides come in three shapes: addition, removal and override."""
     return SetConfigValue.build(key, data)

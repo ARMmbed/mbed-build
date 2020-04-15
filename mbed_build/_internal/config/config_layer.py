@@ -7,9 +7,9 @@ from dataclasses import dataclass
 from typing import Callable, Iterable, List
 
 from mbed_build._internal.config.config_source import ConfigSource
-from mbed_build._internal.config.config_action import (
-    build_action_from_config_entry,
-    build_action_from_target_override_entry,
+from mbed_build._internal.config.config_modifiers import (
+    build_modifier_from_config_entry,
+    build_modifier_from_target_override_entry,
 )
 
 # Fix circular dependency problem
@@ -21,7 +21,7 @@ if TYPE_CHECKING:
 
 @dataclass
 class ConfigLayer:
-    """ConfigLayer is a simple container of actions which can be used to build Config."""
+    """ConfigLayer is a simple container of modifiers which can be used to build Config."""
 
     actions: Iterable[Callable]
 
@@ -35,10 +35,10 @@ class ConfigLayer:
     def from_config_source(cls, config_source: ConfigSource, target_labels: List[str]) -> "ConfigLayer":
         """Return new instance of ConfigLayer built from ConfigSource data.
 
-        This method translates data found in ConfigSource into ConfigActions specific to target.
+        This method translates data found in ConfigSource into modifiers specific to the given target.
         """
         actions_from_config = [
-            build_action_from_config_entry(key=key, data=data) for key, data in config_source.config.items()
+            build_modifier_from_config_entry(key=key, data=data) for key, data in config_source.config.items()
         ]
 
         actions_from_target_overrides: List[Callable] = []
@@ -46,7 +46,7 @@ class ConfigLayer:
         for target_label, overrides in config_source.target_overrides.items():
             if target_label in allowed_target_labels:
                 actions_from_target_overrides.extend(
-                    build_action_from_target_override_entry(key=key, data=data) for key, data in overrides.items()
+                    build_modifier_from_target_override_entry(key=key, data=data) for key, data in overrides.items()
                 )
 
         return cls(actions_from_config + actions_from_target_overrides)
