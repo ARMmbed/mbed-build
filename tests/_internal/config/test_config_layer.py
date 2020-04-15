@@ -18,8 +18,9 @@ class TestApply(TestCase):
         modifier_1 = mock.Mock()
         modifier_2 = mock.Mock()
         config = Config()
+        config_layer = ConfigLayer(modifiers=[modifier_1, modifier_2], config_source=ConfigSourceFactory())
 
-        subject = ConfigLayer(modifiers=[modifier_1, modifier_2]).apply(config)
+        subject = config_layer.apply(config)
 
         self.assertEqual(subject, modifier_2.return_value)
         modifier_1.assert_called_once_with(config)
@@ -42,10 +43,11 @@ class TestFromConfigSource(TestCase):
         self.assertEqual(
             subject,
             ConfigLayer(
+                config_source=config_source,
                 modifiers=[
                     build_modifier_from_config_entry(key="foo", data=True),
                     build_modifier_from_target_override_entry(key="bar", data=1),
                     build_modifier_from_target_override_entry(key="baz", data="maybe"),
-                ]
+                ],
             ),
         )

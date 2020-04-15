@@ -28,6 +28,7 @@ class ConfigLayer:
     - track the origin of incoming changes
     """
 
+    config_source: ConfigSource
     modifiers: Iterable[Callable]
 
     def apply(self, config: "Config") -> "Config":
@@ -54,4 +55,4 @@ class ConfigLayer:
                     build_modifier_from_target_override_entry(key=key, data=data) for key, data in overrides.items()
                 )
 
-        return cls(modifiers_from_config + modifiers_from_target_overrides)
+        return cls(config_source=config_source, modifiers=(modifiers_from_config + modifiers_from_target_overrides))
