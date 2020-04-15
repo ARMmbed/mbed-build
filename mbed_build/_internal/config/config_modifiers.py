@@ -60,4 +60,5 @@ def build_modifier_from_config_entry(key: str, data: Any) -> Callable:
 
 def build_modifier_from_target_override_entry(key: str, data: Any) -> Callable:
     """Target overrides come in three shapes: addition, removal and override."""
+    # TODO: handle add/remove cumulative overrides
     return SetConfigValue.build(key, data)
