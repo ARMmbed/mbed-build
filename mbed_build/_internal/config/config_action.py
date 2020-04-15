@@ -8,9 +8,8 @@ Config actions are built from entries found in JSON files used by MbedOS applica
 Some of those entries aren't simple overrides, but involve more complex operations
 like addition or removal of items from lists.
 """
-from abc import ABC, abstractmethod, abstractclassmethod
 from dataclasses import dataclass
-from typing import Any, Optional
+from typing import Any, Callable, Optional
 
 # Fix circular dependency problem
 from typing import TYPE_CHECKING
@@ -19,40 +18,15 @@ if TYPE_CHECKING:
     from mbed_build._internal.config.config import Config
 
 
-class ConfigAction(ABC):
-    """Common interface for all the actions."""
-
-    @abstractmethod
-    def apply(self, config: "Config") -> "Config":
-        """Interface for apply method."""
-        ...
-
-    @abstractclassmethod
-    def build(cls, key: str, data: Any) -> "ConfigAction":
-        """Interface for build method."""
-        ...
-
-    @staticmethod
-    def from_config_entry(key: str, data: Any) -> "ConfigAction":
-        """Config entries overwrite existing settings."""
-        return SetConfigValueAction.build(key, data)
-
-    @staticmethod
-    def from_target_override_entry(key: str, data: Any) -> "ConfigAction":
-        """Target overrides come in three shapes: addition, removal and override."""
-        # TODO: implement add/remove parsed out from the key
-        return SetConfigValueAction.build(key, data)
-
-
 @dataclass
-class SetConfigValueAction(ConfigAction):
+class SetConfigValue:
     """Overwrite entry in config with new data."""
 
     key: str
     value: Any
     help: Optional[str]
 
-    def apply(self, config: "Config") -> "Config":
+    def __call__(self, config: "Config") -> "Config":
         """Mutate config by overwriting existing entry with new data."""
         existing = config.settings.get(self.key, {})
         override = {"value": self.value}
@@ -62,8 +36,8 @@ class SetConfigValueAction(ConfigAction):
         return config
 
     @classmethod
-    def build(cls, key: str, data: Any) -> "SetConfigValueAction":
-        """Builds action from given data.
+    def build(cls, key: str, data: Any) -> "SetConfigValue":
+        """Builds self from given data.
 
         Configuration source from the JSON files is represented in two distinct ways:
         - key -> value
@@ -77,3 +51,13 @@ class SetConfigValueAction(ConfigAction):
             help = None
 
         return cls(key=key, value=value, help=help)
+
+
+def build_action_from_config_entry(key: str, data: Any) -> Callable:
+    """Config entries overwrite existing settings."""
+    return SetConfigValue.build(key, data)
+
+
+def build_action_from_target_override_entry(key: str, data: Any) -> Callable:
+    """Target overrides come in three shapes: addition, removal and override."""
+    return SetConfigValue.build(key, data)

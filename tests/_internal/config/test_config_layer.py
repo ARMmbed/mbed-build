@@ -6,7 +6,10 @@ from unittest import TestCase, mock
 
 from mbed_build._internal.config.config import Config
 from mbed_build._internal.config.config_layer import ConfigLayer
-from mbed_build._internal.config.config_action import ConfigAction
+from mbed_build._internal.config.config_action import (
+    build_action_from_config_entry,
+    build_action_from_target_override_entry,
+)
 from tests._internal.config.factories import ConfigSourceFactory
 
 
@@ -18,9 +21,9 @@ class TestApply(TestCase):
 
         subject = ConfigLayer(actions=[action_1, action_2]).apply(config)
 
-        self.assertEqual(subject, action_2.apply.return_value)
-        action_1.apply.assert_called_once_with(config)
-        action_2.apply.assert_called_once_with(action_1.apply.return_value)
+        self.assertEqual(subject, action_2.return_value)
+        action_1.assert_called_once_with(config)
+        action_2.assert_called_once_with(action_1.return_value)
 
 
 class TestFromConfigSource(TestCase):
@@ -40,9 +43,9 @@ class TestFromConfigSource(TestCase):
             subject,
             ConfigLayer(
                 actions=[
-                    ConfigAction.from_config_entry(key="foo", data=True),
-                    ConfigAction.from_target_override_entry(key="bar", data=1),
-                    ConfigAction.from_target_override_entry(key="baz", data="maybe"),
+                    build_action_from_config_entry(key="foo", data=True),
+                    build_action_from_target_override_entry(key="bar", data=1),
+                    build_action_from_target_override_entry(key="baz", data="maybe"),
                 ]
             ),
         )
