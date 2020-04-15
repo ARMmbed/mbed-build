@@ -7,6 +7,7 @@ from unittest import TestCase
 from mbed_build._internal.config.config import Config
 from mbed_build._internal.config.config_modifiers import (
     build_modifier_from_config_entry,
+    build_modifier_from_target_override_entry,
     SetConfigValue,
 )
 
@@ -14,6 +15,15 @@ from mbed_build._internal.config.config_modifiers import (
 class TestBuildActionFromConfigEntry(TestCase):
     def test_builds_set_config_value_instance(self):
         subject = build_modifier_from_config_entry("some-key", 123)
+
+        self.assertEqual(
+            subject, SetConfigValue.build(key="some-key", data=123),
+        )
+
+
+class TestBuildActionFromTargetOverrideEntry(TestCase):
+    def test_builds_set_config_value_instance(self):
+        subject = build_modifier_from_target_override_entry("some-key", 123)
 
         self.assertEqual(
             subject, SetConfigValue.build(key="some-key", data=123),
