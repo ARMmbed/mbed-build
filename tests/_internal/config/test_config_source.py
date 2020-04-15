@@ -23,8 +23,8 @@ class TestFromFile(TestCase):
             "target_overrides": {"*": {"rsa-required": True}},
         }
 
-        with tempfile.NamedTemporaryFile() as fp:
-            json_file = pathlib.Path(fp.name)
+        with tempfile.TemporaryDirectory() as directory:
+            json_file = pathlib.Path(directory, "file.json")
             json_file.write_text(json.dumps(json_data))
 
             subject = ConfigSource.from_file(json_file)
@@ -42,8 +42,8 @@ class TestFromFile(TestCase):
     def test_gracefully_handles_missing_data(self):
         json_data = {}
 
-        with tempfile.NamedTemporaryFile() as fp:
-            json_file = pathlib.Path(fp.name)
+        with tempfile.TemporaryDirectory() as directory:
+            json_file = pathlib.Path(directory, "file.json")
             json_file.write_text(json.dumps(json_data))
 
             subject = ConfigSource.from_file(json_file)
