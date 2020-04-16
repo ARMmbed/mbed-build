@@ -1,0 +1,26 @@
+#
+# Copyright (C) 2020 Arm Mbed. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+#
+"""Utilities for building config modifiers."""
+from typing import Any, Callable
+
+from mbed_build._internal.config.config_modifiers import set_config_setting, cumulative
+
+
+def build_modifier_from_config_entry(key: str, data: Any) -> Callable:
+    """Config entries always override config settings."""
+    return set_config_setting.build(key, data)
+
+
+def build_modifier_from_target_override_entry(key: str, data: Any) -> Callable:
+    """Target override can be one of many things.
+
+    Types of target overrides:
+    - cumulative override (for a specific set of keys)
+    - regular config setting override (everything else)
+    """
+    try:
+        return cumulative.build(key, data)
+    except cumulative.UnableToBuildCumulativeModifier:
+        return set_config_setting.build(key, data)
