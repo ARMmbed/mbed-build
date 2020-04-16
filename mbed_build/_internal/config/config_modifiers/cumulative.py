@@ -31,8 +31,17 @@ ALL_ACCUMULATING_OVERRIDES = ACCUMULATING_OVERRIDES + tuple(
 
 
 def build(key: str, data: Any) -> Callable:
-    """Attempt to build a cumulative override modifier."""
-    key = key[7:]  # strip `target.` prefix
+    """Attempt to build a cumulative override modifier.
+
+    A key for this modifier needs to follow a spec from old tools implementation:
+    - start with "target."
+    - the part after "target." is one of ACCUMULATING_OVERRIDES
+    """
+    # Key following a spec would:
+    if not key.startswith("target."):
+        raise UnableToBuildCumulativeModifier
+
+    key = key[7:]  # Strip "target." prefix
     if key in ALL_ACCUMULATING_OVERRIDES:
         override_key, override_type = key.rsplit("_", maxsplit=1)
         override_key = cast(CumulativeOverrideKey, override_key)
