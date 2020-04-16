@@ -61,6 +61,5 @@ def build_modifier_from_config_entry(key: str, data: Any) -> Callable:
 
 
 def build_modifier_from_target_override_entry(key: str, data: Any) -> Callable:
-    """TODO."""
-    # TODO: handle add/remove cumulative overrides
+    """TODO: handle add/remove cumulative overrides."""
     return SetConfigValue.build(key, data)
