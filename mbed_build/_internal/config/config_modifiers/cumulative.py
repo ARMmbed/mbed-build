@@ -5,7 +5,8 @@
 """Accumulate values in Config.<attribute>."""
 import itertools
 from dataclasses import dataclass
-from typing import Any, Callable, List, Literal, cast
+from typing import Any, Callable, List, cast
+from typing_extensions import Literal
 
 # Fix circular dependency problem
 from typing import TYPE_CHECKING
