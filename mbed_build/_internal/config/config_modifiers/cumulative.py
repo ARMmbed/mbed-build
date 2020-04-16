@@ -2,7 +2,7 @@
 # Copyright (C) 2020 Arm Mbed. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
-"""Operate on sets of values stored in Config."""
+"""Accumulate values in Config.<attribute>."""
 import itertools
 from dataclasses import dataclass
 from typing import Any, Callable, List, Literal, cast
@@ -18,7 +18,12 @@ class UnableToBuildCumulativeModifier(Exception):
     """Raised when data given to builder is not valid for cumulative modifier."""
 
 
-ACCUMULATING_OVERRIDES = ("extra_labels", "macros", "device_has", "features", "components")
+# TODO: potentially add more accumulating properties here.
+# Two projects this has been tested against:
+# - mbed-cloud-client-example
+# - mbed-os-example-blinky
+# only contain "features_add" and "features_remove".
+ACCUMULATING_OVERRIDES = ("features",)
 MODIFIERS = ("add", "remove")
 ALL_ACCUMULATING_OVERRIDES = ACCUMULATING_OVERRIDES + tuple(
     f"{attr}_{suffix}" for attr, suffix in itertools.product(ACCUMULATING_OVERRIDES, MODIFIERS)
