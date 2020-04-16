@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 """Operate on sets of values stored in Config."""
-import re
+import itertools
 from dataclasses import dataclass
 from typing import Any, Callable, List, Literal, cast
 
@@ -14,32 +14,32 @@ if TYPE_CHECKING:
     from mbed_build._internal.config.config import Config
 
 
-CumulativeOverrideKey = Literal["features"]
-
-
 class UnableToBuildCumulativeModifier(Exception):
     """Raised when data given to builder is not valid for cumulative modifier."""
 
 
-CUMULATIVE_OVERRIDES = ["features"]
-CUMULATIVE_OVERRIDE_KEY_REGEX = re.compile(
-    f"(?P<override_key>{'|'.join(CUMULATIVE_OVERRIDES)})_(?P<override_type>add|remove)"
+ACCUMULATING_OVERRIDES = ("extra_labels", "macros", "device_has", "features", "components")
+MODIFIERS = ("add", "remove")
+ALL_ACCUMULATING_OVERRIDES = ACCUMULATING_OVERRIDES + tuple(
+    f"{attr}_{suffix}" for attr, suffix in itertools.product(ACCUMULATING_OVERRIDES, MODIFIERS)
 )
 
 
 def build(key: str, data: Any) -> Callable:
     """Attempt to build a cumulative override modifier."""
-    cumulative_key_match = re.search(CUMULATIVE_OVERRIDE_KEY_REGEX, key)
-    if cumulative_key_match:
-        override_type = cumulative_key_match["override_type"]
-        override_key = cast(CumulativeOverrideKey, cumulative_key_match["override_key"])
-
+    key = key[7:]  # strip `target.` prefix
+    if key in ALL_ACCUMULATING_OVERRIDES:
+        override_key, override_type = key.rsplit("_", maxsplit=1)
+        override_key = cast(CumulativeOverrideKey, override_key)
         if override_type == "add":
             return AppendToConfig(key=override_key, value=data)
         if override_type == "remove":
             return RemoveFromConfig(key=override_key, value=data)
 
     raise UnableToBuildCumulativeModifier
+
+
+CumulativeOverrideKey = Literal["features"]
 
 
 @dataclass

@@ -6,7 +6,7 @@ from unittest import TestCase
 
 from mbed_build._internal.config.config_modifiers.cumulative import (
     AppendToConfig,
-    CUMULATIVE_OVERRIDES,
+    ACCUMULATING_OVERRIDES,
     RemoveFromConfig,
     UnableToBuildCumulativeModifier,
     build,
@@ -16,14 +16,14 @@ from tests._internal.config.factories import ConfigFactory
 
 class TestBuild(TestCase):
     def test_builds_append_value_modifier_for_cumulative_overrides(self):
-        for override in CUMULATIVE_OVERRIDES:
+        for override in ACCUMULATING_OVERRIDES:
             with self.subTest('builds append value modifier for "{override}" override'):
                 subject = build(f"target.{override}_add", ["FOO"])
 
                 self.assertEqual(subject, AppendToConfig(key=override, value=["FOO"]))
 
     def test_builds_remove_value_modifier(self):
-        for override in CUMULATIVE_OVERRIDES:
+        for override in ACCUMULATING_OVERRIDES:
             with self.subTest('builds remove value modifier for "{override}" override'):
                 subject = build(f"target.{override}_remove", ["BAR"])
 
