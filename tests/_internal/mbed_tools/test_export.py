@@ -25,6 +25,7 @@ class TestExport(TestCase):
         result = runner.invoke(export, ["-o", output_dir, "-t", toolchain, "-m", mbed_target, "-p", project_path])
 
         self.assertEqual(result.exit_code, 0)
+        self.assertIn(output_dir, result.output)
         mock_generate_cmakelists_file.assert_called_once_with(mbed_target, project_path, toolchain)
         mock_write_cmakelists_file.assert_called_once_with(
             pathlib.Path(output_dir), mock_generate_cmakelists_file.return_value
@@ -43,6 +44,7 @@ class TestExport(TestCase):
         result = runner.invoke(export, ["-o", output_dir, "-t", toolchain, "-m", mbed_target])
 
         self.assertEqual(result.exit_code, 0)
+        self.assertIn(output_dir, result.output)
         mock_generate_cmakelists_file.assert_called_once_with(mbed_target, ".", toolchain)
         mock_write_cmakelists_file.assert_called_once_with(
             pathlib.Path(output_dir), mock_generate_cmakelists_file.return_value
