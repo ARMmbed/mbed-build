@@ -5,7 +5,7 @@
 """Module to generate application's CMake file."""
 import pathlib
 
-from mbed_targets import get_build_attributes_by_board_type
+from mbed_targets import get_target_by_name
 
 from mbed_build._internal.cmake_file import render_cmakelists_template, write_cmakelists_file
 from mbed_build.exceptions import InvalidExportOutputDirectory
@@ -22,7 +22,7 @@ def generate_cmakelists_file(mbed_target: str, project_path: str, toolchain_name
     Returns:
         A string of rendered contents for the file.
     """
-    target_build_attributes = get_build_attributes_by_board_type(mbed_target, project_path)
+    target_build_attributes = get_target_by_name(mbed_target, project_path)
     return render_cmakelists_template(
         target_build_attributes.labels,
         target_build_attributes.features,

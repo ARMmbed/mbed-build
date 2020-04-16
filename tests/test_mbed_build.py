@@ -12,22 +12,19 @@ from mbed_build.mbed_build import generate_cmakelists_file, export_cmakelists_fi
 
 class TestGenerateCMakeListsFile(TestCase):
     @mock.patch("mbed_build.mbed_build.render_cmakelists_template")
-    @mock.patch("mbed_build.mbed_build.get_build_attributes_by_board_type")
-    def test_correct_arguments_passed(self, get_build_attributes_by_board_type, render_cmakelists_template):
-        target_build_attributes = mock.Mock()
-        get_build_attributes_by_board_type.return_value = target_build_attributes
+    @mock.patch("mbed_build.mbed_build.get_target_by_name")
+    def test_correct_arguments_passed(self, get_target_by_name, render_cmakelists_template):
+        target = mock.Mock()
+        get_target_by_name.return_value = target
         mbed_target = "K64F"
         project_path = "blinky"
         toolchain_name = "GCC"
 
         generate_cmakelists_file(mbed_target, project_path, toolchain_name)
 
-        get_build_attributes_by_board_type.assert_called_once_with(mbed_target, project_path)
+        get_target_by_name.assert_called_once_with(mbed_target, project_path)
         render_cmakelists_template.assert_called_once_with(
-            target_build_attributes.labels,
-            target_build_attributes.features,
-            target_build_attributes.components,
-            toolchain_name,
+            target.labels, target.features, target.components, toolchain_name,
         )
 
 

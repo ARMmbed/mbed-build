@@ -8,7 +8,7 @@ from tempfile import TemporaryDirectory
 from unittest import TestCase, mock
 from typing import Iterable
 
-from mbed_targets import MbedTargetBuildAttributes
+from mbed_targets import Target
 
 from mbed_build._internal.find_files import find_files, MbedignoreFilter, LabelFilter, BoardLabelFilter
 
@@ -82,13 +82,13 @@ class TestListFiles(TestCase):
             self.assertIn(Path(directory, path), subject)
 
 
-@mock.patch("mbed_build._internal.find_files.get_build_attributes_by_board_type", autospec=True)
+@mock.patch("mbed_build._internal.find_files.get_target_by_board_type", autospec=True)
 class TestBoardLabelFilter(TestCase):
-    def test_matches_paths_not_following_board_label_rules(self, get_build_attributes_by_board_type):
-        build_attributes = mock.Mock(
-            MbedTargetBuildAttributes, labels={"T"}, features={"F"}, components={"C"}
+    def test_matches_paths_not_following_board_label_rules(self, get_target_by_board_type):
+        target = mock.Mock(
+            Target, labels={"T"}, features={"F"}, components={"C"}
         )  # Zero interface safety here, dataclasses don't support spec_set
-        get_build_attributes_by_board_type.return_value = build_attributes
+        get_target_by_board_type.return_value = target
         mbed_program_directory = Path("some-program")
         board_type = "K64F"
 
@@ -98,13 +98,13 @@ class TestBoardLabelFilter(TestCase):
         self.assertFalse(subject(Path("TARGET_T", "FEATURE_X")))
         self.assertFalse(subject(Path("TARGET_T", "FEATURE_F", "COMPONENT_X")))
 
-        get_build_attributes_by_board_type.assert_called_with(board_type, mbed_program_directory)
+        get_target_by_board_type.assert_called_with(board_type, mbed_program_directory)
 
-    def test_does_not_match_paths_following_board_label_rules(self, get_build_attributes_by_board_type):
-        build_attributes = mock.Mock(
-            MbedTargetBuildAttributes, labels={"T"}, features={"F"}, components={"C"}
+    def test_does_not_match_paths_following_board_label_rules(self, get_target_by_board_type):
+        target = mock.Mock(
+            Target, labels={"T"}, features={"F"}, components={"C"}
         )  # Zero interface safety here, dataclasses don't support spec_set
-        get_build_attributes_by_board_type.return_value = build_attributes
+        get_target_by_board_type.return_value = target
         mbed_program_directory = Path("some-program")
         board_type = "K64F"
 
@@ -114,7 +114,7 @@ class TestBoardLabelFilter(TestCase):
         self.assertTrue(subject(Path("TARGET_T", "FEATURE_F")))
         self.assertTrue(subject(Path("TARGET_T", "FEATURE_F", "COMPONENT_C")))
 
-        get_build_attributes_by_board_type.assert_called_with(board_type, mbed_program_directory)
+        get_target_by_board_type.assert_called_with(board_type, mbed_program_directory)
 
 
 class TestLabelFilter(TestCase):
