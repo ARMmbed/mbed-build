@@ -2,7 +2,7 @@
 # Copyright (C) 2020 Arm Mbed. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
-"""Definition of SetConfigSetting - it creates or updates entries in config settings."""
+"""Create or update entries in Config.settings."""
 from dataclasses import dataclass
 from typing import Any, Callable, Optional
 
