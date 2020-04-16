@@ -3,22 +3,28 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 """Build configuration abstraction layer."""
-from dataclasses import dataclass, field
-from typing import List
+from typing import Any, Dict, List, Optional
+from typing_extensions import TypedDict
 
 from mbed_build._internal.config.config_layer import ConfigLayer
 
 
-@dataclass
-class Config:
+class Setting(TypedDict):
+    """Represents a config setting."""
+
+    help: Optional[str]
+    value: Any
+
+
+class Config(TypedDict):
     """Represents a build configuration."""
 
-    settings: dict = field(default_factory=dict)
+    settings: Dict[str, Setting]
 
-    @classmethod
-    def from_layers(cls, layers: List[ConfigLayer]) -> "Config":
-        """Create configuration from layers."""
-        config = cls()
-        for layer in layers:
-            config = layer.apply(config)
-        return config
+
+def build_config_from_layers(layers: List[ConfigLayer]) -> Config:
+    """Create configuration from layers."""
+    config = Config(settings={})
+    for layer in layers:
+        layer.apply(config)
+    return config
