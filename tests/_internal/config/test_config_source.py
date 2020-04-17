@@ -10,8 +10,8 @@ from unittest import TestCase
 from mbed_build._internal.config.config_source import ConfigSource
 
 
-class TestFromFile(TestCase):
-    def test_builds_new_config_source_from_json_file(self):
+class TestFromMbedLib(TestCase):
+    def test_builds_namespaced_config_source_from_mbed_lib_json(self):
         json_data = {
             "name": "ns-hal-pal",
             "config": {
@@ -20,22 +20,30 @@ class TestFromFile(TestCase):
                     "value": False,
                 },
             },
-            "target_overrides": {"*": {"rsa-required": True}},
+            "target_overrides": {
+                "*": {"rsa-required": True, "target.some-setting": 123, "target.add_features": ["BLE"]}
+            },
         }
 
         with tempfile.TemporaryDirectory() as directory:
             json_file = pathlib.Path(directory, "file.json")
             json_file.write_text(json.dumps(json_data))
 
-            subject = ConfigSource.from_file(json_file)
+            subject = ConfigSource.from_mbed_lib(json_file)
 
         self.assertEqual(
             subject,
             ConfigSource(
                 file=json_file,
-                name=json_data["name"],
-                config=json_data["config"],
-                target_overrides=json_data["target_overrides"],
+                config={
+                    "ns-hal-pal.nvm_cfstore": {
+                        "help": "Use cfstore as a NVM storage. Else RAM simulation will be used",
+                        "value": False,
+                    }
+                },
+                target_overrides={
+                    "*": {"target.some-setting": 123, "target.add_features": ["BLE"], "ns-hal-pal.rsa-required": True}
+                },
             ),
         )
 
@@ -46,6 +54,6 @@ class TestFromFile(TestCase):
             json_file = pathlib.Path(directory, "file.json")
             json_file.write_text(json.dumps(json_data))
 
-            subject = ConfigSource.from_file(json_file)
+            subject = ConfigSource.from_mbed_lib(json_file)
 
-        self.assertEqual(subject, ConfigSource(file=json_file, name="foo", config={}, target_overrides={}))
+        self.assertEqual(subject, ConfigSource(file=json_file, config={}, target_overrides={}))
