@@ -3,10 +3,17 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 """Build configuration abstraction layer."""
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Set, Optional
 from typing_extensions import TypedDict
 
 from mbed_build._internal.config.config_layer import ConfigLayer
+
+
+class Config(TypedDict):
+    """Represents a build configuration."""
+
+    settings: Dict[str, "Setting"]
+    target: "TargetOverrides"
 
 
 class Setting(TypedDict):
@@ -16,15 +23,26 @@ class Setting(TypedDict):
     value: Any
 
 
-class Config(TypedDict):
-    """Represents a build configuration."""
+class TargetOverrides(TypedDict):
+    """Represents target cumulative overrides."""
 
-    settings: Dict[str, Setting]
+    components: Set[str]
+    device_has: Set[str]
+    extra_labels: Set[str]
+    features: Set[str]
+    macros: Set[str]
 
 
 def build_config_from_layers(layers: List[ConfigLayer]) -> Config:
     """Create configuration from layers."""
-    config = Config(settings={})
+    config = _empty_config()
     for layer in layers:
         layer.apply(config)
     return config
+
+
+def _empty_config() -> Config:
+    return Config(
+        settings={},
+        target={"components": set(), "device_has": set(), "extra_labels": set(), "features": set(), "macros": set(),},
+    )
