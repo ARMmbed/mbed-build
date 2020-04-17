@@ -4,7 +4,7 @@
 #
 from unittest import TestCase, mock
 
-from mbed_build._internal.config.config_modifiers.utils import (
+from mbed_build._internal.config.config_modifiers.build_modifiers import (
     build_modifier_from_target_override_entry,
     build_modifier_from_config_entry,
 )
@@ -12,7 +12,7 @@ from mbed_build._internal.config.config_modifiers.set_target_attribute import In
 
 
 class TestBuildModifierFromConfigEntry(TestCase):
-    @mock.patch("mbed_build._internal.config.config_modifiers.utils.set_config_setting.build")
+    @mock.patch("mbed_build._internal.config.config_modifiers.build_modifiers.set_config_setting.build")
     def test_builds_set_setting_modifier(self, set_config_setting_build):
         key = "foo"
         data = "bar"
@@ -22,7 +22,7 @@ class TestBuildModifierFromConfigEntry(TestCase):
 
 
 class TestBuildModifierFromTargetOverrideEntry(TestCase):
-    @mock.patch("mbed_build._internal.config.config_modifiers.utils.set_target_attribute.build")
+    @mock.patch("mbed_build._internal.config.config_modifiers.build_modifiers.set_target_attribute.build")
     def test_attempts_to_build_cumulative_modifier(self, set_target_attribute_build):
         key = "foo"
         data = "bar"
@@ -30,8 +30,8 @@ class TestBuildModifierFromTargetOverrideEntry(TestCase):
         self.assertEqual(build_modifier_from_target_override_entry(key, data), set_target_attribute_build.return_value)
         set_target_attribute_build.assert_called_once_with(key, data)
 
-    @mock.patch("mbed_build._internal.config.config_modifiers.utils.set_target_attribute.build")
-    @mock.patch("mbed_build._internal.config.config_modifiers.utils.set_config_setting.build")
+    @mock.patch("mbed_build._internal.config.config_modifiers.build_modifiers.set_target_attribute.build")
+    @mock.patch("mbed_build._internal.config.config_modifiers.build_modifiers.set_config_setting.build")
     def test_returns_setting_modifier_if_building_target_modifier_fails(
         self, set_config_setting_build, set_target_attribute_build
     ):
