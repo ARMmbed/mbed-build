@@ -47,3 +47,15 @@ class TestBuildFromLayers(TestCase):
         subject = build_config_from_layers([layer_1, layer_2, layer_3])
 
         self.assertEqual(subject["target"]["features"], set(["FEATURE_1", "FEATURE_3"]))
+
+    def test_respects_strict_cumulative_overrides(self):
+        source_1 = ConfigSourceFactory(
+            **{"target_overrides": {"*": {"target.features_add": ["FEATURE_1", "FEATURE_2"]}}}
+        )
+        source_2 = ConfigSourceFactory(**{"target_overrides": {"*": {"target.features": ["FEATURE_2"]}}})
+        layer_1 = ConfigLayer.from_config_source(source_1, ["K64F"])
+        layer_2 = ConfigLayer.from_config_source(source_2, ["K64F"])
+
+        subject = build_config_from_layers([layer_1, layer_2])
+
+        self.assertEqual(subject["target"]["features"], set(["FEATURE_2"]))

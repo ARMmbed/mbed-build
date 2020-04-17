@@ -20,6 +20,11 @@ def build_modifier_from_target_override_entry(key: str, data: Any) -> Callable:
     - cumulative override (for a specific set of keys)
     - regular config setting override (everything else)
     """
+    # Strip optional target prefix
+    prefix = "target."
+    if key.startswith(prefix):
+        key = key[len(prefix) :]
+
     try:
         return set_target_attribute.build(key, data)
     except set_target_attribute.InvalidModifierData:
