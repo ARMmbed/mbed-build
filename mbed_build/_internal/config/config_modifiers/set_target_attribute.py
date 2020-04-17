@@ -2,7 +2,7 @@
 # Copyright (C) 2020 Arm Mbed. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
-"""Accumulate values in Config.<attribute>."""
+"""Modify values in Config.target.*."""
 import itertools
 from dataclasses import dataclass
 from typing import Any, Callable, List, cast
@@ -16,7 +16,7 @@ if TYPE_CHECKING:
 
 
 class InvalidModifierData(Exception):
-    """Raised when data given to builder is not valid for cumulative modifier."""
+    """Raised when data given to builder is not valid for target attribute modifier."""
 
 
 ACCUMULATING_OVERRIDES = ("extra_labels", "macros", "device_has", "features", "components")
@@ -27,7 +27,7 @@ ALL_ACCUMULATING_OVERRIDES = ACCUMULATING_OVERRIDES + tuple(
 
 
 def build(key: str, data: Any) -> Callable:
-    """Attempt to build a cumulative override modifier.
+    """Attempt to build a target attribute modifier.
 
     A key for this modifier needs to follow a spec from old tools implementation:
     - start with "target."
@@ -54,7 +54,7 @@ CumulativeOverrideKey = Literal["extra_labels", "macros", "device_has", "feature
 
 @dataclass
 class AppendToTargetAttribute:
-    """Append value to one of the config cumulative attributes."""
+    """Append value to one of the targets attributes."""
 
     key: CumulativeOverrideKey
     value: List[str]
@@ -66,7 +66,7 @@ class AppendToTargetAttribute:
 
 @dataclass
 class RemoveFromTargetAttribute:
-    """Remove value from one of the config cumulative attributes."""
+    """Remove value from one of the targets attributes."""
 
     key: CumulativeOverrideKey
     value: List[str]
