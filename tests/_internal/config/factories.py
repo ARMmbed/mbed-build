@@ -23,4 +23,6 @@ class ConfigFactory(factory.Factory):
         model = Config
 
     settings = factory.Dict({})
-    features = factory.LazyFunction(set)
+    target = factory.Dict(
+        {"components": set(), "device_has": set(), "extra_labels": set(), "features": set(), "macros": set()}
+    )

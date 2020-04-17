@@ -9,6 +9,13 @@ from typing_extensions import TypedDict
 from mbed_build._internal.config.config_layer import ConfigLayer
 
 
+class Config(TypedDict):
+    """Represents a build configuration."""
+
+    settings: Dict[str, "Setting"]
+    target: "TargetOverrides"
+
+
 class Setting(TypedDict):
     """Represents a config setting."""
 
@@ -16,11 +23,9 @@ class Setting(TypedDict):
     value: Any
 
 
-class Config(TypedDict):
-    """Represents a build configuration."""
+class TargetOverrides(TypedDict):
+    """Represents target cumulative overrides."""
 
-    settings: Dict[str, Setting]
-    # Cumulative
     components: Set[str]
     device_has: Set[str]
     extra_labels: Set[str]
@@ -37,4 +42,7 @@ def build_config_from_layers(layers: List[ConfigLayer]) -> Config:
 
 
 def _empty_config() -> Config:
-    return Config(settings={}, components=set(), device_has=set(), extra_labels=set(), features=set(), macros=set())
+    return Config(
+        settings={},
+        target={"components": set(), "device_has": set(), "extra_labels": set(), "features": set(), "macros": set(),},
+    )

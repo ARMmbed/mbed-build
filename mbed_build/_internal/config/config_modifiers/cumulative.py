@@ -61,7 +61,7 @@ class AppendToConfig:
 
     def __call__(self, config: "Config") -> None:
         """Mutate config by appending value to key."""
-        config[self.key] = config[self.key] | set(self.value)
+        config["target"][self.key] = config["target"][self.key] | set(self.value)
 
 
 @dataclass
@@ -73,4 +73,4 @@ class RemoveFromConfig:
 
     def __call__(self, config: "Config") -> None:
         """Mutate config by removing value from key."""
-        config[self.key] = config[self.key] - set(self.value)
+        config["target"][self.key] = config["target"][self.key] - set(self.value)

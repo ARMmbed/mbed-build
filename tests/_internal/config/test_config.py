@@ -46,4 +46,4 @@ class TestBuildFromLayers(TestCase):
 
         subject = build_config_from_layers([layer_1, layer_2, layer_3])
 
-        self.assertEqual(subject["features"], set(["FEATURE_1", "FEATURE_3"]))
+        self.assertEqual(subject["target"]["features"], set(["FEATURE_1", "FEATURE_3"]))

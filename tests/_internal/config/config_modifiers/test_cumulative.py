@@ -36,19 +36,19 @@ class TestBuild(TestCase):
 
 class TestAppendValue(TestCase):
     def test_appends_to_existing_value(self):
-        config = ConfigFactory(features=set(["SWAG"]))
+        config = ConfigFactory(target={"features": set(["SWAG"])})
         modifier = AppendToConfig(key="features", value=["BAR"])
 
         modifier(config)
 
-        self.assertEqual(config["features"], set(["SWAG", "BAR"]))
+        self.assertEqual(config["target"]["features"], set(["SWAG", "BAR"]))
 
 
 class TestRemoveValue(TestCase):
     def test_removes_existing_values(self):
-        config = ConfigFactory(features=set(["FOO", "BAR", "BAZ"]))
+        config = ConfigFactory(target={"features": set(["FOO", "BAR", "BAZ"])})
         modifier = RemoveFromConfig(key="features", value=["FOO", "BAR"])
 
         modifier(config)
 
-        self.assertEqual(config["features"], set(["BAZ"]))
+        self.assertEqual(config["target"]["features"], set(["BAZ"]))
