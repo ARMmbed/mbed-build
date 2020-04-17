@@ -40,7 +40,7 @@ def build(key: str, data: Any) -> Callable:
     key = key[7:]  # Strip "target." prefix
     if key in ALL_ACCUMULATING_OVERRIDES:
         override_key, override_type = key.rsplit("_", maxsplit=1)
-        override_key = cast(CumulativeOverrideKey, override_key)
+        override_key = cast(AccumulatingOverrideKey, override_key)
         if override_type == "add":
             return AppendToTargetAttribute(key=override_key, value=data)
         if override_type == "remove":
@@ -49,14 +49,14 @@ def build(key: str, data: Any) -> Callable:
     raise InvalidModifierData
 
 
-CumulativeOverrideKey = Literal["extra_labels", "macros", "device_has", "features", "components", "features"]
+AccumulatingOverrideKey = Literal["extra_labels", "macros", "device_has", "features", "components", "features"]
 
 
 @dataclass
 class AppendToTargetAttribute:
     """Append value to one of the targets attributes."""
 
-    key: CumulativeOverrideKey
+    key: AccumulatingOverrideKey
     value: List[str]
 
     def __call__(self, config: "Config") -> None:
@@ -68,7 +68,7 @@ class AppendToTargetAttribute:
 class RemoveFromTargetAttribute:
     """Remove value from one of the targets attributes."""
 
-    key: CumulativeOverrideKey
+    key: AccumulatingOverrideKey
     value: List[str]
 
     def __call__(self, config: "Config") -> None:
