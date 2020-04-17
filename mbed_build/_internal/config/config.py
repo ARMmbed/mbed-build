@@ -20,12 +20,21 @@ class Config(TypedDict):
     """Represents a build configuration."""
 
     settings: Dict[str, Setting]
+    # Cumulative
+    components: Set[str]
+    device_has: Set[str]
+    extra_labels: Set[str]
     features: Set[str]
+    macros: Set[str]
 
 
 def build_config_from_layers(layers: List[ConfigLayer]) -> Config:
     """Create configuration from layers."""
-    config = Config(settings={}, features=set())
+    config = _empty_config()
     for layer in layers:
         layer.apply(config)
     return config
+
+
+def _empty_config() -> Config:
+    return Config(settings={}, components=set(), device_has=set(), extra_labels=set(), features=set(), macros=set())

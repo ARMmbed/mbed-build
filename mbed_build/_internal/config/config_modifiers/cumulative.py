@@ -19,12 +19,7 @@ class UnableToBuildCumulativeModifier(Exception):
     """Raised when data given to builder is not valid for cumulative modifier."""
 
 
-# TODO: potentially add more accumulating properties here.
-# Two projects this has been tested against:
-# - mbed-cloud-client-example
-# - mbed-os-example-blinky
-# only contain "features_add" and "features_remove".
-ACCUMULATING_OVERRIDES = ("features",)
+ACCUMULATING_OVERRIDES = ("extra_labels", "macros", "device_has", "features", "components")
 MODIFIERS = ("add", "remove")
 ALL_ACCUMULATING_OVERRIDES = ACCUMULATING_OVERRIDES + tuple(
     f"{attr}_{suffix}" for attr, suffix in itertools.product(ACCUMULATING_OVERRIDES, MODIFIERS)
@@ -54,7 +49,7 @@ def build(key: str, data: Any) -> Callable:
     raise UnableToBuildCumulativeModifier
 
 
-CumulativeOverrideKey = Literal["features"]
+CumulativeOverrideKey = Literal["extra_labels", "macros", "device_has", "features", "components", "features"]
 
 
 @dataclass
