@@ -40,11 +40,11 @@ class SetConfigSetting:
 
     def __call__(self, config: "Config") -> None:
         """Mutate config by overwriting existing entry with new data."""
-        existing = config["settings"].get(self.key)
+        existing = config["settings"].get(self.key, {})
         if existing:
             existing["value"] = self.value
         else:
-            config["settings"][self.key] = {
+            existing = {
                 "value": self.value,
                 "help": self.help,
             }
