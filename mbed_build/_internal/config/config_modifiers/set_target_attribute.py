@@ -26,12 +26,16 @@ ALL_ACCUMULATING_OVERRIDES = ACCUMULATING_OVERRIDES + tuple(
 )
 
 
-def build(key: str, data: Any) -> Callable:
+def build(key: str, data: List[str]) -> Callable:
     """Attempt to build a target attribute modifier.
 
     A key for this modifier needs to follow a spec from old tools implementation:
     - start with "target."
     - the part after "target." is one of ACCUMULATING_OVERRIDES
+
+    Args:
+        key: A key identifying target attribute, must have "target." prefix
+        data: A list of overrides to add or remove from target attributes
     """
     # Key following a spec would:
     prefix = "target."
