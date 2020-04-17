@@ -3,9 +3,9 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 """Modify values in Config.target.*."""
-import itertools
+import re
 from dataclasses import dataclass
-from typing import Any, Callable, List, cast
+from typing import Callable, List, Tuple, cast
 from typing_extensions import Literal
 
 # Fix circular dependency problem
@@ -19,13 +19,6 @@ class InvalidModifierData(Exception):
     """Raised when data given to builder is not valid for target attribute modifier."""
 
 
-ACCUMULATING_OVERRIDES = ("extra_labels", "macros", "device_has", "features", "components")
-MODIFIERS = ("add", "remove")
-ALL_ACCUMULATING_OVERRIDES = ACCUMULATING_OVERRIDES + tuple(
-    f"{attr}_{suffix}" for attr, suffix in itertools.product(ACCUMULATING_OVERRIDES, MODIFIERS)
-)
-
-
 def build(key: str, data: List[str]) -> Callable:
     """Attempt to build a target attribute modifier.
 
@@ -37,24 +30,19 @@ def build(key: str, data: List[str]) -> Callable:
         key: A key identifying target attribute, must have "target." prefix
         data: A list of overrides to add or remove from target attributes
     """
-    # Key following a spec would:
-    prefix = "target."
-    if not key.startswith(prefix):
+    try:
+        key, modifier = _extract_key_and_modifier(key)
+    except ValueError:
         raise InvalidModifierData
 
-    key = key[len(prefix) :]  # Strip "target." prefix
-    if key in ALL_ACCUMULATING_OVERRIDES:
-        override_key, override_type = key.rsplit("_", maxsplit=1)
-        override_key = cast(AccumulatingOverrideKey, override_key)
-        if override_type == "add":
-            return AppendToTargetAttribute(key=override_key, value=data)
-        if override_type == "remove":
-            return RemoveFromTargetAttribute(key=override_key, value=data)
-
-    raise InvalidModifierData
+    if modifier == "add":
+        return AppendToTargetAttribute(key=key, value=data)
+    if modifier == "remove":
+        return RemoveFromTargetAttribute(key=key, value=data)
+    return OverwriteTargetAttribute(key=key, value=data)
 
 
-AccumulatingOverrideKey = Literal["extra_labels", "macros", "device_has", "features", "components", "features"]
+AccumulatingOverrideKey = Literal["extra_labels", "macros", "device_has", "features", "components"]
 
 
 @dataclass
@@ -79,3 +67,31 @@ class RemoveFromTargetAttribute:
     def __call__(self, config: "Config") -> None:
         """Mutate config by removing value from key."""
         config["target"][self.key] = config["target"][self.key] - set(self.value)
+
+
+@dataclass
+class OverwriteTargetAttribute:
+    """Overwrite value in one of the targets attributes."""
+
+    key: AccumulatingOverrideKey
+    value: List[str]
+
+    def __call__(self, config: "Config") -> None:
+        """Mutate config by removing value from key."""
+        config["target"][self.key] = set(self.value)
+
+
+ACCUMULATING_OVERRIDES = ("extra_labels", "macros", "device_has", "features", "components")
+
+
+def _extract_key_and_modifier(key: str) -> Tuple[AccumulatingOverrideKey, str]:
+    regex = fr"""
+            (?P<key>{'|'.join(ACCUMULATING_OVERRIDES)}) # attribute name (one of ACCUMULATING_OVERRIDES)
+            _?                                          # separator
+            (?P<modifier>(add|remove)?)                 # modifier (add, remove or empty)
+    """
+    match = re.search(regex, key, re.VERBOSE)
+    if not match:
+        raise ValueError
+    key = cast(AccumulatingOverrideKey, match["key"])
+    return key, match["modifier"]

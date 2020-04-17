@@ -8,6 +8,7 @@ from mbed_build._internal.config.config_modifiers.set_target_attribute import (
     AppendToTargetAttribute,
     ACCUMULATING_OVERRIDES,
     RemoveFromTargetAttribute,
+    OverwriteTargetAttribute,
     InvalidModifierData,
     build,
 )
@@ -15,19 +16,26 @@ from tests._internal.config.factories import ConfigFactory
 
 
 class TestBuild(TestCase):
-    def test_builds_append_value_modifier_for_cumulative_overrides(self):
+    def test_builds_append_modifier(self):
         for override in ACCUMULATING_OVERRIDES:
             with self.subTest('builds append value modifier for "{override}" override'):
-                subject = build(f"target.{override}_add", ["FOO"])
+                subject = build(f"{override}_add", ["FOO"])
 
                 self.assertEqual(subject, AppendToTargetAttribute(key=override, value=["FOO"]))
 
-    def test_builds_remove_value_modifier(self):
+    def test_builds_remove_modifier(self):
         for override in ACCUMULATING_OVERRIDES:
             with self.subTest('builds remove value modifier for "{override}" override'):
-                subject = build(f"target.{override}_remove", ["BAR"])
+                subject = build(f"{override}_remove", ["BAR"])
 
                 self.assertEqual(subject, RemoveFromTargetAttribute(key=override, value=["BAR"]))
+
+    def test_builds_override_modifier(self):
+        for override in ACCUMULATING_OVERRIDES:
+            with self.subTest('builds override value modifier for "{override}" override'):
+                subject = build(f"{override}", ["BAR"])
+
+                self.assertEqual(subject, OverwriteTargetAttribute(key=override, value=["BAR"]))
 
     def test_raises_given_invalid_key(self):
         with self.assertRaises(InvalidModifierData):

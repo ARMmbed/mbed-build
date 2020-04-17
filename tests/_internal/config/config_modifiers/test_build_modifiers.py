@@ -41,3 +41,14 @@ class TestBuildModifierFromTargetOverrideEntry(TestCase):
 
         self.assertEqual(build_modifier_from_target_override_entry(key, data), set_config_setting_build.return_value)
         set_config_setting_build.assert_called_once_with(key, data)
+
+    @mock.patch("mbed_build._internal.config.config_modifiers.build_modifiers.set_target_attribute.build")
+    @mock.patch("mbed_build._internal.config.config_modifiers.build_modifiers.set_config_setting.build")
+    def test_strips_target_prefix(self, set_config_setting_build, set_target_attribute_build):
+        set_target_attribute_build.side_effect = InvalidModifierData
+        key = "target.hat"
+        data = "boat"
+
+        self.assertEqual(build_modifier_from_target_override_entry(key, data), set_config_setting_build.return_value)
+        set_target_attribute_build.assert_called_once_with("hat", data)
+        set_config_setting_build.assert_called_once_with("hat", data)
