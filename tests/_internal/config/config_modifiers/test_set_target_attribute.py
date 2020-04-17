@@ -4,11 +4,11 @@
 #
 from unittest import TestCase
 
-from mbed_build._internal.config.config_modifiers.cumulative import (
-    AppendToConfig,
+from mbed_build._internal.config.config_modifiers.set_target_attribute import (
+    AppendToTargetAttribute,
     ACCUMULATING_OVERRIDES,
-    RemoveFromConfig,
-    UnableToBuildCumulativeModifier,
+    RemoveFromTargetAttribute,
+    InvalidModifierData,
     build,
 )
 from tests._internal.config.factories import ConfigFactory
@@ -20,34 +20,34 @@ class TestBuild(TestCase):
             with self.subTest('builds append value modifier for "{override}" override'):
                 subject = build(f"target.{override}_add", ["FOO"])
 
-                self.assertEqual(subject, AppendToConfig(key=override, value=["FOO"]))
+                self.assertEqual(subject, AppendToTargetAttribute(key=override, value=["FOO"]))
 
     def test_builds_remove_value_modifier(self):
         for override in ACCUMULATING_OVERRIDES:
             with self.subTest('builds remove value modifier for "{override}" override'):
                 subject = build(f"target.{override}_remove", ["BAR"])
 
-                self.assertEqual(subject, RemoveFromConfig(key=override, value=["BAR"]))
+                self.assertEqual(subject, RemoveFromTargetAttribute(key=override, value=["BAR"]))
 
     def test_raises_given_invalid_key(self):
-        with self.assertRaises(UnableToBuildCumulativeModifier):
+        with self.assertRaises(InvalidModifierData):
             build("definitely-not-a-cumulative-override", data=None)
 
 
-class TestAppendValue(TestCase):
+class TestAppendToTargetAttribute(TestCase):
     def test_appends_to_existing_value(self):
         config = ConfigFactory(target={"features": set(["SWAG"])})
-        modifier = AppendToConfig(key="features", value=["BAR"])
+        modifier = AppendToTargetAttribute(key="features", value=["BAR"])
 
         modifier(config)
 
         self.assertEqual(config["target"]["features"], set(["SWAG", "BAR"]))
 
 
-class TestRemoveValue(TestCase):
+class TestRemoveFromTargetAttribute(TestCase):
     def test_removes_existing_values(self):
         config = ConfigFactory(target={"features": set(["FOO", "BAR", "BAZ"])})
-        modifier = RemoveFromConfig(key="features", value=["FOO", "BAR"])
+        modifier = RemoveFromTargetAttribute(key="features", value=["FOO", "BAR"])
 
         modifier(config)
 

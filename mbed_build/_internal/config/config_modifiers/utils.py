@@ -5,7 +5,7 @@
 """Utilities for building config modifiers."""
 from typing import Any, Callable
 
-from mbed_build._internal.config.config_modifiers import set_config_setting, cumulative
+from mbed_build._internal.config.config_modifiers import set_config_setting, set_target_attribute
 
 
 def build_modifier_from_config_entry(key: str, data: Any) -> Callable:
@@ -21,6 +21,6 @@ def build_modifier_from_target_override_entry(key: str, data: Any) -> Callable:
     - regular config setting override (everything else)
     """
     try:
-        return cumulative.build(key, data)
-    except cumulative.UnableToBuildCumulativeModifier:
+        return set_target_attribute.build(key, data)
+    except set_target_attribute.InvalidModifierData:
         return set_config_setting.build(key, data)

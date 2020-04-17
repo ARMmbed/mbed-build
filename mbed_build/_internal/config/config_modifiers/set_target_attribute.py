@@ -15,7 +15,7 @@ if TYPE_CHECKING:
     from mbed_build._internal.config.config import Config
 
 
-class UnableToBuildCumulativeModifier(Exception):
+class InvalidModifierData(Exception):
     """Raised when data given to builder is not valid for cumulative modifier."""
 
 
@@ -35,25 +35,25 @@ def build(key: str, data: Any) -> Callable:
     """
     # Key following a spec would:
     if not key.startswith("target."):
-        raise UnableToBuildCumulativeModifier
+        raise InvalidModifierData
 
     key = key[7:]  # Strip "target." prefix
     if key in ALL_ACCUMULATING_OVERRIDES:
         override_key, override_type = key.rsplit("_", maxsplit=1)
         override_key = cast(CumulativeOverrideKey, override_key)
         if override_type == "add":
-            return AppendToConfig(key=override_key, value=data)
+            return AppendToTargetAttribute(key=override_key, value=data)
         if override_type == "remove":
-            return RemoveFromConfig(key=override_key, value=data)
+            return RemoveFromTargetAttribute(key=override_key, value=data)
 
-    raise UnableToBuildCumulativeModifier
+    raise InvalidModifierData
 
 
 CumulativeOverrideKey = Literal["extra_labels", "macros", "device_has", "features", "components", "features"]
 
 
 @dataclass
-class AppendToConfig:
+class AppendToTargetAttribute:
     """Append value to one of the config cumulative attributes."""
 
     key: CumulativeOverrideKey
@@ -65,7 +65,7 @@ class AppendToConfig:
 
 
 @dataclass
-class RemoveFromConfig:
+class RemoveFromTargetAttribute:
     """Remove value from one of the config cumulative attributes."""
 
     key: CumulativeOverrideKey
