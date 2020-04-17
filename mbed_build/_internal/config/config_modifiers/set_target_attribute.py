@@ -38,7 +38,7 @@ def build(key: str, data: Any) -> Callable:
     if not key.startswith(prefix):
         raise InvalidModifierData
 
-    key = key[len(prefix):]  # Strip "target." prefix
+    key = key[len(prefix) :]  # Strip "target." prefix
     if key in ALL_ACCUMULATING_OVERRIDES:
         override_key, override_type = key.rsplit("_", maxsplit=1)
         override_key = cast(AccumulatingOverrideKey, override_key)
