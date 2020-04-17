@@ -40,7 +40,7 @@ class TestFromFile(TestCase):
         )
 
     def test_gracefully_handles_missing_data(self):
-        json_data = {}
+        json_data = {"name": "foo"}
 
         with tempfile.TemporaryDirectory() as directory:
             json_file = pathlib.Path(directory, "file.json")
@@ -48,4 +48,4 @@ class TestFromFile(TestCase):
 
             subject = ConfigSource.from_file(json_file)
 
-        self.assertEqual(subject, ConfigSource(file=json_file, name=None, config={}, target_overrides={}))
+        self.assertEqual(subject, ConfigSource(file=json_file, name="foo", config={}, target_overrides={}))

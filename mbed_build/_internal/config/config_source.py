@@ -6,7 +6,6 @@
 import json
 import pathlib
 from dataclasses import dataclass
-from typing import Optional
 
 
 @dataclass
@@ -21,7 +20,7 @@ class ConfigSource:
     This class serves as a common interface for interrogating sources listed above.
     """
 
-    name: Optional[str]
+    name: str
     file: pathlib.Path
     config: dict
     target_overrides: dict
@@ -32,7 +31,7 @@ class ConfigSource:
         contents = json.loads(json_file.read_text())
         return cls(
             file=json_file,
-            name=contents.get("name", None),
+            name=contents["name"],
             config=contents.get("config", {}),
             target_overrides=contents.get("target_overrides", {}),
         )
