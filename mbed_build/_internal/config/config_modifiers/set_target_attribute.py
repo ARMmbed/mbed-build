@@ -34,10 +34,11 @@ def build(key: str, data: Any) -> Callable:
     - the part after "target." is one of ACCUMULATING_OVERRIDES
     """
     # Key following a spec would:
-    if not key.startswith("target."):
+    prefix = "target."
+    if not key.startswith(prefix):
         raise InvalidModifierData
 
-    key = key[7:]  # Strip "target." prefix
+    key = key[len(prefix):]  # Strip "target." prefix
     if key in ALL_ACCUMULATING_OVERRIDES:
         override_key, override_type = key.rsplit("_", maxsplit=1)
         override_key = cast(AccumulatingOverrideKey, override_key)
