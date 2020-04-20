@@ -44,5 +44,5 @@ def build_config_from_layers(layers: List[ConfigLayer]) -> Config:
 def _empty_config() -> Config:
     return Config(
         settings={},
-        target={"components": set(), "device_has": set(), "extra_labels": set(), "features": set(), "macros": set(),},
+        target={"components": set(), "device_has": set(), "extra_labels": set(), "features": set(), "macros": set()},
     )

@@ -4,7 +4,7 @@
 #
 from unittest import TestCase, mock
 
-from mbed_build._internal.config.config_layer import ConfigLayer
+from mbed_build._internal.config.config_layer import ConfigLayer, _namespace
 from mbed_build._internal.config.config_modifiers import (
     build_modifier_from_config_entry,
     build_modifier_from_target_override_entry,
@@ -27,8 +27,9 @@ class TestApply(TestCase):
 
 
 class TestFromConfigSource(TestCase):
-    def test_creates_config_layer_with_modifiers_from_config_source(self):
+    def test_creates_config_layer_with_namespaced_modifiers_from_config_source(self):
         config_source = ConfigSourceFactory(
+            namespace="namespace",
             config={"foo": True},
             target_overrides={
                 "*": {"bar": 1},
@@ -44,9 +45,17 @@ class TestFromConfigSource(TestCase):
             ConfigLayer(
                 config_source=config_source,
                 modifiers=[
-                    build_modifier_from_config_entry(key="foo", data=True),
-                    build_modifier_from_target_override_entry(key="bar", data=1),
-                    build_modifier_from_target_override_entry(key="baz", data="maybe"),
+                    build_modifier_from_config_entry(key=_namespace("foo", "namespace"), data=True),
+                    build_modifier_from_target_override_entry(key=_namespace("bar", "namespace"), data=1),
+                    build_modifier_from_target_override_entry(key=_namespace("baz", "namespace"), data="maybe"),
                 ],
             ),
         )
+
+
+class TestNamespace(TestCase):
+    def test_leaves_namespaced_keys_alone(self):
+        self.assertEqual(_namespace("target.foo", "my-namespace"), "target.foo")
+
+    def test_namespaces_keys(self):
+        self.assertEqual(_namespace("foo", "my-namespace"), "my-namespace.foo")
