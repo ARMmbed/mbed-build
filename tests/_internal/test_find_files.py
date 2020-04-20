@@ -10,7 +10,7 @@ from typing import Iterable
 
 from mbed_targets import Target
 
-from mbed_build._internal.find_files import find_files, MbedignoreFilter, LabelFilter, BoardLabelFilter
+from mbed_build._internal.find_files import find_files, filter_files, MbedignoreFilter, LabelFilter, BoardLabelFilter
 
 
 @contextlib.contextmanager
@@ -61,6 +61,8 @@ class TestListFiles(TestCase):
         for path in matching_paths:
             self.assertIn(Path(directory, path), subject)
 
+
+class TestFilterFiles(TestCase):
     def test_respects_given_filters(self):
         matching_paths = [
             Path("foo", "file.txt"),
@@ -74,12 +76,11 @@ class TestListFiles(TestCase):
         def my_filter(path):
             return "bar" not in str(path)
 
-        with create_files(matching_paths + excluded_paths) as directory:
-            subject = find_files("file.txt", directory, [my_filter])
+        subject = filter_files((matching_paths + excluded_paths), [my_filter])
 
         self.assertEqual(len(subject), len(matching_paths))
         for path in matching_paths:
-            self.assertIn(Path(directory, path), subject)
+            self.assertIn(path, subject)
 
 
 @mock.patch("mbed_build._internal.find_files.get_target_by_board_type", autospec=True)

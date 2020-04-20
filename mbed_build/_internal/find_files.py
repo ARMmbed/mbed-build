@@ -38,7 +38,7 @@ def find_files(filename: str, directory: Path, filters: Optional[List[Callable]]
         filters = filters + [MbedignoreFilter.from_file(mbedignore)]
 
     # Remove files and directories that don't match current set of filters
-    filtered_children = (child for child in children if all(f(child) for f in filters))
+    filtered_children = filter_files(children, filters)
 
     for child in filtered_children:
         if child.is_dir():
@@ -50,6 +50,11 @@ def find_files(filename: str, directory: Path, filters: Optional[List[Callable]]
             result.append(child)
 
     return result
+
+
+def filter_files(files: List[Path], filters: List[Callable]) -> List[Path]:
+    """Filter given paths to files using filter callables."""
+    return [file for file in files if all(f(file) for f in filters)]
 
 
 class BoardLabelFilter:
