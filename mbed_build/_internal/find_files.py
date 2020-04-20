@@ -57,26 +57,6 @@ def filter_files(files: List[Path], filters: List[Callable]) -> List[Path]:
     return [file for file in files if all(f(file) for f in filters)]
 
 
-class BoardLabelFilter:
-    """Filter out given paths using path labelling rules specific to a board."""
-
-    def __init__(self, board_type: str, mbed_program_directory: Path):
-        """Initialise filter attributes.
-
-        Allowed label data will be retrieved from `mbed-targets`.
-        """
-        target = get_target_by_board_type(board_type, mbed_program_directory)
-        self._label_filters = [
-            LabelFilter("TARGET", target.labels),
-            LabelFilter("FEATURE", target.features),
-            LabelFilter("COMPONENT", target.components),
-        ]
-
-    def __call__(self, path: Path) -> bool:
-        """Return True if given path contains only allowed labels - should not be filtered out."""
-        return all(f(path) for f in self._label_filters)
-
-
 class LabelFilter:
     """Filter out given paths using path labelling rules.
 
