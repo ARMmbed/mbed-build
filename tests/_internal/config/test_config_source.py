@@ -11,7 +11,7 @@ from mbed_build._internal.config.config_source import ConfigSource
 
 
 class TestFromMbedLib(TestCase):
-    def test_builds_namespaced_config_source_from_mbed_lib_json(self):
+    def test_builds_config_source_from_mbed_lib_json(self):
         json_data = {
             "name": "ns-hal-pal",
             "config": {
@@ -34,16 +34,10 @@ class TestFromMbedLib(TestCase):
         self.assertEqual(
             subject,
             ConfigSource(
+                namespace=json_data["name"],
                 file=json_file,
-                config={
-                    "ns-hal-pal.nvm_cfstore": {
-                        "help": "Use cfstore as a NVM storage. Else RAM simulation will be used",
-                        "value": False,
-                    }
-                },
-                target_overrides={
-                    "*": {"target.some-setting": 123, "target.add_features": ["BLE"], "ns-hal-pal.rsa-required": True}
-                },
+                config=json_data["config"],
+                target_overrides=json_data["target_overrides"],
             ),
         )
 
@@ -56,4 +50,6 @@ class TestFromMbedLib(TestCase):
 
             subject = ConfigSource.from_mbed_lib(json_file)
 
-        self.assertEqual(subject, ConfigSource(file=json_file, config={}, target_overrides={}))
+        self.assertEqual(
+            subject, ConfigSource(namespace=json_data["name"], file=json_file, config={}, target_overrides={})
+        )
