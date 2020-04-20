@@ -7,8 +7,6 @@ from pathlib import Path
 import fnmatch
 from typing import Callable, Iterable, Optional, List, Tuple
 
-from mbed_targets import get_target_by_board_type
-
 
 def find_files(filename: str, directory: Path, filters: Optional[List[Callable]] = None) -> List[Path]:
     """Recursively find files by name under a given directory.
