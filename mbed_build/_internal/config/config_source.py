@@ -48,7 +48,7 @@ def _namespace_key(key: str, namespace: str) -> str:
 
     It should be one of:
     - "target"
-    - "application"
+    - "app"
     - library name (where "mbed_lib.json" comes from)
 
     If given key is already namespaced, return it as is - this is going to be the case for
