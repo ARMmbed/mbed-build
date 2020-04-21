@@ -24,7 +24,7 @@ def create_files(files: Iterable[Path]):
         yield temp_directory
 
 
-class TestListFiles(TestCase):
+class TestFindFiles(TestCase):
     def test_finds_files_by_name(self):
         matching_paths = [
             Path("file.txt"),
