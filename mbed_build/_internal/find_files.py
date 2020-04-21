@@ -8,7 +8,18 @@ import fnmatch
 from typing import Callable, Iterable, Optional, List, Tuple
 
 
-def find_files(filename: str, directory: Path, filters: Optional[List[Callable]] = None) -> List[Path]:
+def find_files(filename: str, directory: Path) -> List[Path]:
+    """Proxy to `_find_files`, which applies legacy filtering rules."""
+    # Temporary workaround, which replicates hardcoded ignore rules from old tools.
+    # Legacy list of ignored directories is longer, however "TESTS" and
+    # "TEST_APPS" were the only ones that actually exist in the MbedOS source.
+    # Ideally, this should be solved by putting an `.mbedignore` file in the root of MbedOS repo,
+    # similarly to what the code below pretends is happening.
+    legacy_ignore = MbedignoreFilter(("*/TESTS", "*/TEST_APPS"))
+    return _find_files(filename, directory, [legacy_ignore])
+
+
+def _find_files(filename: str, directory: Path, filters: Optional[List[Callable]] = None) -> List[Path]:
     """Recursively find files by name under a given directory.
 
     This function automatically applies rules from .mbedignore files found during traversal.
@@ -41,7 +52,7 @@ def find_files(filename: str, directory: Path, filters: Optional[List[Callable]]
     for child in filtered_children:
         if child.is_dir():
             # If processed child is a directory, recurse with current set of filters
-            result += find_files(filename, child, filters)
+            result += _find_files(filename, child, filters)
 
         if child.is_file() and child.name == filename:
             # We've got a match
