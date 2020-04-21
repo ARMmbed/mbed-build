@@ -43,16 +43,14 @@ class ConfigLayer:
 
         This method translates data found in ConfigSource into modifiers specific to the given target.
         """
-        modifiers_from_config = [
-            build_modifier_from_config_entry(key=key, data=data) for key, data in config_source.config.items()
-        ]
+        modifiers = []
+        for key, data in config_source.config.items():
+            modifiers.append(build_modifier_from_config_entry(key=key, data=data))
 
-        modifiers_from_target_overrides: List[Callable] = []
         allowed_target_labels = ["*"] + target_labels
         for target_label, overrides in config_source.target_overrides.items():
             if target_label in allowed_target_labels:
-                modifiers_from_target_overrides.extend(
-                    build_modifier_from_target_override_entry(key=key, data=data) for key, data in overrides.items()
-                )
+                for key, data in overrides.items():
+                    modifiers.append(build_modifier_from_target_override_entry(key=key, data=data))
 
-        return cls(config_source=config_source, modifiers=(modifiers_from_config + modifiers_from_target_overrides))
+        return cls(config_source=config_source, modifiers=modifiers)

@@ -27,7 +27,7 @@ class TestApply(TestCase):
 
 
 class TestFromConfigSource(TestCase):
-    def test_creates_config_layer_with_modifiers_from_config_source(self):
+    def test_creates_config_layer_modifiers_from_config_source(self):
         config_source = ConfigSourceFactory(
             config={"foo": True},
             target_overrides={
