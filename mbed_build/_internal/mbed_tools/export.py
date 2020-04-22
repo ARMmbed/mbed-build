@@ -10,13 +10,13 @@ import click
 from mbed_build.mbed_build import generate_cmakelists_file, write_cmakelists_file
 
 
-@click.command()
+@click.command(help="This is an unfinished implementation of export. It only exports the initial Mbed OS 'key folder names'.")
 @click.option(
     "-o",
     "--output-directory",
     type=click.Path(),
     required=True,
-    help="Destination for exported top-level CMakeLists.txt file.",
+    help="Destination for exported CMakeLists.txt file containing directory keys.",
 )
 @click.option(
     "-t",
