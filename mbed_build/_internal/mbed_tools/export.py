@@ -10,7 +10,9 @@ import click
 from mbed_build.mbed_build import generate_cmakelists_file, write_cmakelists_file
 
 
-@click.command(help="This is an unfinished implementation of export. It only exports the initial Mbed OS 'key folder names'.")
+@click.command(
+    help="This is an unfinished implementation of export. It only exports the initial Mbed OS 'key folder names'."
+)
 @click.option(
     "-o",
     "--output-directory",
