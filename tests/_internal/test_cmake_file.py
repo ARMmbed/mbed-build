@@ -3,9 +3,8 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 import pathlib
+import tempfile
 from unittest import TestCase
-
-from pyfakefs.fake_filesystem_unittest import Patcher
 
 from mbed_build._internal.cmake_file import render_cmakelists_template, write_cmakelists_file
 
@@ -24,9 +23,9 @@ class TestRendersCMakeListsFile(TestCase):
 
 class TestWriteCMakeListsFile(TestCase):
     def test_writes_content_to_file(self):
-        with Patcher():
+        with tempfile.TemporaryDirectory() as directory:
             content = "Some rendered content"
-            export_path = pathlib.Path("tests", "output")
+            export_path = pathlib.Path(directory, "output")
 
             write_cmakelists_file(export_path, content)
 
