@@ -7,7 +7,7 @@ import pathlib
 import tempfile
 from unittest import TestCase, mock
 
-from mbed_build._internal.new_config.source import Source, _namespace_data, _filter_target_overrides
+from mbed_build._internal.config.source import Source, _namespace_data, _filter_target_overrides
 
 
 class TestMbedLibSource(TestCase):
@@ -33,7 +33,7 @@ class TestMbedLibSource(TestCase):
             _namespace_data(_filter_target_overrides(data["target_overrides"], ["THIS_TARGET"]), data["name"]),
         )
 
-    @mock.patch("mbed_build._internal.new_config.source.get_target_by_board_type")
+    @mock.patch("mbed_build._internal.config.source.get_target_by_board_type")
     def test_from_target(self, get_target_by_board_type):
         # Warning: Target is a dataclass and dataclasses provide no type safety when mocking
         target = mock.Mock(

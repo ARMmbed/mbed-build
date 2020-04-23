@@ -2,47 +2,114 @@
 # Copyright (C) 2020 Arm Mbed. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
-"""Build configuration abstraction layer."""
-from typing import Any, Dict, List, Set, Optional
-from typing_extensions import TypedDict
+"""Build configuration representation."""
+import re
+import itertools
+from dataclasses import dataclass, field, fields
+from typing import Any, Dict, List, Optional, Set, Tuple
 
-from mbed_build._internal.config.config_layer import ConfigLayer
-
-
-class Config(TypedDict):
-    """Represents a build configuration."""
-
-    settings: Dict[str, "Setting"]
-    target: "TargetOverrides"
+from mbed_build._internal.config.source import Source
 
 
-class Setting(TypedDict):
-    """Represents a config setting."""
+@dataclass
+class Option:
+    """Representation of configuration option."""
 
-    help: Optional[str]
     value: Any
+    macro_name: Optional[str]
+    help_text: Optional[str]
+
+    @classmethod
+    def build(cls, data: Any) -> "Option":
+        """Build configuration option from config entry value.
+
+        Config values are either complex data structures or simple values.
+        This function handles both.
+        """
+        if isinstance(data, dict):
+            return cls(value=data.get("value"), macro_name=data.get("macro_name"), help_text=data.get("help"))
+        else:
+            return cls(value=data, macro_name=None, help_text=None)
+
+    def set_value(self, value: Any) -> None:
+        """Mutate self with new value."""
+        self.value = value
 
 
-class TargetOverrides(TypedDict):
-    """Represents target cumulative overrides."""
+@dataclass
+class TargetMetadata:
+    """Representation of target metadata assembled during config parsing.
 
-    components: Set[str]
-    device_has: Set[str]
-    extra_labels: Set[str]
-    features: Set[str]
-    macros: Set[str]
+    This is where the cumulative attributes are stored.
+    """
 
-
-def build_config_from_layers(layers: List[ConfigLayer]) -> Config:
-    """Create configuration from layers."""
-    config = _empty_config()
-    for layer in layers:
-        layer.apply(config)
-    return config
+    macros: Set[str] = field(default_factory=set)
+    features: Set[str] = field(default_factory=set)
+    components: Set[str] = field(default_factory=set)
+    labels: Set[str] = field(default_factory=set)
+    device_has: Set[str] = field(default_factory=set)
 
 
-def _empty_config() -> Config:
-    return Config(
-        settings={},
-        target={"components": set(), "device_has": set(), "extra_labels": set(), "features": set(), "macros": set()},
-    )
+METADATA_FIELDS = [f.name for f in fields(TargetMetadata)]
+PREFIXED_METADATA_FIELDS = [f"target.{f}" for f in METADATA_FIELDS]
+METADATA_OVERRIDE_KEYS = PREFIXED_METADATA_FIELDS + [
+    f"{attr}_{suffix}" for attr, suffix in itertools.product(PREFIXED_METADATA_FIELDS, ["add", "remove"])
+]
+
+
+@dataclass
+class Config:
+    """Representation of build configuration."""
+
+    options: Dict[str, Option] = field(default_factory=dict)
+    target_metadata: TargetMetadata = field(default_factory=TargetMetadata)
+
+    @classmethod
+    def from_sources(cls, sources: List[Source]) -> "Config":
+        """Interrogate each source in turn to create final Config."""
+        config = Config()
+        for source in sources:
+            for key, value in source.config.items():
+                _create_config_option(config, key, value, source.name)
+            for key, value in source.target_overrides.items():
+                if key in METADATA_OVERRIDE_KEYS:
+                    _modify_config_target_metadata(config, key, value, source.name)
+                else:
+                    _update_config_option(config, key, value, source.name)
+        return config
+
+
+def _create_config_option(config: Config, key: str, value: Any, source: Source) -> None:
+    """Mutates Config in place by creating a new Option."""
+    config.options[key] = Option.build(value)
+
+
+def _update_config_option(config: Config, key: str, value: Any, source: Source) -> None:
+    """Mutates Config in place by updating the value of existing Option."""
+    if key not in config.options:
+        raise ValueError(f"Can't update option which does not exist {key} {value} {source}")
+    config.options[key].set_value(value)
+
+
+def _modify_config_target_metadata(config: Config, key: str, value: Any, source: Source) -> None:
+    """Mutates Config in place by adding, removing or resetting the value of target metadata field."""
+    key, modifier = _extract_target_modifier_data(key)
+    if modifier == "add":
+        new_value = getattr(config.target_metadata, key) | set(value)
+    elif modifier == "remove":
+        new_value = getattr(config.target_metadata, key) - set(value)
+    else:
+        new_value = set(value)
+    setattr(config.target_metadata, key, new_value)
+
+
+def _extract_target_modifier_data(key: str) -> Tuple[str, str]:
+    regex = fr"""
+            (?P<key>{'|'.join(METADATA_FIELDS)}) # attribute name (one of ACCUMULATING_OVERRIDES)
+            _?                                   # separator
+            (?P<modifier>(add|remove)?)          # modifier (add, remove or empty)
+    """
+    match = re.search(regex, key, re.VERBOSE)
+    if not match:
+        raise ValueError(f"Not a target modifier key {key}")
+    return match["key"], match["modifier"]

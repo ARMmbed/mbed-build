@@ -6,8 +6,8 @@ import pathlib
 from mbed_targets import get_target_by_board_type
 from typing import Callable, List
 
-from mbed_build._internal.new_config.config import Config, TargetMetadata
-from mbed_build._internal.new_config.source import Source
+from mbed_build._internal.config.config import Config, TargetMetadata
+from mbed_build._internal.config.source import Source
 from mbed_build._internal.find_files import find_files, filter_files, LabelFilter
 
 
