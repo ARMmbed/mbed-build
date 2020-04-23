@@ -3,7 +3,6 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 import pathlib
-from mbed_targets import get_target_by_board_type
 from typing import Callable, List
 
 from mbed_build._internal.config.config import Config, TargetMetadata
