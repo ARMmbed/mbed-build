@@ -1,11 +1,19 @@
 {#
-    ToDo: use the correct definitions in the current versions of dev_cmake branches
-    Not currently representative of final output
+    ToDo: Not currently representative of final export output.
+    This contains the keys for target, feature and component directories inside Mbed OS required for a build
+    as defined by targets.json.
 #}
-set_property(GLOBAL PROPERTY MBED_OS_TARGET_KEYS {% for label in target_labels %}{{label}};{% endfor %})
 
-set_property(GLOBAL PROPERTY MBED_OS_FEATURE_KEYS {% for label in feature_labels %}{{label}};{% endfor %})
+{% if target_labels %}
+    set_property(GLOBAL PROPERTY MBED_OS_TARGET_KEYS {% for label in target_labels %}{{label}};{% endfor %})
+{% endif %}
 
-set_property(GLOBAL PROPERTY MBED_OS_COMPONENT_KEYS {% for label in component_labels %}{{label}};{% endfor %})
+{% if feature_labels %}
+    set_property(GLOBAL PROPERTY MBED_OS_FEATURE_KEYS {% for label in feature_labels %}{{label}};{% endfor %})
+{% endif %}
+
+{% if component_labels %}
+    set_property(GLOBAL PROPERTY MBED_OS_COMPONENT_KEYS {% for label in component_labels %}{{label}};{% endfor %})
+{% endif %}
 
 set_property(GLOBAL PROPERTY MBED_OS_TOOLCHAIN {{ toolchain_name }})
