@@ -18,22 +18,30 @@ class Option:
     value: Any
     macro_name: Optional[str]
     help_text: Optional[str]
+    set_by: str
 
     @classmethod
-    def build(cls, data: Any) -> "Option":
+    def build(cls, data: Any, source: Source) -> "Option":
         """Build configuration option from config entry value.
 
         Config values are either complex data structures or simple values.
         This function handles both.
         """
         if isinstance(data, dict):
-            return cls(value=data.get("value"), macro_name=data.get("macro_name"), help_text=data.get("help"))
+            return cls(
+                value=data.get("value"),
+                macro_name=data.get("macro_name"),
+                help_text=data.get("help"),
+                set_by=source.name,
+            )
         else:
-            return cls(value=data, macro_name=None, help_text=None)
+            return cls(value=data, macro_name=None, help_text=None, set_by=source.name)
 
-    def set_value(self, value: Any) -> None:
+    def set_value(self, value: Any, source: Source) -> None:
         """Mutate self with new value."""
         self.value = value
+        self.set_by = source.name
+        return self
 
 
 @dataclass
@@ -70,28 +78,28 @@ class Config:
         config = Config()
         for source in sources:
             for key, value in source.config.items():
-                _create_config_option(config, key, value, source.name)
+                _create_config_option(config, key, value, source)
             for key, value in source.target_overrides.items():
                 if key in METADATA_OVERRIDE_KEYS:
-                    _modify_config_target_metadata(config, key, value, source.name)
+                    _modify_config_target_metadata(config, key, value)
                 else:
-                    _update_config_option(config, key, value, source.name)
+                    _update_config_option(config, key, value, source)
         return config
 
 
 def _create_config_option(config: Config, key: str, value: Any, source: Source) -> None:
     """Mutates Config in place by creating a new Option."""
-    config.options[key] = Option.build(value)
+    config.options[key] = Option.build(value, source)
 
 
 def _update_config_option(config: Config, key: str, value: Any, source: Source) -> None:
     """Mutates Config in place by updating the value of existing Option."""
     if key not in config.options:
-        raise ValueError(f"Can't update option which does not exist {key} {value} {source}")
-    config.options[key].set_value(value)
+        raise ValueError(f"Can't update option which does not exist. ({key}={value} from {source.name})")
+    config.options[key].set_value(value, source)
 
 
-def _modify_config_target_metadata(config: Config, key: str, value: Any, source: Source) -> None:
+def _modify_config_target_metadata(config: Config, key: str, value: Any) -> None:
     """Mutates Config in place by adding, removing or resetting the value of target metadata field."""
     key, modifier = _extract_target_modifier_data(key)
     if modifier == "add":

@@ -17,7 +17,12 @@ class TestConfigFromSources(TestCase):
         config = Config.from_sources([source_a, source_b])
 
         self.assertEqual(
-            config.options, {"bool": Option.build(False), "number": Option.build(1), "string": Option.build("foo")},
+            config.options,
+            {
+                "bool": Option.build(True, source_a).set_value(False, source_b),
+                "number": Option.build(1, source_b),
+                "string": Option.build("foo", source_a),
+            },
         )
 
     def test_raises_when_trying_to_override_unset_option(self):
@@ -33,7 +38,7 @@ class TestConfigFromSources(TestCase):
 
         config = Config.from_sources([source_a, source_b])
 
-        self.assertEqual(config.options, {"bool": Option.build({"help": "A simple bool", "value": False})})
+        self.assertEqual(config.options["bool"].help_text, "A simple bool")
 
     def test_assembles_metadata_from_sources(self):
         for field in fields(TargetMetadata):
