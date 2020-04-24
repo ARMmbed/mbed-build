@@ -19,9 +19,9 @@ class TestConfigFromSources(TestCase):
         self.assertEqual(
             config.options,
             {
-                "bool": Option.build(True, source_a).set_value(False, source_b),
-                "number": Option.build(1, source_b),
-                "string": Option.build("foo", source_a),
+                "bool": Option.build("bool", True, source_a).set_value(False, source_b),
+                "number": Option.build("number", 1, source_b),
+                "string": Option.build("string", "foo", source_a),
             },
         )
 
@@ -50,3 +50,35 @@ class TestConfigFromSources(TestCase):
                 config = Config.from_sources([source_a, source_b, source_c])
 
                 self.assertEqual(getattr(config.target_metadata, field.name), {"FOO", "BAZ"})
+
+
+class TestOptionBuild(TestCase):
+    def test_builds_option_from_config_data(self):
+        source = SourceFactory(name="foo")
+        data = {
+            "value": 123,
+            "help": "some help text",
+            "macro_name": "FOO_MACRO",
+        }
+        option = Option.build(key="target.stack-size", data=data, source=source)
+
+        self.assertEqual(
+            option,
+            Option(
+                key="target.stack-size",
+                value=data["value"],
+                help_text=data["help"],
+                macro_name=data["macro_name"],
+                set_by=source.name,
+            ),
+        )
+
+    def test_generates_macro_name_if_not_in_data(self):
+        source = SourceFactory()
+        data = {
+            "value": 123,
+            "help": "some help text",
+        }
+        option = Option.build(key="update-client.storage-size", data=data, source=source)
+
+        self.assertEqual(option.macro_name, "MBED_CONF_UPDATE_CLIENT_STORAGE_SIZE")
