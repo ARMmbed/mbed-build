@@ -31,7 +31,7 @@ class Option:
         Args:
             key: Namespaced configuration key
             data: Configuration data - a dict or a primitive
-            source: Source from which option data came from - used for tracing overrides
+            source: Source from which option data came - used for tracing overrides
         """
         if isinstance(data, dict):
             return cls(
