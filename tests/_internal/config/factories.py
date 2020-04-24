@@ -4,24 +4,13 @@
 #
 import factory
 
-from mbed_build._internal.config.config import Config
-from mbed_build._internal.config.config_source import ConfigSource
+from mbed_build._internal.config.source import Source
 
 
-class ConfigSourceFactory(factory.Factory):
+class SourceFactory(factory.Factory):
     class Meta:
-        model = ConfigSource
+        model = Source
 
-    file = factory.Faker("file_path", extension="json")
+    name = factory.Faker("slug")
     config = factory.Dict({})
     target_overrides = factory.Dict({})
-
-
-class ConfigFactory(factory.Factory):
-    class Meta:
-        model = Config
-
-    settings = factory.Dict({})
-    target = factory.Dict(
-        {"components": set(), "device_has": set(), "extra_labels": set(), "features": set(), "macros": set()}
-    )

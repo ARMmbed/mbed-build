@@ -4,58 +4,49 @@
 #
 from unittest import TestCase
 
-from mbed_build._internal.config.config import build_config_from_layers
-from mbed_build._internal.config.config_layer import ConfigLayer
-from tests._internal.config.factories import ConfigSourceFactory
+from dataclasses import fields
+from mbed_build._internal.config.config import Config, Option, TargetMetadata
+from tests._internal.config.factories import SourceFactory
 
 
-class TestBuildFromLayers(TestCase):
-    def test_assembles_config_from_layers(self):
-        source_1 = ConfigSourceFactory(config={"is-nice": {"help": "Determine if app is nice", "value": True}})
-        source_2 = ConfigSourceFactory(config={"a-number": 123})
-        layer_1 = ConfigLayer.from_config_source(source_1, ["DOES_NOT_MATTER"])
-        layer_2 = ConfigLayer.from_config_source(source_2, ["DOES_NOT_MATTER"])
+class TestConfigFromSources(TestCase):
+    def test_builds_config_from_sources(self):
+        source_a = SourceFactory(config={"bool": True, "string": "foo"})
+        source_b = SourceFactory(config={"number": 1}, target_overrides={"bool": False})
 
-        subject = build_config_from_layers([layer_1, layer_2])
+        config = Config.from_sources([source_a, source_b])
 
-        self.assertEqual(subject["settings"]["is-nice"]["value"], True)
-        self.assertEqual(subject["settings"]["is-nice"]["help"], "Determine if app is nice")
-        self.assertEqual(subject["settings"]["a-number"]["value"], 123)
-
-    def test_respects_target_overrides(self):
-        source_1 = ConfigSourceFactory(config={"is-nice": True})
-        source_2 = ConfigSourceFactory(target_overrides={"*": {"is-nice": False}})
-        source_3 = ConfigSourceFactory(target_overrides={"NOT_THIS_TARGET": {"is-nice": True}})
-        layer_1 = ConfigLayer.from_config_source(source_1, ["TARGET"])
-        layer_2 = ConfigLayer.from_config_source(source_2, ["TARGET"])
-        layer_3 = ConfigLayer.from_config_source(source_3, ["TARGET"])
-
-        subject = build_config_from_layers([layer_1, layer_2, layer_3])
-
-        self.assertEqual(subject["settings"]["is-nice"]["value"], False)
-
-    def test_respects_cumulative_overrides(self):
-        source_1 = ConfigSourceFactory(
-            **{"target_overrides": {"*": {"target.features_add": ["FEATURE_1", "FEATURE_2"]}}}
+        self.assertEqual(
+            config.options,
+            {
+                "bool": Option.build(True, source_a).set_value(False, source_b),
+                "number": Option.build(1, source_b),
+                "string": Option.build("foo", source_a),
+            },
         )
-        source_2 = ConfigSourceFactory(**{"target_overrides": {"*": {"target.features_remove": ["FEATURE_2"]}}})
-        source_3 = ConfigSourceFactory(**{"target_overrides": {"K64F": {"target.features_add": ["FEATURE_3"]}}})
-        layer_1 = ConfigLayer.from_config_source(source_1, ["K64F"])
-        layer_2 = ConfigLayer.from_config_source(source_2, ["K64F"])
-        layer_3 = ConfigLayer.from_config_source(source_3, ["K64F"])
 
-        subject = build_config_from_layers([layer_1, layer_2, layer_3])
+    def test_raises_when_trying_to_override_unset_option(self):
+        source_a = SourceFactory(config={"bool": True})
+        source_b = SourceFactory(target_overrides={"string": "hello"})
 
-        self.assertEqual(subject["target"]["features"], set(["FEATURE_1", "FEATURE_3"]))
+        with self.assertRaises(ValueError):
+            Config.from_sources([source_a, source_b])
 
-    def test_respects_strict_cumulative_overrides(self):
-        source_1 = ConfigSourceFactory(
-            **{"target_overrides": {"*": {"target.features_add": ["FEATURE_1", "FEATURE_2"]}}}
-        )
-        source_2 = ConfigSourceFactory(**{"target_overrides": {"*": {"target.features": ["FEATURE_2"]}}})
-        layer_1 = ConfigLayer.from_config_source(source_1, ["K64F"])
-        layer_2 = ConfigLayer.from_config_source(source_2, ["K64F"])
+    def test_keeps_old_option_data(self):
+        source_a = SourceFactory(config={"bool": {"help": "A simple bool", "value": True}})
+        source_b = SourceFactory(target_overrides={"bool": False})
 
-        subject = build_config_from_layers([layer_1, layer_2])
+        config = Config.from_sources([source_a, source_b])
 
-        self.assertEqual(subject["target"]["features"], set(["FEATURE_2"]))
+        self.assertEqual(config.options["bool"].help_text, "A simple bool")
+
+    def test_assembles_metadata_from_sources(self):
+        for field in fields(TargetMetadata):
+            with self.subTest(f"Assemble {field.name}"):
+                source_a = SourceFactory(target_overrides={f"target.{field.name}": ["FOO"]})
+                source_b = SourceFactory(target_overrides={f"target.{field.name}_add": ["BAR", "BAZ"]})
+                source_c = SourceFactory(target_overrides={f"target.{field.name}_remove": ["BAR"]})
+
+                config = Config.from_sources([source_a, source_b, source_c])
+
+                self.assertEqual(getattr(config.target_metadata, field.name), {"FOO", "BAZ"})
