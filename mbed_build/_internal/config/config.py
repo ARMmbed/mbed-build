@@ -37,7 +37,7 @@ class Option:
         else:
             return cls(value=data, macro_name=None, help_text=None, set_by=source.name)
 
-    def set_value(self, value: Any, source: Source) -> None:
+    def set_value(self, value: Any, source: Source) -> "Option":
         """Mutate self with new value."""
         self.value = value
         self.set_by = source.name
