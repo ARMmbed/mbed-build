@@ -6,9 +6,10 @@
 from dataclasses import dataclass
 import json
 from pathlib import Path
-from typing import List
+from typing import List, Tuple
 
 from mbed_targets import get_target_by_board_type
+from mbed_build._internal.config.cumulative_data import METADATA_OVERRIDE_KEYS
 
 
 @dataclass
@@ -21,14 +22,13 @@ class Source:
     - mbed_app.json
 
     This class provides a common interface to configuration data.
-    It also handles data normalisation, to fix inconsistencies between sources:
-    - namespacing
-    - override filtering for specific target labels
     """
 
-    name: str
+    human_name: str
+    namespace: str
     config: dict
-    target_overrides: dict
+    config_overrides: dict
+    cumulative_overrides: dict
 
     @classmethod
     def from_mbed_lib(cls, file: Path, target_labels: List[str]) -> "Source":
@@ -39,31 +39,31 @@ class Source:
             target_labels: Labels for which "target_overrides" should apply
         """
         data = json.loads(file.read_text())
-        namespace = data["name"]
-        config = data.get("config", {})
         target_overrides = data.get("target_overrides", {})
-        label_specific_target_overrides = _filter_target_overrides(target_overrides, target_labels)
+        target_specific_overrides = _filter_target_overrides(target_overrides, target_labels)
+        config_overrides, cumulative_overrides = _split_target_overrides_by_type(target_specific_overrides)
         return cls(
-            config=_namespace_data(config, namespace),
-            target_overrides=_namespace_data(label_specific_target_overrides, namespace),
-            name=str(file),
+            human_name=f"Source from file: {file}",
+            namespace=data["name"],
+            config=data.get("config", {}),
+            cumulative_overrides=cumulative_overrides,
+            config_overrides=config_overrides,
         )
 
     @classmethod
     def from_target(cls, mbed_target: str, mbed_program_directory: Path) -> "Source":
         """Build Source from retrieved mbed_targets.Target data."""
         target = get_target_by_board_type(mbed_target, mbed_program_directory)
-        namespace = "target"
-        config = target.config
-        target_overrides = {
-            "features": target.features,
-            "components": target.components,
-            "labels": target.labels,
-        }
         return cls(
-            config=_namespace_data(config, namespace),
-            target_overrides=_namespace_data(target_overrides, namespace),
-            name=f"mbed_target.Target for {mbed_target}",
+            human_name=f"mbed_target.Target for {mbed_target}",
+            namespace="target",
+            config=target.config,
+            config_overrides={},
+            cumulative_overrides={
+                "features": target.features,
+                "components": target.components,
+                "labels": target.labels,
+            },
         )
 
 
@@ -77,6 +77,18 @@ def _filter_target_overrides(data: dict, allowed_labels: List[str]) -> dict:
         if target_label == "*" or target_label in allowed_labels:
             flattened.update(overrides)
     return flattened
+
+
+def _split_target_overrides_by_type(data: dict) -> Tuple[dict, dict]:
+    """Split target override data into config overrides and cumulative overrides."""
+    config_overrides = {}
+    cumulative_overrides = {}
+    for key, value in data.items():
+        if key in METADATA_OVERRIDE_KEYS:
+            cumulative_overrides[key] = value
+        else:
+            config_overrides[key] = value
+    return config_overrides, cumulative_overrides
 
 
 def _namespace_data(data: dict, namespace: str) -> dict:
