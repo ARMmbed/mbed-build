@@ -62,7 +62,7 @@ def _build_macro_name(config_key: str) -> str:
 
 @dataclass
 class Config:
-    """Representation of build configuration."""
+    """Representation of config attributes assembled during Source parsing."""
 
     options: Dict[str, Option] = field(default_factory=dict)
 
@@ -86,5 +86,8 @@ def _create_config_option(config: Config, key: str, value: Any, source: Source) 
 def _update_config_option(config: Config, key: str, value: Any, source: Source) -> None:
     """Mutates Config in place by updating the value of existing Option."""
     if key not in config.options:
-        raise ValueError(f"Can't update option which does not exist. ({key}={value} from {source.human_name})")
+        raise ValueError(
+            f"Can't update option which does not exist."
+            f" Attempt to set '{key}' to '{value}' from '{source.human_name}')"
+        )
     config.options[key].set_value(value, source)
