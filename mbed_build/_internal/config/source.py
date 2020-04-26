@@ -25,7 +25,6 @@ class Source:
     """
 
     human_name: str
-    namespace: str
     config: dict
     config_overrides: dict
     cumulative_overrides: dict
@@ -39,13 +38,19 @@ class Source:
             target_labels: Labels for which "target_overrides" should apply
         """
         data = json.loads(file.read_text())
+        namespace = data["name"]
+
+        config = data.get("config", {})
+        config = _namespace_data(config, namespace)
+
         target_overrides = data.get("target_overrides", {})
         target_specific_overrides = _filter_target_overrides(target_overrides, target_labels)
+        target_specific_overrides = _namespace_data(target_specific_overrides, namespace)
         config_overrides, cumulative_overrides = _split_target_overrides_by_type(target_specific_overrides)
+
         return cls(
-            human_name=f"Source from file: {file}",
-            namespace=data["name"],
-            config=data.get("config", {}),
+            human_name=f"File: {file}",
+            config=config,
             cumulative_overrides=cumulative_overrides,
             config_overrides=config_overrides,
         )
@@ -54,16 +59,21 @@ class Source:
     def from_target(cls, mbed_target: str, mbed_program_directory: Path) -> "Source":
         """Build Source from retrieved mbed_targets.Target data."""
         target = get_target_by_board_type(mbed_target, mbed_program_directory)
+        namespace = "target"
+        config = _namespace_data(target.config, namespace)
+
+        cumulative_overrides = {
+            "features": target.features,
+            "components": target.components,
+            "labels": target.labels,
+        }
+        cumulative_overrides = _namespace_data(cumulative_overrides, namespace)
+
         return cls(
             human_name=f"mbed_target.Target for {mbed_target}",
-            namespace="target",
-            config=target.config,
+            config=config,
             config_overrides={},
-            cumulative_overrides={
-                "features": target.features,
-                "components": target.components,
-                "labels": target.labels,
-            },
+            cumulative_overrides=cumulative_overrides,
         )
 
 

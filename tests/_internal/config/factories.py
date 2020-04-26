@@ -12,7 +12,6 @@ class SourceFactory(factory.Factory):
         model = Source
 
     human_name = factory.Faker("name")
-    namespace = factory.Faker("slug")
     config = factory.Dict({})
     config_overrides = factory.Dict({})
     cumulative_overrides = factory.Dict({})

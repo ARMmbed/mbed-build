@@ -19,7 +19,7 @@ class TestMbedLibSource(TestCase):
                 "target_overrides": {
                     "*": {"a-number": 456, "target.features_add": ["FOO"]},
                     "NOT_THIS_TARGET": {"a-string": "foo", "target.features_add": ["BAR"]},
-                    "THIS_TARGET": {"a-bool": False, "target.macros": ["BOOM"], "something-else": "blah"},
+                    "THIS_TARGET": {"a-bool": False, "target.macros": ["BOOM"], "other-lib.something-else": "blah"},
                 },
             }
             file = pathlib.Path(directory, "mbed_lib.json")
@@ -30,10 +30,9 @@ class TestMbedLibSource(TestCase):
         self.assertEqual(
             subject,
             Source(
-                human_name=f"Source from file: {file}",
-                namespace="foo",
-                config={"a-number": 123, "a-bool": {"help": "Simply a boolean", "value": True}},
-                config_overrides={"a-number": 456, "a-bool": False, "something-else": "blah"},
+                human_name=f"File: {file}",
+                config={"foo.a-number": 123, "foo.a-bool": {"help": "Simply a boolean", "value": True}},
+                config_overrides={"foo.a-number": 456, "foo.a-bool": False, "other-lib.something-else": "blah"},
                 cumulative_overrides={"target.features_add": ["FOO"], "target.macros": ["BOOM"]},
             ),
         )
@@ -57,13 +56,12 @@ class TestMbedLibSource(TestCase):
             subject,
             Source(
                 human_name=f"mbed_target.Target for {mbed_target}",
-                namespace="target",
-                config=target.config,
+                config={"target.foo": "bar", "target.bool": True},
                 config_overrides={},
                 cumulative_overrides={
-                    "features": target.features,
-                    "components": target.components,
-                    "labels": target.labels,
+                    "target.features": target.features,
+                    "target.components": target.components,
+                    "target.labels": target.labels,
                 },
             ),
         )
