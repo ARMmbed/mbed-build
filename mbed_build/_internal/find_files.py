@@ -61,7 +61,7 @@ def _find_files(filename: str, directory: Path, filters: Optional[List[Callable]
     return result
 
 
-def filter_files(files: List[Path], filters: List[Callable]) -> List[Path]:
+def filter_files(files: Iterable[Path], filters: Iterable[Callable]) -> Iterable[Path]:
     """Filter given paths to files using filter callables."""
     return [file for file in files if all(f(file) for f in filters)]
 

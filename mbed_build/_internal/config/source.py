@@ -6,7 +6,7 @@
 from dataclasses import dataclass
 import json
 from pathlib import Path
-from typing import List, Tuple
+from typing import Iterable, Tuple
 
 from mbed_targets import get_target_by_board_type
 from mbed_build._internal.config.cumulative_data import METADATA_OVERRIDE_KEYS
@@ -30,7 +30,7 @@ class Source:
     cumulative_overrides: dict
 
     @classmethod
-    def from_mbed_lib(cls, file: Path, target_labels: List[str]) -> "Source":
+    def from_mbed_lib(cls, file: Path, target_labels: Iterable[str]) -> "Source":
         """Build Source from mbed_lib.json file.
 
         Args:
@@ -77,7 +77,7 @@ class Source:
         )
 
 
-def _filter_target_overrides(data: dict, allowed_labels: List[str]) -> dict:
+def _filter_target_overrides(data: dict, allowed_labels: Iterable[str]) -> dict:
     """Flatten and filter target overrides.
 
     Ensures returned dictionary only contains configuration settings applicable to given allowed labels.
