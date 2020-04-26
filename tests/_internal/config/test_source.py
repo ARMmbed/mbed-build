@@ -76,10 +76,6 @@ class TestFilterTargetOverrides(TestCase):
         self.assertEqual(subject, {"number": 123, "bool": True})
 
 
-class TestSplitTargetOverridesByType(TestCase):
-    pass
-
-
 class TestNamespaceData(TestCase):
     def test_prefixes_keys_without_namespace(self):
         data = {
