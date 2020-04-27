@@ -11,6 +11,7 @@ class SourceFactory(factory.Factory):
     class Meta:
         model = Source
 
-    name = factory.Faker("slug")
+    human_name = factory.Faker("name")
     config = factory.Dict({})
-    target_overrides = factory.Dict({})
+    config_overrides = factory.Dict({})
+    cumulative_overrides = factory.Dict({})

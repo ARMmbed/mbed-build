@@ -17,9 +17,9 @@ class TestMbedLibSource(TestCase):
                 "name": "foo",
                 "config": {"a-number": 123, "a-bool": {"help": "Simply a boolean", "value": True}},
                 "target_overrides": {
-                    "*": {"a-number": 456},
-                    "NOT_THIS_TARGET": {"a-string": "foo"},
-                    "THIS_TARGET": {"a-bool": False},
+                    "*": {"a-number": 456, "target.features_add": ["FOO"]},
+                    "NOT_THIS_TARGET": {"a-string": "foo", "target.features_add": ["BAR"]},
+                    "THIS_TARGET": {"a-bool": False, "target.macros": ["BOOM"], "other-lib.something-else": "blah"},
                 },
             }
             file = pathlib.Path(directory, "mbed_lib.json")
@@ -27,10 +27,14 @@ class TestMbedLibSource(TestCase):
 
             subject = Source.from_mbed_lib(file, ["THIS_TARGET"])
 
-        self.assertEqual(subject.config, _namespace_data(data["config"], data["name"]))
         self.assertEqual(
-            subject.target_overrides,
-            _namespace_data(_filter_target_overrides(data["target_overrides"], ["THIS_TARGET"]), data["name"]),
+            subject,
+            Source(
+                human_name=f"File: {file}",
+                config={"foo.a-number": 123, "foo.a-bool": {"help": "Simply a boolean", "value": True}},
+                config_overrides={"foo.a-number": 456, "foo.a-bool": False, "other-lib.something-else": "blah"},
+                cumulative_overrides={"target.features_add": ["FOO"], "target.macros": ["BOOM"]},
+            ),
         )
 
     @mock.patch("mbed_build._internal.config.source.get_target_by_board_type")
@@ -51,11 +55,14 @@ class TestMbedLibSource(TestCase):
         self.assertEqual(
             subject,
             Source(
-                name=f"mbed_target.Target for {mbed_target}",
-                config=_namespace_data(target.config, "target"),
-                target_overrides=_namespace_data(
-                    {"features": target.features, "components": target.components, "labels": target.labels}, "target"
-                ),
+                human_name=f"mbed_target.Target for {mbed_target}",
+                config={"target.foo": "bar", "target.bool": True},
+                config_overrides={},
+                cumulative_overrides={
+                    "target.features": target.features,
+                    "target.components": target.components,
+                    "target.labels": target.labels,
+                },
             ),
         )
 
