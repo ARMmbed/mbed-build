@@ -3,9 +3,8 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 """Configuration assembly algorithm."""
-from dataclasses import dataclass
 from pathlib import Path
-from typing import Iterable, Set
+from typing import Iterable
 
 from mbed_build._internal.config.config import Config
 from mbed_build._internal.config.cumulative_data import CumulativeData
@@ -13,16 +12,8 @@ from mbed_build._internal.config.source import Source
 from mbed_build._internal.find_files import LabelFilter, filter_files, find_files
 
 
-@dataclass
-class BuildConfig:
-    """Representation of build configuration."""
-
-    config: Config
-    macros: Set[str]
-
-
-def assemble_config(mbed_target: str, mbed_program_directory: Path) -> BuildConfig:
-    """Assemble BuildConfig for given target and program directory.
+def assemble_config(mbed_target: str, mbed_program_directory: Path) -> Config:
+    """Assemble Config for given target and program directory.
 
     The structure and configuration of MbedOS requires us to do multiple passes over
     configuration files, as each pass might affect which configuration files should be included
@@ -33,7 +24,7 @@ def assemble_config(mbed_target: str, mbed_program_directory: Path) -> BuildConf
     return _assemble_config(target_source, mbed_lib_files)
 
 
-def _assemble_config(target_source: Source, mbed_lib_files: Iterable[Path]) -> BuildConfig:
+def _assemble_config(target_source: Source, mbed_lib_files: Iterable[Path]) -> Config:
     previous_cumulative_data = None
     current_cumulative_data = CumulativeData.from_sources([target_source])
     while True:
@@ -46,8 +37,7 @@ def _assemble_config(target_source: Source, mbed_lib_files: Iterable[Path]) -> B
         if previous_cumulative_data == current_cumulative_data:
             break
 
-    config = Config.from_sources(all_sources)
-    return BuildConfig(config=config, macros=current_cumulative_data.macros)
+    return Config.from_sources(all_sources)
 
 
 def _filter_files(files: Iterable[Path], cumulative_data: CumulativeData) -> Iterable[Path]:

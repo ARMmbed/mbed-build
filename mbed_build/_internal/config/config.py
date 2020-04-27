@@ -10,8 +10,33 @@ from mbed_build._internal.config.source import Source
 
 
 @dataclass
+class Macro:
+    """Representation of a macro."""
+
+    value: Any
+    name: str
+    set_by: str
+
+    @classmethod
+    def build(cls, macro: str, source: Source) -> "Macro":
+        """Build macro from macro string.
+
+        There's two flavours of macro strings in MbedOS configuration:
+        - with value: FOO=BAR
+        - without value: FOO
+        """
+        if macro.find("=") != -1:
+            name, value = macro.split("=")
+        else:
+            name = macro
+            value = None
+
+        return cls(name=name, value=value, set_by=source.human_name)
+
+
+@dataclass
 class Option:
-    """Representation of configuration option."""
+    """Representation of a configuration option."""
 
     value: Any
     macro_name: Optional[str]
@@ -62,9 +87,15 @@ def _build_macro_name(config_key: str) -> str:
 
 @dataclass
 class Config:
-    """Representation of config attributes assembled during Source parsing."""
+    """Representation of config attributes assembled during Source parsing.
+
+    Attributes:
+        options: Options parsed from "config" and "config_overrides" sections of *.json files
+        macros: Macros parsed from "macros" section of mbed_lib.json and mbed_app.json file
+    """
 
     options: Dict[str, Option] = field(default_factory=dict)
+    macros: Dict[str, Macro] = field(default_factory=dict)
 
     @classmethod
     def from_sources(cls, sources: Iterable[Source]) -> "Config":
@@ -75,6 +106,8 @@ class Config:
                 _create_config_option(config, key, value, source)
             for key, value in source.config_overrides.items():
                 _update_config_option(config, key, value, source)
+            for value in source.macros:
+                _create_macro(config, value, source)
         return config
 
 
@@ -91,3 +124,16 @@ def _update_config_option(config: Config, key: str, value: Any, source: Source) 
             f" Attempting to set '{key}' to '{value}' in '{source.human_name}'."
         )
     config.options[key].set_value(value, source)
+
+
+def _create_macro(config: Config, macro_str: str, source: Source) -> None:
+    """Mutates Config in place by creating a new macro."""
+    macro = Macro.build(macro_str, source)
+    existing = config.macros.get(macro.name)
+    if existing:
+        raise ValueError(
+            f"Can't override previously set macro."
+            f" Attempting to set '{macro.name}' to '{macro.value}' in '{source.human_name}'."
+            f" Set previously by '{existing.set_by}'."
+        )
+    config.macros[macro.name] = macro
