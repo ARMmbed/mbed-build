@@ -1,0 +1,1 @@
+Parse macros from configuration files
