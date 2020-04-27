@@ -40,7 +40,7 @@ def _assemble_config(target_source: Source, mbed_lib_files: Iterable[Path]) -> B
     while True:
         filtered_files = _filter_files(mbed_lib_files, current_cumulative_data)
         mbed_lib_sources = [Source.from_mbed_lib(file, current_cumulative_data.labels) for file in filtered_files]
-        all_sources = list(itertools.chain([target_source], mbed_lib_sources))
+        all_sources = [target_source] + mbed_lib_sources
         previous_cumulative_data = current_cumulative_data
         current_cumulative_data = CumulativeData.from_sources(all_sources)
 
