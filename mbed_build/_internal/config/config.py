@@ -26,7 +26,7 @@ class Macro:
         - without value: FOO
         """
         value: Any
-        if macro.find("=") != -1:
+        if "=" in macro:
             name, value = macro.split("=")
         else:
             name = macro
