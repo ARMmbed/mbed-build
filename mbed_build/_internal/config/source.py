@@ -9,7 +9,7 @@ from pathlib import Path
 from typing import Iterable, Tuple
 
 from mbed_targets import get_target_by_board_type
-from mbed_build._internal.config.cumulative_data import METADATA_OVERRIDE_KEYS
+from mbed_build._internal.config.cumulative_data import ALL_CUMULATIVE_FIELDS
 
 
 @dataclass
@@ -94,7 +94,7 @@ def _split_target_overrides_by_type(data: dict) -> Tuple[dict, dict]:
     config_overrides = {}
     cumulative_overrides = {}
     for key, value in data.items():
-        if key in METADATA_OVERRIDE_KEYS:
+        if key in ALL_CUMULATIVE_FIELDS:
             cumulative_overrides[key] = value
         else:
             config_overrides[key] = value
