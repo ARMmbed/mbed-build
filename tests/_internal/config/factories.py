@@ -15,3 +15,4 @@ class SourceFactory(factory.Factory):
     config = factory.Dict({})
     config_overrides = factory.Dict({})
     cumulative_overrides = factory.Dict({})
+    macros = factory.List([])
