@@ -67,12 +67,12 @@ def _build_tabular_output(config_data: BuildConfig) -> str:
     macros_table = tabulate(macros_data, macros_table_headers)
 
     output_template = (
-        f"PARAMETER CONFIGURATION\n"
-        f"-----------------------\n"
+        "PARAMETER CONFIGURATION\n"
+        "-----------------------\n"
         f"{parameters_table}\n"
-        f"\n"
-        f"MACRO CONFIGURATION\n"
-        f"-------------------\n"
+        "\n"
+        "MACRO CONFIGURATION\n"
+        "-------------------\n"
         f"{macros_table}"
     )
 
@@ -113,12 +113,12 @@ def _build_legacy_output(config_data: BuildConfig) -> str:
         macro_list += f"{macro}\n"
 
     output_template = (
-        f"Configuration parameters\n"
-        f"------------------------\n"
+        "Configuration parameters\n"
+        "------------------------\n"
         f"{parameter_list}\n"
-        f"\n"
-        f"Macros\n"
-        f"------\n"
+        "\n"
+        "Macros\n"
+        "------\n"
         f"{macro_list}"
     )
     return output_template
