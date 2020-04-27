@@ -21,7 +21,7 @@ class Macro:
     def build(cls, macro: str, source: Source) -> "Macro":
         """Build macro from macro string.
 
-        There's two flavours of macro strings in MbedOS configuration:
+        There are two flavours of macro strings in MbedOS configuration:
         - with value: FOO=BAR
         - without value: FOO
         """
