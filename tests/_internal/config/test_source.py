@@ -10,7 +10,7 @@ from unittest import TestCase, mock
 from mbed_build._internal.config.source import Source, _namespace_data, _filter_target_overrides
 
 
-class TestMbedLibSource(TestCase):
+class TestSource(TestCase):
     def test_from_mbed_lib(self):
         with tempfile.TemporaryDirectory() as directory:
             data = {
