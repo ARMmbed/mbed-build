@@ -9,7 +9,7 @@ from mbed_build._internal.config.cumulative_data import CumulativeData
 from tests._internal.config.factories import SourceFactory
 
 
-class TestConfigCumulativeDataFromSources(TestCase):
+class TestCumulativeDataFromSources(TestCase):
     def test_assembles_metadata_from_sources(self):
         for field in fields(CumulativeData):
             with self.subTest(f"Assemble {field.name}"):
