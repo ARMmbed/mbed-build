@@ -36,32 +36,29 @@ class TestConfigAssembly(TestCase):
             Path("subdir", "FEATURE_RED", "mbed_lib.json"): {
                 "name": "red",
                 "config": {"bool": False},
-                "target_overrides": {
-                    "A": {"bool": True, "target.features_add": ["BLUE"], "target.macros_add": ["RED_MACRO"]}
-                },
+                "target_overrides": {"A": {"bool": True, "target.features_add": ["BLUE"]}},
+                "macros": ["RED_MACRO"],
             },
-            Path("COMPONENT_LEG", "mbed_lib.json"): {"name": "leg", "config": {"number-of-fingers": 5}},
+            Path("COMPONENT_LEG", "mbed_lib.json"): {
+                "name": "leg",
+                "config": {"number-of-fingers": 5},
+                "macros": ["LEG_MACRO"],
+            },
         }
         unused_mbed_lib_files = {
             Path("subdir", "FEATURE_BROWN", "mbed_lib.json"): {
                 "name": "brown",
                 "target_overrides": {"*": {"red.bool": "DON'T USE ME"}},
+                "macros": ["DONT_USE_THIS_MACRO"],
             }
         }
 
-        target_source = SourceFactory(
-            cumulative_overrides={
-                "target.labels": ["A"],
-                "target.components": ["LEG"],
-                "target.macros": ["TARGET_MACRO"],
-            }
-        )
+        target_source = SourceFactory(cumulative_overrides={"target.labels": ["A"], "target.components": ["LEG"]})
 
         with create_files({**mbed_lib_files, **unused_mbed_lib_files}) as directory:
-            build_config = _assemble_config(target_source, find_files("mbed_lib.json", directory))
+            config = _assemble_config(target_source, find_files("mbed_lib.json", directory))
 
             mbed_lib_sources = [Source.from_mbed_lib(Path(directory, file), ["A"]) for file in mbed_lib_files.keys()]
             expected_config = Config.from_sources([target_source] + mbed_lib_sources)
 
-            self.assertEqual(build_config.config, expected_config)
-            self.assertEqual(build_config.macros, set(["TARGET_MACRO", "RED_MACRO"]))
+            self.assertEqual(config, expected_config)

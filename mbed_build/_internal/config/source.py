@@ -28,6 +28,7 @@ class Source:
     config: dict
     config_overrides: dict
     cumulative_overrides: dict
+    macros: Iterable[str]
 
     @classmethod
     def from_mbed_lib(cls, file: Path, target_labels: Iterable[str]) -> "Source":
@@ -48,11 +49,14 @@ class Source:
         target_specific_overrides = _namespace_data(target_specific_overrides, namespace)
         config_overrides, cumulative_overrides = _split_target_overrides_by_type(target_specific_overrides)
 
+        macros = data.get("macros", [])
+
         return cls(
             human_name=f"File: {file}",
             config=config,
             cumulative_overrides=cumulative_overrides,
             config_overrides=config_overrides,
+            macros=macros,
         )
 
     @classmethod
@@ -74,6 +78,7 @@ class Source:
             config=config,
             config_overrides={},
             cumulative_overrides=cumulative_overrides,
+            macros=[],
         )
 
 

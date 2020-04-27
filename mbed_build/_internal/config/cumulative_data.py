@@ -19,7 +19,6 @@ if TYPE_CHECKING:
 class CumulativeData:
     """Representation of cumulative attributes assembled during Source parsing."""
 
-    macros: Set[str] = field(default_factory=set)
     features: Set[str] = field(default_factory=set)
     components: Set[str] = field(default_factory=set)
     labels: Set[str] = field(default_factory=set)
