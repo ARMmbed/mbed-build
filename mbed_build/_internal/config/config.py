@@ -88,6 +88,6 @@ def _update_config_option(config: Config, key: str, value: Any, source: Source) 
     if key not in config.options:
         raise ValueError(
             f"Can't update option which does not exist."
-            f" Attempt to set '{key}' to '{value}' from '{source.human_name}')"
+            f" Attempting to set '{key}' to '{value}' in '{source.human_name}'."
         )
     config.options[key].set_value(value, source)
