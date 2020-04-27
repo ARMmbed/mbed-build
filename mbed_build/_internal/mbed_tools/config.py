@@ -27,7 +27,7 @@ from mbed_build._internal.config.assemble_build_config import assemble_config, B
     type=click.Choice(["table", "json", "legacy"]),
     default="table",
     show_default=True,
-    help="Set output format. Default will show you the brief table format. For more detailled information use JSON format.",
+    help="Set output format. To see maximum info use JSON format.",
 )
 def config(mbed_target: str, project_path: str, format: str) -> None:
     """Calculates the configuration for a build and prints it out.
