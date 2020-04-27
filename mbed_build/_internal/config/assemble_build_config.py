@@ -3,7 +3,6 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 """Configuration assembly algorithm."""
-import itertools
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterable, Set
