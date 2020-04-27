@@ -19,8 +19,9 @@ class TestSource(TestCase):
                 "target_overrides": {
                     "*": {"a-number": 456, "target.features_add": ["FOO"]},
                     "NOT_THIS_TARGET": {"a-string": "foo", "target.features_add": ["BAR"]},
-                    "THIS_TARGET": {"a-bool": False, "target.macros": ["BOOM"], "other-lib.something-else": "blah"},
+                    "THIS_TARGET": {"a-bool": False, "other-lib.something-else": "blah"},
                 },
+                "macros": ["MACRO=1"],
             }
             file = pathlib.Path(directory, "mbed_lib.json")
             file.write_text(json.dumps(data))
@@ -33,7 +34,8 @@ class TestSource(TestCase):
                 human_name=f"File: {file}",
                 config={"foo.a-number": 123, "foo.a-bool": {"help": "Simply a boolean", "value": True}},
                 config_overrides={"foo.a-number": 456, "foo.a-bool": False, "other-lib.something-else": "blah"},
-                cumulative_overrides={"target.features_add": ["FOO"], "target.macros": ["BOOM"]},
+                cumulative_overrides={"target.features_add": ["FOO"]},
+                macros=["MACRO=1"],
             ),
         )
 
@@ -63,6 +65,7 @@ class TestSource(TestCase):
                     "target.components": target.components,
                     "target.labels": target.labels,
                 },
+                macros=[],
             ),
         )
 
