@@ -5,11 +5,12 @@
 """Write out the computed configuration for a build."""
 import json
 import pathlib
-from typing import Dict, Any
+from typing import Dict, Any, List, Tuple
 
 import click
 from tabulate import tabulate
 
+from mbed_build._internal.config.config import Config, Option
 from mbed_build._internal.config.assemble_build_config import assemble_config, BuildConfig
 
 
@@ -58,7 +59,7 @@ def _build_tabular_output(config_data: BuildConfig) -> str:
     parameter_table_headers = ["key", "macro name", "value"]
 
     parameters_data = []
-    for _, option in sorted(config_data.config.options.items(), key=lambda item: item[1].key):
+    for option in _config_options_sorted_by_key(config_data.config):
         parameters_data.append([option.key, option.macro_name, option.value])
     parameters_table = tabulate(parameters_data, parameter_table_headers)
 
@@ -82,7 +83,7 @@ def _build_tabular_output(config_data: BuildConfig) -> str:
 def _build_json_output(config_data: BuildConfig) -> str:
     config: Dict[str, Any] = {"parameters": [], "macros": []}
 
-    for _, option in sorted(config_data.config.options.items(), key=lambda item: item[1].key):
+    for option in _config_options_sorted_by_key(config_data.config):
         config["parameters"].append(
             {
                 "key": option.key,
@@ -102,7 +103,7 @@ def _build_json_output(config_data: BuildConfig) -> str:
 def _build_legacy_output(config_data: BuildConfig) -> str:
     """Output format to match that of legacy tools running mbed compile --config."""
     parameter_list = ""
-    for _, option in sorted(config_data.config.options.items(), key=lambda item: item[1].key):
+    for option in _config_options_sorted_by_key(config_data.config):
         if option.value:
             parameter_list += f'{option.key} = {option.value} (macro name: "{option.macro_name}")\n'
         else:
@@ -122,3 +123,9 @@ def _build_legacy_output(config_data: BuildConfig) -> str:
         f"{macro_list}"
     )
     return output_template
+
+
+def _config_options_sorted_by_key(config: Config) -> List[Option]:
+    extracted_options = map(lambda item: item[1], config.options.items())
+    sorted_options = sorted(extracted_options, key=lambda item: item.key)
+    return sorted_options
