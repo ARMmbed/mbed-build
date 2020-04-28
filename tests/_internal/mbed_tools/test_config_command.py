@@ -18,45 +18,36 @@ from mbed_build._internal.mbed_tools.config import (
 from tests._internal.config.factories import BuildConfigFactory, OptionFactory
 
 
-@mock.patch("mbed_build._internal.mbed_tools.config._build_legacy_output")
-@mock.patch("mbed_build._internal.mbed_tools.config._build_json_output")
-@mock.patch("mbed_build._internal.mbed_tools.config._build_tabular_output")
-@mock.patch("mbed_build._internal.mbed_tools.config.assemble_config")
+@mock.patch("mbed_build._internal.mbed_tools.config.assemble_config", return_value=BuildConfigFactory())
 class TestConfig(TestCase):
     mbed_target = "K64F"
     project_path = "somewhere"
 
-    def test_config_table(self, assemble_config, build_tabular_output, build_json_output, build_legacy_output):
+    def test_config_table(self, assemble_config):
         runner = CliRunner()
         result = runner.invoke(config, ["-m", self.mbed_target, "-p", self.project_path])
 
         self.assertEqual(result.exit_code, 0)
+        self.assertEqual(result.output, _build_tabular_output(assemble_config.return_value) + "\n")
         assemble_config.assert_called_once_with(self.mbed_target, pathlib.Path(self.project_path))
-        build_tabular_output.assert_called_once_with(assemble_config.return_value)
-        build_json_output.assert_not_called()
-        build_legacy_output.assert_not_called()
 
-    def test_config_json(self, assemble_config, build_tabular_output, build_json_output, build_legacy_output):
+    def test_config_json(self, assemble_config):
         runner = CliRunner()
         result = runner.invoke(config, ["-m", self.mbed_target, "-p", self.project_path, "--format", "json"])
 
         self.assertEqual(result.exit_code, 0)
+        self.assertEqual(result.output, _build_json_output(assemble_config.return_value) + "\n")
         assemble_config.assert_called_once_with(self.mbed_target, pathlib.Path(self.project_path))
-        build_tabular_output.assert_not_called()
-        build_json_output.assert_called_once_with(assemble_config.return_value)
-        build_legacy_output.assert_not_called()
 
-    def test_config_legacy(self, assemble_config, build_tabular_output, build_json_output, build_legacy_output):
+    def test_config_legacy(self, assemble_config):
         runner = CliRunner()
         result = runner.invoke(
             config, ["-m", self.mbed_target, "-p", self.project_path, "--format", "json", "--format", "legacy"]
         )
 
         self.assertEqual(result.exit_code, 0)
+        self.assertEqual(result.output, _build_legacy_output(assemble_config.return_value) + "\n")
         assemble_config.assert_called_once_with(self.mbed_target, pathlib.Path(self.project_path))
-        build_tabular_output.assert_not_called()
-        build_json_output.assert_not_called()
-        build_legacy_output.assert_called_once_with(assemble_config.return_value)
 
 
 class TestBuildTabularOutput(TestCase):
