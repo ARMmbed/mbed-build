@@ -114,7 +114,7 @@ class TestBuildLegacyOutput(TestCase):
             "\n"
             "Macros\n"
             "------\n"
-            f"{macro.name}=({macro.value})\n"
+            f"{macro.name}={macro.value}\n"
         )
 
         result = _build_legacy_output(config)

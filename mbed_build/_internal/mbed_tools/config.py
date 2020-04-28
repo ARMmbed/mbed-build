@@ -114,7 +114,7 @@ def _build_legacy_output(config: Config) -> str:
     macro_list = ""
     for macro in _config_macros_sorted_by_name(config):
         if macro.value:
-            macro_list += f"{macro.name}=({macro.value})\n"
+            macro_list += f"{macro.name}={macro.value}\n"
         else:
             macro_list += f"{macro.name}\n"
 
