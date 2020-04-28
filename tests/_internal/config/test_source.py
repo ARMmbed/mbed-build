@@ -39,6 +39,33 @@ class TestSource(TestCase):
             ),
         )
 
+    def test_from_mbed_app(self):
+        with tempfile.TemporaryDirectory() as directory:
+            data = {
+                "config": {"a-bool": False, "a-number": {"help": "Simply a number", "value": 0}},
+                "target_overrides": {
+                    "*": {"a-bool": True, "target.features_add": ["HAT"]},
+                    "NOT_THIS_TARGET": {"a-number": 999, "target.features_add": ["BOAT"]},
+                    "THIS_TARGET": {"a-number": 2, "some-lib.something-else": "blah"},
+                },
+                "macros": ["SOME_MACRO=2"],
+            }
+            file = pathlib.Path(directory, "mbed_app.json")
+            file.write_text(json.dumps(data))
+
+            subject = Source.from_mbed_app(file, ["THIS_TARGET"])
+
+        self.assertEqual(
+            subject,
+            Source(
+                human_name=f"File: {file}",
+                config={"app.a-bool": False, "app.a-number": {"help": "Simply a number", "value": 0}},
+                config_overrides={"app.a-number": 2, "app.a-bool": True, "some-lib.something-else": "blah"},
+                cumulative_overrides={"target.features_add": ["HAT"]},
+                macros=["SOME_MACRO=2"],
+            ),
+        )
+
     @mock.patch("mbed_build._internal.config.source.get_target_by_board_type")
     def test_from_target(self, get_target_by_board_type):
         # Warning: Target is a dataclass and dataclasses provide no type safety when mocking
