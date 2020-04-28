@@ -132,7 +132,7 @@ class TestBuildLegacyOutput(TestCase):
         expected_output = (
             "Configuration parameters\n"
             "------------------------\n"
-            f'{option.key} has no value\n\n'
+            f"{option.key} has no value\n\n"
             "\n"
             "Macros\n"
             "------\n"
