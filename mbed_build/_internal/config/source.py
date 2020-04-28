@@ -38,21 +38,43 @@ class Source:
             file: Path to mbed_lib.json file
             target_labels: Labels for which "target_overrides" should apply
         """
-        data = json.loads(file.read_text())
-        namespace = data["name"]
+        file_contents = json.loads(file.read_text())
+        namespace = file_contents["name"]
 
-        config = data.get("config", {})
+        return cls.from_file_contents(
+            file_name=str(file), file_contents=file_contents, namespace=namespace, target_labels=target_labels
+        )
+
+    @classmethod
+    def from_mbed_app(cls, file: Path, target_labels: Iterable[str]) -> "Source":
+        """Build Source from mbed_app.json file.
+
+        Args:
+            file: Path to mbed_app.json file
+            target_labels: Labels for which "target_overrides" should apply
+        """
+        file_contents = json.loads(file.read_text())
+        return cls.from_file_contents(
+            file_name=str(file), file_contents=file_contents, namespace="app", target_labels=target_labels
+        )
+
+    @classmethod
+    def from_file_contents(
+        cls, file_name: str, file_contents: dict, namespace: str, target_labels: Iterable[str]
+    ) -> "Source":
+        """Build Source from file contents."""
+        config = file_contents.get("config", {})
         config = _namespace_data(config, namespace)
 
-        target_overrides = data.get("target_overrides", {})
+        target_overrides = file_contents.get("target_overrides", {})
         target_specific_overrides = _filter_target_overrides(target_overrides, target_labels)
         target_specific_overrides = _namespace_data(target_specific_overrides, namespace)
         config_overrides, cumulative_overrides = _split_target_overrides_by_type(target_specific_overrides)
 
-        macros = data.get("macros", [])
+        macros = file_contents.get("macros", [])
 
         return cls(
-            human_name=f"File: {file}",
+            human_name=f"File: {file_name}",
             config=config,
             cumulative_overrides=cumulative_overrides,
             config_overrides=config_overrides,
@@ -79,35 +101,6 @@ class Source:
             config_overrides={},
             cumulative_overrides=cumulative_overrides,
             macros=[],
-        )
-
-    @classmethod
-    def from_mbed_app(cls, file: Path, target_labels: Iterable[str]) -> "Source":
-        """Build Source from mbed_app.json file.
-
-        Args:
-            file: Path to mbed_app.json file
-            target_labels: Labels for which "target_overrides" should apply
-        """
-        data = json.loads(file.read_text())
-        namespace = "app"
-
-        config = data.get("config", {})
-        config = _namespace_data(config, namespace)
-
-        target_overrides = data.get("target_overrides", {})
-        target_specific_overrides = _filter_target_overrides(target_overrides, target_labels)
-        target_specific_overrides = _namespace_data(target_specific_overrides, namespace)
-        config_overrides, cumulative_overrides = _split_target_overrides_by_type(target_specific_overrides)
-
-        macros = data.get("macros", [])
-
-        return cls(
-            human_name=f"File: {file}",
-            config=config,
-            cumulative_overrides=cumulative_overrides,
-            config_overrides=config_overrides,
-            macros=macros,
         )
 
 
