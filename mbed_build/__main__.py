@@ -9,6 +9,7 @@ from mbed_build.mbed_tools import config, export
 
 @click.group()
 def cli():
+    """Group exposing the commands from the mbed-build package."""
     pass
 
 

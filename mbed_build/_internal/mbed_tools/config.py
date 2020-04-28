@@ -96,7 +96,7 @@ def _build_json_output(config: Config) -> str:
 
     for macro in _config_macros_sorted_by_name(config):
         config_object["macros"].append(
-            {"name": macro.name, "value": macro.value, "set_by": macro.set_by,}
+            {"name": macro.name, "value": macro.value, "set_by": macro.set_by}
         )
 
     return json.dumps(config_object, indent=4)

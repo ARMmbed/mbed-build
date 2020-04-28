@@ -92,7 +92,7 @@ class TestBuildJSONOutput(TestCase):
                     "set_by": option.set_by,
                 }
             ],
-            "macros": [{"name": macro.name, "value": macro.value, "set_by": macro.set_by,}],
+            "macros": [{"name": macro.name, "value": macro.value, "set_by": macro.set_by}],
         }
 
         result = _build_json_output(config)
