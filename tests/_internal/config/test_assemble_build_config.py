@@ -40,13 +40,13 @@ class TestAssembleConfig(TestCase):
         mbed_target = "K64F"
         mbed_program_directory = Path("foo")
         program = mock.Mock()
-        MbedProgram.from_existing_local_program_directory.return_value = program
+        MbedProgram.from_existing.return_value = program
 
         subject = assemble_config(mbed_target, mbed_program_directory)
 
         self.assertEqual(subject, _assemble_config_from_sources_and_lib_files.return_value)
         _assemble_config_from_sources_and_lib_files.assert_called_once_with(
-            Source.from_target.return_value, find_files.return_value, program.metadata.config_file
+            Source.from_target.return_value, find_files.return_value, program.files.app_config_file
         )
         find_files.assert_called_once_with("mbed_lib.json", mbed_program_directory)
 

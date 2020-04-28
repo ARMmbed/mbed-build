@@ -22,8 +22,8 @@ def assemble_config(mbed_target: str, mbed_program_directory: Path) -> Config:
     """
     target_source = Source.from_target(mbed_target, mbed_program_directory)
     mbed_lib_files = find_files("mbed_lib.json", mbed_program_directory)
-    mbed_program = MbedProgram.from_existing_local_program_directory(mbed_program_directory)
-    mbed_app_file = mbed_program.metadata.config_file
+    mbed_program = MbedProgram.from_existing(mbed_program_directory)
+    mbed_app_file = mbed_program.files.app_config_file
     return _assemble_config_from_sources_and_lib_files(target_source, mbed_lib_files, mbed_app_file)
 
 
