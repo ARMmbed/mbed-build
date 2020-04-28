@@ -81,6 +81,35 @@ class Source:
             macros=[],
         )
 
+    @classmethod
+    def from_mbed_app(cls, file: Path, target_labels: Iterable[str]) -> "Source":
+        """Build Source from mbed_app.json file.
+
+        Args:
+            file: Path to mbed_app.json file
+            target_labels: Labels for which "target_overrides" should apply
+        """
+        data = json.loads(file.read_text())
+        namespace = "app"
+
+        config = data.get("config", {})
+        config = _namespace_data(config, namespace)
+
+        target_overrides = data.get("target_overrides", {})
+        target_specific_overrides = _filter_target_overrides(target_overrides, target_labels)
+        target_specific_overrides = _namespace_data(target_specific_overrides, namespace)
+        config_overrides, cumulative_overrides = _split_target_overrides_by_type(target_specific_overrides)
+
+        macros = data.get("macros", [])
+
+        return cls(
+            human_name=f"File: {file}",
+            config=config,
+            cumulative_overrides=cumulative_overrides,
+            config_overrides=config_overrides,
+            macros=macros,
+        )
+
 
 def _filter_target_overrides(data: dict, allowed_labels: Iterable[str]) -> dict:
     """Flatten and filter target overrides.
