@@ -119,3 +119,25 @@ class TestBuildLegacyOutput(TestCase):
 
         result = _build_legacy_output(config)
         self.assertEqual(result, expected_output)
+
+    def test_builds_value_none(self):
+        option = OptionFactory()
+        option.value = None
+        macro = MacroFactory()
+        macro.value = None
+        config = ConfigFactory()
+        config.options[option.key] = option
+        config.macros[macro.name] = macro
+
+        expected_output = (
+            "Configuration parameters\n"
+            "------------------------\n"
+            f'{option.key} has no value\n\n'
+            "\n"
+            "Macros\n"
+            "------\n"
+            f"{macro.name}\n"
+        )
+
+        result = _build_legacy_output(config)
+        self.assertEqual(result, expected_output)
