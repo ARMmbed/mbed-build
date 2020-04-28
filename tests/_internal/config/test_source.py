@@ -33,8 +33,12 @@ class TestSource(TestCase):
             Source(
                 human_name=f"File: {file}",
                 config={"foo.a-number": 123, "foo.a-bool": {"help": "Simply a boolean", "value": True}},
-                config_overrides={"foo.a-number": 456, "foo.a-bool": False, "other-lib.something-else": "blah"},
-                cumulative_overrides={"target.features_add": ["FOO"]},
+                overrides={
+                    "foo.a-number": 456,
+                    "foo.a-bool": False,
+                    "other-lib.something-else": "blah",
+                    "target.features_add": ["FOO"],
+                },
                 macros=["MACRO=1"],
             ),
         )
@@ -60,8 +64,12 @@ class TestSource(TestCase):
             Source(
                 human_name=f"File: {file}",
                 config={"app.a-bool": False, "app.a-number": {"help": "Simply a number", "value": 0}},
-                config_overrides={"app.a-number": 2, "app.a-bool": True, "some-lib.something-else": "blah"},
-                cumulative_overrides={"target.features_add": ["HAT"]},
+                overrides={
+                    "app.a-number": 2,
+                    "app.a-bool": True,
+                    "some-lib.something-else": "blah",
+                    "target.features_add": ["HAT"],
+                },
                 macros=["SOME_MACRO=2"],
             ),
         )
@@ -86,8 +94,7 @@ class TestSource(TestCase):
             Source(
                 human_name=f"mbed_target.Target for {mbed_target}",
                 config={"target.foo": "bar", "target.bool": True},
-                config_overrides={},
-                cumulative_overrides={
+                overrides={
                     "target.features": target.features,
                     "target.components": target.components,
                     "target.labels": target.labels,
