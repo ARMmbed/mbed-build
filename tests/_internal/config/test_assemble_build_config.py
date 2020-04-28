@@ -3,7 +3,6 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 import json
-import contextlib
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from unittest import TestCase, mock
@@ -28,9 +27,7 @@ def create_files(directory, files):
     return created_files
 
 
-@mock.patch(
-    "mbed_build._internal.config.assemble_build_config.MbedProgram.from_existing_local_program_directory", autospec=True
-)
+@mock.patch("mbed_build._internal.config.assemble_build_config.MbedProgram", autospec=True)
 @mock.patch("mbed_build._internal.config.assemble_build_config.Source", autospec=True)
 @mock.patch("mbed_build._internal.config.assemble_build_config.find_files", autospec=True)
 @mock.patch(
@@ -38,12 +35,12 @@ def create_files(directory, files):
 )
 class TestAssembleConfig(TestCase):
     def test_calls_collaborator_with_source_and_file_paths(
-        self, _assemble_config_from_sources_and_lib_files, find_files, Source, from_existing_local_program_directory,
+        self, _assemble_config_from_sources_and_lib_files, find_files, Source, MbedProgram,
     ):
         mbed_target = "K64F"
         mbed_program_directory = Path("foo")
         program = mock.Mock()
-        from_existing_local_program_directory.return_value = program
+        MbedProgram.from_existing_local_program_directory.return_value = program
 
         subject = assemble_config(mbed_target, mbed_program_directory)
 
