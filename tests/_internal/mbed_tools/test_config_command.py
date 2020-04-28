@@ -28,7 +28,7 @@ class TestConfig(TestCase):
         result = runner.invoke(config, ["-m", self.mbed_target, "-p", self.project_path])
 
         self.assertEqual(result.exit_code, 0)
-        self.assertEqual(result.output, _build_tabular_output(assemble_config.return_value) + "\n")
+        self.assertIn(_build_tabular_output(assemble_config.return_value), result.output)
         assemble_config.assert_called_once_with(self.mbed_target, pathlib.Path(self.project_path))
 
     def test_config_json(self, assemble_config):
@@ -36,7 +36,7 @@ class TestConfig(TestCase):
         result = runner.invoke(config, ["-m", self.mbed_target, "-p", self.project_path, "--format", "json"])
 
         self.assertEqual(result.exit_code, 0)
-        self.assertEqual(result.output, _build_json_output(assemble_config.return_value) + "\n")
+        self.assertIn(_build_json_output(assemble_config.return_value), result.output)
         assemble_config.assert_called_once_with(self.mbed_target, pathlib.Path(self.project_path))
 
     def test_config_legacy(self, assemble_config):
@@ -46,7 +46,7 @@ class TestConfig(TestCase):
         )
 
         self.assertEqual(result.exit_code, 0)
-        self.assertEqual(result.output, _build_legacy_output(assemble_config.return_value) + "\n")
+        self.assertIn(_build_legacy_output(assemble_config.return_value), result.output)
         assemble_config.assert_called_once_with(self.mbed_target, pathlib.Path(self.project_path))
 
 
