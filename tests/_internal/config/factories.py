@@ -4,8 +4,7 @@
 #
 import factory
 
-from mbed_build._internal.config.assemble_build_config import BuildConfig
-from mbed_build._internal.config.config import Config, Option
+from mbed_build._internal.config.config import Config, Option, Macro
 from mbed_build._internal.config.source import Source
 
 
@@ -31,16 +30,18 @@ class OptionFactory(factory.Factory):
     key = "key"
 
 
+class MacroFactory(factory.Factory):
+    class Meta:
+        model = Macro
+
+    value = "0"
+    name = "A_MACRO"
+    set_by = "source"
+
+
 class ConfigFactory(factory.Factory):
     class Meta:
         model = Config
 
     options = factory.Dict({})
-
-
-class BuildConfigFactory(factory.Factory):
-    class Meta:
-        model = BuildConfig
-
-    config = factory.SubFactory(ConfigFactory)
-    macros = set()
+    macros = factory.Dict({})

@@ -15,10 +15,10 @@ from mbed_build._internal.mbed_tools.config import (
     _build_json_output,
     _build_legacy_output,
 )
-from tests._internal.config.factories import BuildConfigFactory, OptionFactory
+from tests._internal.config.factories import ConfigFactory, OptionFactory, MacroFactory
 
 
-@mock.patch("mbed_build._internal.mbed_tools.config.assemble_config", return_value=BuildConfigFactory())
+@mock.patch("mbed_build._internal.mbed_tools.config.assemble_config", return_value=ConfigFactory())
 class TestConfig(TestCase):
     mbed_target = "K64F"
     project_path = "somewhere"
@@ -53,13 +53,13 @@ class TestConfig(TestCase):
 class TestBuildTabularOutput(TestCase):
     def test_builds(self):
         option = OptionFactory()
-        macro = "I_AM_A_MACRO"
-        config_data = BuildConfigFactory()
-        config_data.config.options[option.key] = option
-        config_data.macros.add(macro)
+        macro = MacroFactory()
+        config = ConfigFactory()
+        config.options[option.key] = option
+        config.macros[macro.name] = macro
 
         parameters_table = tabulate([[option.key, option.macro_name, option.value]], ["key", "macro name", "value"])
-        macros_table = tabulate([[macro, " "]], ["name", "value"])
+        macros_table = tabulate([[macro.name, macro.value]], ["name", "value"])
         expected_output = (
             "PARAMETER CONFIGURATION\n"
             "-----------------------\n"
@@ -70,17 +70,17 @@ class TestBuildTabularOutput(TestCase):
             f"{macros_table}"
         )
 
-        result = _build_tabular_output(config_data)
+        result = _build_tabular_output(config)
         self.assertEqual(result, expected_output)
 
 
 class TestBuildJSONOutput(TestCase):
     def test_builds(self):
         option = OptionFactory()
-        macro = "I_AM_A_MACRO"
-        config_data = BuildConfigFactory()
-        config_data.config.options[option.key] = option
-        config_data.macros.add(macro)
+        macro = MacroFactory()
+        config = ConfigFactory()
+        config.options[option.key] = option
+        config.macros[macro.name] = macro
 
         expected_config = {
             "parameters": [
@@ -92,20 +92,20 @@ class TestBuildJSONOutput(TestCase):
                     "set_by": option.set_by,
                 }
             ],
-            "macros": [{"name": macro}],
+            "macros": [{"name": macro.name, "value": macro.value, "set_by": macro.set_by,}],
         }
 
-        result = _build_json_output(config_data)
+        result = _build_json_output(config)
         self.assertEqual(result, json.dumps(expected_config, indent=4))
 
 
 class TestBuildLegacyOutput(TestCase):
     def test_builds(self):
         option = OptionFactory()
-        macro = "I_AM_A_MACRO"
-        config_data = BuildConfigFactory()
-        config_data.config.options[option.key] = option
-        config_data.macros.add(macro)
+        macro = MacroFactory()
+        config = ConfigFactory()
+        config.options[option.key] = option
+        config.macros[macro.name] = macro
 
         expected_output = (
             "Configuration parameters\n"
@@ -114,8 +114,8 @@ class TestBuildLegacyOutput(TestCase):
             "\n"
             "Macros\n"
             "------\n"
-            f"{macro}\n"
+            f"{macro.name}=({macro.value})\n"
         )
 
-        result = _build_legacy_output(config_data)
+        result = _build_legacy_output(config)
         self.assertEqual(result, expected_output)
