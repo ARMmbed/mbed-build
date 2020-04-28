@@ -29,8 +29,9 @@ class CumulativeData:
         """Interrogate each Source in turn to create final CumulativeData."""
         data = CumulativeData()
         for source in sources:
-            for key, value in source.cumulative_overrides.items():
-                _modify_field(data, key, value)
+            for key, value in source.overrides.items():
+                if key in ALL_CUMULATIVE_FIELDS:
+                    _modify_field(data, key, value)
         return data
 
 
