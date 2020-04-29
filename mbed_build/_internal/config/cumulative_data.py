@@ -8,11 +8,7 @@ import re
 from dataclasses import dataclass, field, fields
 from typing import Any, Iterable, Set, Tuple
 
-
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from mbed_build._internal.config.source import Source
+from mbed_build._internal.config.source import Source
 
 
 @dataclass
@@ -25,7 +21,7 @@ class CumulativeData:
     device_has: Set[str] = field(default_factory=set)
 
     @classmethod
-    def from_sources(cls, sources: Iterable["Source"]) -> "CumulativeData":
+    def from_sources(cls, sources: Iterable[Source]) -> "CumulativeData":
         """Interrogate each Source in turn to create final CumulativeData."""
         data = CumulativeData()
         for source in sources:
