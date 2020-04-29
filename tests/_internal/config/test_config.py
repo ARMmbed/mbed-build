@@ -6,6 +6,8 @@ from unittest import TestCase
 
 from mbed_build._internal.config.config import Config, Option, Macro
 from tests._internal.config.factories import SourceFactory
+from mbed_build._internal.config.cumulative_data import CUMULATIVE_OVERRIDE_KEYS_IN_SOURCE
+from mbed_build._internal.config.bootloader_overrides import BOOTLOADER_OVERRIDE_KEYS_IN_SOURCE
 
 
 class TestConfigFromSources(TestCase):
@@ -50,6 +52,13 @@ class TestConfigFromSources(TestCase):
         config = Config.from_sources([source_a, source_b])
 
         self.assertEqual(config.options["bool"].help_text, "A simple bool")
+
+    def test_does_not_explode_on_override_keys_used_by_other_parsers(self):
+        for key in CUMULATIVE_OVERRIDE_KEYS_IN_SOURCE + BOOTLOADER_OVERRIDE_KEYS_IN_SOURCE:
+            with self.subTest("Ignores override key '{key}'"):
+                source_a = SourceFactory()
+                source_b = SourceFactory(overrides={key: "boom?"})
+                Config.from_sources([source_a, source_b])
 
 
 class TestOptionBuild(TestCase):

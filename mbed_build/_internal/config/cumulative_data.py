@@ -30,7 +30,7 @@ class CumulativeData:
         data = CumulativeData()
         for source in sources:
             for key, value in source.overrides.items():
-                if key in ALL_CUMULATIVE_FIELDS:
+                if key in CUMULATIVE_OVERRIDE_KEYS_IN_SOURCE:
                     _modify_field(data, key, value)
         return data
 
@@ -47,18 +47,18 @@ def _modify_field(data: CumulativeData, key: str, value: Any) -> None:
     setattr(data, key, new_value)
 
 
-CUMULATIVE_FIELDS = [f.name for f in fields(CumulativeData)]
-PREFIXED_CUMULATIVE_FIELDS = [f"target.{f}" for f in CUMULATIVE_FIELDS]
-ALL_CUMULATIVE_FIELDS = PREFIXED_CUMULATIVE_FIELDS + [
-    f"{attr}_{suffix}" for attr, suffix in itertools.product(PREFIXED_CUMULATIVE_FIELDS, ["add", "remove"])
+_CUMULATIVE_FIELDS = [f.name for f in fields(CumulativeData)]
+_PREFIXED_CUMULATIVE_FIELDS = [f"target.{f}" for f in _CUMULATIVE_FIELDS]
+CUMULATIVE_OVERRIDE_KEYS_IN_SOURCE = _PREFIXED_CUMULATIVE_FIELDS + [
+    f"{attr}_{suffix}" for attr, suffix in itertools.product(_PREFIXED_CUMULATIVE_FIELDS, ["add", "remove"])
 ]
 
 
 def _extract_target_modifier_data(key: str) -> Tuple[str, str]:
     regex = fr"""
-            (?P<key>{'|'.join(CUMULATIVE_FIELDS)}) # attribute name (one of ACCUMULATING_OVERRIDES)
-            _?                                     # separator
-            (?P<modifier>(add|remove)?)            # modifier (add, remove or empty)
+            (?P<key>{'|'.join(_CUMULATIVE_FIELDS)}) # attribute name (one of ACCUMULATING_OVERRIDES)
+            _?                                      # separator
+            (?P<modifier>(add|remove)?)             # modifier (add, remove or empty)
     """
     match = re.search(regex, key, re.VERBOSE)
     if not match:
