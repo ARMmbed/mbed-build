@@ -1,1 +1,0 @@
-Add mbed_app.json on top of already parsed config

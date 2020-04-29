@@ -1,1 +1,0 @@
-Ability to filter found files

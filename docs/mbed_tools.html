@@ -8,8 +8,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.8.1" />
-<title>mbed_build API documentation</title>
-<meta name="description" content="Exposes the primary interfaces for the library." />
+<title>mbed_build.mbed_tools API documentation</title>
+<meta name="description" content="Integration with https://github.com/ARMmbed/mbed-tools." />
 <link href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css' rel='stylesheet'>
 <link href='https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/8.0.0/sanitize.min.css' rel='stylesheet'>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" rel="stylesheet">
@@ -21,10 +21,10 @@
 <main>
 <article id="content">
 <header>
-<h1 class="title">Package <code>mbed_build</code></h1>
+<h1 class="title">Module <code>mbed_build.mbed_tools</code></h1>
 </header>
 <section id="section-intro">
-<p>Exposes the primary interfaces for the library.</p>
+<p>Integration with <a href="https://github.com/ARMmbed/mbed-tools.">https://github.com/ARMmbed/mbed-tools.</a></p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -33,27 +33,17 @@
 # Copyright (C) 2020 Arm Mbed. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
-&#34;&#34;&#34;Exposes the primary interfaces for the library.&#34;&#34;&#34;
+&#34;&#34;&#34;Integration with https://github.com/ARMmbed/mbed-tools.&#34;&#34;&#34;
+from mbed_build._internal.mbed_tools.config import config
+from mbed_build._internal.mbed_tools.export import export
 
-from mbed_build._version import __version__</code></pre>
+cli = export
+
+config = config
+export = export</code></pre>
 </details>
 </section>
 <section>
-<h2 class="section-title" id="header-submodules">Sub-modules</h2>
-<dl>
-<dt><code class="name"><a title="mbed_build.exceptions" href="exceptions.html">mbed_build.exceptions</a></code></dt>
-<dd>
-<div class="desc"><p>Public exceptions raised by the package.</p></div>
-</dd>
-<dt><code class="name"><a title="mbed_build.mbed_build" href="mbed_build.html">mbed_build.mbed_build</a></code></dt>
-<dd>
-<div class="desc"><p>Module to generate application's CMake file.</p></div>
-</dd>
-<dt><code class="name"><a title="mbed_build.mbed_tools" href="mbed_tools.html">mbed_build.mbed_tools</a></code></dt>
-<dd>
-<div class="desc"><p>Integration with <a href="https://github.com/ARMmbed/mbed-tools.">https://github.com/ARMmbed/mbed-tools.</a></p></div>
-</dd>
-</dl>
 </section>
 <section>
 </section>
@@ -68,11 +58,9 @@ from mbed_build._version import __version__</code></pre>
 <ul></ul>
 </div>
 <ul id="index">
-<li><h3><a href="#header-submodules">Sub-modules</a></h3>
+<li><h3>Super-module</h3>
 <ul>
-<li><code><a title="mbed_build.exceptions" href="exceptions.html">mbed_build.exceptions</a></code></li>
-<li><code><a title="mbed_build.mbed_build" href="mbed_build.html">mbed_build.mbed_build</a></code></li>
-<li><code><a title="mbed_build.mbed_tools" href="mbed_tools.html">mbed_build.mbed_tools</a></code></li>
+<li><code><a title="mbed_build" href="index.html">mbed_build</a></code></li>
 </ul>
 </li>
 </ul>

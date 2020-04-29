@@ -1,1 +1,0 @@
-Config assembly cumulative attributes

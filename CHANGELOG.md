@@ -11,3 +11,48 @@ beta releases are not included in this history. For a full list of all releases,
 [PyPI Release History](https://pypi.org/project/mbed-build/#history).
 
 [//]: # (begin_release_notes)
+
+"1.0.0" (2020-04-29)
+====================
+
+Major changes
+-------------
+
+- Update code to work with new names of mbed-targets interfaces. (#20200414)
+
+
+Features
+--------
+
+- Add functionality for rendering and outputting CMakeLists.txt file. (#20200325)
+- Add basic Cli for export. (#20200327)
+- Initial mbed_lib.json discovery respecting .mbedignore (#20200401)
+- Filter mbed_lib.json files by target labels (#20200402)
+- Ignore legacy directories in MbedOS (#20200406)
+- Hook up target labels to top level cmake file (#20200407)
+- Initial configuration assembly (#20200415)
+- Config assembly cumulative attributes (#20200416)
+- Strict cumulative overrides (#20200417)
+- Configuration namespacing (#20200420)
+- Ability to filter found files (#20200421)
+- Generate macros for Options (#20200424)
+- Multi pass configuration assembly (#20200426)
+- Parse macros from configuration files (#20200427)
+- Add config command. (#20200428)
+- Parse bootloader overrides (#20200429)
+- Only need to pass toolchain name (#2020040701)
+- Add mbed_app.json on top of already parsed config (#2020042801)
+
+
+Bugfixes
+--------
+
+- Correctly name path to project (#20200408)
+- Checked 3rd-party licences. (#20200427)
+- Display 0 values, convert bools into ints (#20200429)
+
+
+Misc
+----
+
+- #20200324, #20200402, #20200405, #20200408, #20200415, #20200420, #20200422, #20200423, #20200427, #20200428, #2020040801, #2020042201, #2020042801
