@@ -104,7 +104,7 @@ def _build_legacy_output(config: Config) -> str:
     """Output format to match that of legacy tools running mbed compile --config."""
     parameter_list = ""
     for option in _config_options_sorted_by_key(config):
-        if option.value:
+        if option.value is not None:
             parameter_list += f'{option.key} = {option.value} (macro name: "{option.macro_name}")\n'
         else:
             parameter_list += f"{option.key} has no value\n"
