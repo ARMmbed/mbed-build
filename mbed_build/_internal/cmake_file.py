@@ -7,12 +7,33 @@ import pathlib
 from typing import Iterable
 
 import jinja2
+from mbed_targets import get_target_by_name
 
 TEMPLATES_DIRECTORY = pathlib.Path("_internal", "templates")
 TEMPLATE_NAME = "CMakeLists.tmpl"
 
 
-def render_cmakelists_template(
+def generate_cmakelists_file(mbed_target: str, program_path: str, toolchain_name: str) -> str:
+    """Generate the top-level CMakeLists.txt file containing the correct definitions for a build.
+
+    Args:
+        mbed_target: the target the application is being built for
+        program_path: the path to the local Mbed program
+        toolchain_name: the toolchain to be used to build the application
+
+    Returns:
+        A string of rendered contents for the file.
+    """
+    target_build_attributes = get_target_by_name(mbed_target, program_path)
+    return _render_cmakelists_template(
+        target_build_attributes.labels,
+        target_build_attributes.features,
+        target_build_attributes.components,
+        toolchain_name,
+    )
+
+
+def _render_cmakelists_template(
     target_labels: Iterable[str], feature_labels: Iterable[str], component_labels: Iterable[str], toolchain_name: str,
 ) -> str:
     """Loads the CMakeLists.txt file template and renders it with the correct details.
@@ -35,21 +56,3 @@ def render_cmakelists_template(
         "toolchain_name": toolchain_name,
     }
     return template.render(context)
-
-
-def write_cmakelists_file(output_directory: pathlib.Path, file_contents: str) -> None:
-    """Writes out the CMakeLists.txt file to the output directory.
-
-    If the intermediate directories to the output directory don't exist,
-    this function will create them.
-
-    This function will overwrite any existing CMakeLists.txt file in the
-    output directory.
-
-    Args:
-        output_directory: path to directory where we want the CMakeLists.txt to go
-        file_contents: the contents of the CMakeLists.txt file
-    """
-    output_directory.mkdir(parents=True, exist_ok=True)
-    output_file = output_directory.joinpath("CMakeLists.txt")
-    output_file.write_text(file_contents)

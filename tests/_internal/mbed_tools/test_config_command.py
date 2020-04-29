@@ -21,33 +21,33 @@ from tests._internal.config.factories import ConfigFactory, OptionFactory, Macro
 @mock.patch("mbed_build._internal.mbed_tools.config.assemble_config", return_value=ConfigFactory())
 class TestConfig(TestCase):
     mbed_target = "K64F"
-    project_path = "somewhere"
+    program_path = "somewhere"
 
     def test_config_table(self, assemble_config):
         runner = CliRunner()
-        result = runner.invoke(config, ["-m", self.mbed_target, "-p", self.project_path])
+        result = runner.invoke(config, ["-m", self.mbed_target, "-p", self.program_path])
 
         self.assertEqual(result.exit_code, 0)
         self.assertIn(_build_tabular_output(assemble_config.return_value), result.output)
-        assemble_config.assert_called_once_with(self.mbed_target, pathlib.Path(self.project_path))
+        assemble_config.assert_called_once_with(self.mbed_target, pathlib.Path(self.program_path))
 
     def test_config_json(self, assemble_config):
         runner = CliRunner()
-        result = runner.invoke(config, ["-m", self.mbed_target, "-p", self.project_path, "--format", "json"])
+        result = runner.invoke(config, ["-m", self.mbed_target, "-p", self.program_path, "--format", "json"])
 
         self.assertEqual(result.exit_code, 0)
         self.assertIn(_build_json_output(assemble_config.return_value), result.output)
-        assemble_config.assert_called_once_with(self.mbed_target, pathlib.Path(self.project_path))
+        assemble_config.assert_called_once_with(self.mbed_target, pathlib.Path(self.program_path))
 
     def test_config_legacy(self, assemble_config):
         runner = CliRunner()
         result = runner.invoke(
-            config, ["-m", self.mbed_target, "-p", self.project_path, "--format", "json", "--format", "legacy"]
+            config, ["-m", self.mbed_target, "-p", self.program_path, "--format", "json", "--format", "legacy"]
         )
 
         self.assertEqual(result.exit_code, 0)
         self.assertIn(_build_legacy_output(assemble_config.return_value), result.output)
-        assemble_config.assert_called_once_with(self.mbed_target, pathlib.Path(self.project_path))
+        assemble_config.assert_called_once_with(self.mbed_target, pathlib.Path(self.program_path))
 
 
 class TestBuildTabularOutput(TestCase):
