@@ -7,7 +7,8 @@ from dataclasses import dataclass, field
 from typing import Any, Dict, Iterable, Optional
 
 from mbed_build._internal.config.source import Source
-from mbed_build._internal.config.cumulative_data import ALL_CUMULATIVE_FIELDS
+from mbed_build._internal.config.cumulative_data import CUMULATIVE_OVERRIDE_KEYS_IN_SOURCE
+from mbed_build._internal.config.bootloader_overrides import BOOTLOADER_OVERRIDE_KEYS_IN_SOURCE
 
 
 @dataclass
@@ -87,6 +88,9 @@ def _build_macro_name(config_key: str) -> str:
     return f"MBED_CONF_{sanitised_config_key}"
 
 
+IGNORED_OVERRIDE_KEYS_IN_SOURCE = CUMULATIVE_OVERRIDE_KEYS_IN_SOURCE + BOOTLOADER_OVERRIDE_KEYS_IN_SOURCE
+
+
 @dataclass
 class Config:
     """Representation of config attributes assembled during Source parsing.
@@ -107,7 +111,7 @@ class Config:
             for key, value in source.config.items():
                 _create_config_option(config, key, value, source)
             for key, value in source.overrides.items():
-                if key in ALL_CUMULATIVE_FIELDS:
+                if key in IGNORED_OVERRIDE_KEYS_IN_SOURCE:
                     continue
                 _update_config_option(config, key, value, source)
             for value in source.macros:
