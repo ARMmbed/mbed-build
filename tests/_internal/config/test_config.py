@@ -53,16 +53,9 @@ class TestConfigFromSources(TestCase):
 
         self.assertEqual(config.options["bool"].help_text, "A simple bool")
 
-    def test_does_not_explode_on_cumulative_override_keys(self):
-        for key in CUMULATIVE_OVERRIDE_KEYS_IN_SOURCE:
-            with self.subTest("Ignores {key} cumulative override"):
-                source_a = SourceFactory()
-                source_b = SourceFactory(overrides={key: "boom?"})
-                Config.from_sources([source_a, source_b])
-
-    def test_does_not_explode_on_bootloader_override_keys(self):
-        for key in BOOTLOADER_OVERRIDE_KEYS_IN_SOURCE:
-            with self.subTest("Ignores {key} bootloader override"):
+    def test_does_not_explode_on_override_keys_used_by_other_parsers(self):
+        for key in CUMULATIVE_OVERRIDE_KEYS_IN_SOURCE + BOOTLOADER_OVERRIDE_KEYS_IN_SOURCE:
+            with self.subTest("Ignores override key '{key}'"):
                 source_a = SourceFactory()
                 source_b = SourceFactory(overrides={key: "boom?"})
                 Config.from_sources([source_a, source_b])
