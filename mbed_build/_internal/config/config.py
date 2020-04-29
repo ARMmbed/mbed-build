@@ -63,29 +63,20 @@ class Option:
             return cls(
                 key=key,
                 value=data.get("value"),
-                macro_name=data.get("macro_name", _build_macro_name(key)),
+                macro_name=data.get("macro_name", _build_option_macro_name(key)),
                 help_text=data.get("help"),
                 set_by=source.human_name,
             )
         else:
-            return cls(value=data, key=key, macro_name=_build_macro_name(key), help_text=None, set_by=source.human_name)
+            return cls(
+                value=data, key=key, macro_name=_build_option_macro_name(key), help_text=None, set_by=source.human_name
+            )
 
     def set_value(self, value: Any, source: Source) -> "Option":
         """Mutate self with new value."""
         self.value = value
         self.set_by = source.human_name
         return self
-
-
-def _build_macro_name(config_key: str) -> str:
-    """Build macro name for configuration key.
-
-    All configuration variables require a macro name, so that they can be referenced in a header file.
-    Some values in config define "macro_name", some don't. This helps generate consistent macro names
-    for the latter.
-    """
-    sanitised_config_key = config_key.replace(".", "_").replace("-", "_").upper()
-    return f"MBED_CONF_{sanitised_config_key}"
 
 
 IGNORED_OVERRIDE_KEYS_IN_SOURCE = CUMULATIVE_OVERRIDE_KEYS_IN_SOURCE + BOOTLOADER_OVERRIDE_KEYS_IN_SOURCE
@@ -132,6 +123,17 @@ def _update_config_option(config: Config, key: str, value: Any, source: Source) 
             f" Attempting to set '{key}' to '{value}' in '{source.human_name}'."
         )
     config.options[key].set_value(value, source)
+
+
+def _build_option_macro_name(config_key: str) -> str:
+    """Build macro name for configuration key.
+
+    All configuration variables require a macro name, so that they can be referenced in a header file.
+    Some values in config define "macro_name", some don't. This helps generate consistent macro names
+    for the latter.
+    """
+    sanitised_config_key = config_key.replace(".", "_").replace("-", "_").upper()
+    return f"MBED_CONF_{sanitised_config_key}"
 
 
 def _create_macro(config: Config, macro_str: str, source: Source) -> None:
