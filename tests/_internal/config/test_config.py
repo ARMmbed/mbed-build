@@ -82,6 +82,14 @@ class TestOptionBuild(TestCase):
             ),
         )
 
+    def test_sanitizes_booleans_into_ints(self):
+        source = SourceFactory()
+        option = Option.build(key="target.is-cool", data={"value": True}, source=source)
+        self.assertEqual(option.value, 1)
+
+        option = Option.build(key="target.is-cool", data=False, source=source)
+        self.assertEqual(option.value, 0)
+
     def test_generates_macro_name_if_not_in_data(self):
         source = SourceFactory()
         data = {
@@ -91,6 +99,14 @@ class TestOptionBuild(TestCase):
         option = Option.build(key="update-client.storage-size", data=data, source=source)
 
         self.assertEqual(option.macro_name, "MBED_CONF_UPDATE_CLIENT_STORAGE_SIZE")
+
+
+class TestOptionSetValue(TestCase):
+    def test_sanitizes_booleans_into_ints(self):
+        option = Option.build(key="foo", data="some-data", source=SourceFactory())
+        option.set_value(False, SourceFactory())
+
+        self.assertEqual(option.value, 0)
 
 
 class TestMacroBuild(TestCase):
