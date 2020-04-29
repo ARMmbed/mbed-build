@@ -11,7 +11,7 @@ from tests._internal.config.factories import SourceFactory
 class TestConfigFromSources(TestCase):
     def test_builds_config_from_sources(self):
         source_a = SourceFactory(config={"bool": True, "string": "foo"}, macros=["MACRO_A=A"])
-        source_b = SourceFactory(config={"number": 1}, config_overrides={"bool": False}, macros=["MACRO_B=B"])
+        source_b = SourceFactory(config={"number": 1}, overrides={"bool": False}, macros=["MACRO_B=B"])
 
         config = Config.from_sources([source_a, source_b])
 
@@ -31,7 +31,7 @@ class TestConfigFromSources(TestCase):
 
     def test_raises_when_trying_to_override_unset_option(self):
         source_a = SourceFactory(config={"bool": True})
-        source_b = SourceFactory(config_overrides={"string": "hello"})
+        source_b = SourceFactory(overrides={"string": "hello"})
 
         with self.assertRaises(ValueError):
             Config.from_sources([source_a, source_b])
@@ -45,7 +45,7 @@ class TestConfigFromSources(TestCase):
 
     def test_keeps_old_option_data(self):
         source_a = SourceFactory(config={"bool": {"help": "A simple bool", "value": True}})
-        source_b = SourceFactory(config_overrides={"bool": False})
+        source_b = SourceFactory(overrides={"bool": False})
 
         config = Config.from_sources([source_a, source_b])
 

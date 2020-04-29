@@ -53,7 +53,7 @@ class TestAssembleConfig(TestCase):
 
 class TestAssembleConfigFromSourcesAndLibFiles(TestCase):
     def test_assembles_config_using_all_relevant_files(self):
-        target_source = SourceFactory(config={"target.foo": "foo"}, cumulative_overrides={"target.labels": ["A"]})
+        target_source = SourceFactory(config={"target.foo": "foo"}, overrides={"target.labels": ["A"]})
         mbed_lib_files = [
             {
                 "path": Path("TARGET_A", "mbed_lib.json"),

@@ -14,8 +14,7 @@ class SourceFactory(factory.Factory):
 
     human_name = factory.Faker("name")
     config = factory.Dict({})
-    config_overrides = factory.Dict({})
-    cumulative_overrides = factory.Dict({})
+    overrides = factory.Dict({})
     macros = factory.List([])
 
 

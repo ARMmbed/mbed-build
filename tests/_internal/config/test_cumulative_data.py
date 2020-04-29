@@ -13,9 +13,9 @@ class TestCumulativeDataFromSources(TestCase):
     def test_assembles_metadata_from_sources(self):
         for field in fields(CumulativeData):
             with self.subTest(f"Assemble {field.name}"):
-                source_a = SourceFactory(cumulative_overrides={f"target.{field.name}": ["FOO"]})
-                source_b = SourceFactory(cumulative_overrides={f"target.{field.name}_add": ["BAR", "BAZ"]})
-                source_c = SourceFactory(cumulative_overrides={f"target.{field.name}_remove": ["BAR"]})
+                source_a = SourceFactory(overrides={f"target.{field.name}": ["FOO"]})
+                source_b = SourceFactory(overrides={f"target.{field.name}_add": ["BAR", "BAZ"]})
+                source_c = SourceFactory(overrides={f"target.{field.name}_remove": ["BAR"]})
 
                 config_cumulative_data = CumulativeData.from_sources([source_a, source_b, source_c])
 

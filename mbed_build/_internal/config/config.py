@@ -7,6 +7,7 @@ from dataclasses import dataclass, field
 from typing import Any, Dict, Iterable, Optional
 
 from mbed_build._internal.config.source import Source
+from mbed_build._internal.config.cumulative_data import ALL_CUMULATIVE_FIELDS
 
 
 @dataclass
@@ -91,7 +92,7 @@ class Config:
     """Representation of config attributes assembled during Source parsing.
 
     Attributes:
-        options: Options parsed from "config" and "config_overrides" sections of *.json files
+        options: Options parsed from "config" and "target_overrides" sections of *.json files
         macros: Macros parsed from "macros" section of mbed_lib.json and mbed_app.json file
     """
 
@@ -105,7 +106,9 @@ class Config:
         for source in sources:
             for key, value in source.config.items():
                 _create_config_option(config, key, value, source)
-            for key, value in source.config_overrides.items():
+            for key, value in source.overrides.items():
+                if key in ALL_CUMULATIVE_FIELDS:
+                    continue
                 _update_config_option(config, key, value, source)
             for value in source.macros:
                 _create_macro(config, value, source)
