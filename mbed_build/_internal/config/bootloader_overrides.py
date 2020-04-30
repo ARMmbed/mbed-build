@@ -6,11 +6,7 @@
 from dataclasses import dataclass, field, fields
 from typing import Any, Iterable, Optional
 
-
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from mbed_build._internal.config.source import Source
+from mbed_build._internal.config.source import Source
 
 
 @dataclass
@@ -49,7 +45,7 @@ class BootloaderOverrides:
     mbed_ram_size: Optional[BootloaderOverride] = field(default=None)
 
     @classmethod
-    def from_sources(cls, sources: Iterable["Source"]) -> "BootloaderOverrides":
+    def from_sources(cls, sources: Iterable[Source]) -> "BootloaderOverrides":
         """Interrogate each Source in turn to create BootloaderOverrides."""
         data = BootloaderOverrides()
         for source in sources:
