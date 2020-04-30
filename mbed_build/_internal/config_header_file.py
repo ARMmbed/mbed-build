@@ -38,17 +38,13 @@ def _render_config_header_template(config: Config) -> str:
     Returns:
         The rendered contents of the template with the config definitions included.
     """
+    options = list(config.options.values())
+    macros = list(config.macros.values())
     context = {
-        "options": sorted(
-            [(option.macro_name, str(option.value), option.set_by) for option in config.options.values()]
-        ),
-        "macros": sorted([(m.name, str(m.value or ""), m.set_by) for m in config.macros.values()]),
-        "max_name_length": _max_field_length(
-            list(config.options.values()), "macro_name", list(config.macros.values()), "name"
-        ),
-        "max_value_length": _max_field_length(
-            list(config.options.values()), "value", list(config.macros.values()), "value"
-        ),
+        "options": sorted([(option.macro_name, str(option.value), option.set_by) for option in options]),
+        "macros": sorted([(m.name, str(m.value or ""), m.set_by) for m in macros]),
+        "max_name_length": _max_field_length(options, "macro_name", macros, "name"),
+        "max_value_length": _max_field_length(options, "value", macros, "value"),
     }
     env = jinja2.Environment(loader=jinja2.PackageLoader("mbed_build", str(TEMPLATES_DIRECTORY)))
     template = env.get_template(TEMPLATE_NAME)
