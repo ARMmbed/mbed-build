@@ -5,23 +5,23 @@
 """Write out the computed configuration for a build."""
 import json
 import pathlib
-from typing import Dict, Any, List, Iterator, ItemsView
+from typing import Dict, Any, List
 
 import click
 from tabulate import tabulate
 
-from mbed_build._internal.config.config import Config, Option, Macro
 from mbed_build._internal.config.assemble_build_config import assemble_config
+from mbed_build._internal.config.config import Config, Option, Macro
 
 
 @click.command(help="Print the computed configuration for a build.")
-@click.option("-m", "--mbed_target", required=True, help="A build target for an Mbed-enabled device, eg. K64F")
+@click.option("-m", "--mbed-target", required=True, help="A build target for an Mbed-enabled device, eg. K64F")
 @click.option(
     "-p",
-    "--project-path",
+    "--program-path",
     type=click.Path(),
     default=".",
-    help="Path to local Mbed project. By default is the current working directory.",
+    help="Path to local Mbed program. By default is the current working directory.",
 )
 @click.option(
     "--format",
@@ -30,22 +30,22 @@ from mbed_build._internal.config.assemble_build_config import assemble_config
     show_default=True,
     help="Set output format. To see maximum info use JSON format.",
 )
-def config(mbed_target: str, project_path: str, format: str) -> None:
+def config(mbed_target: str, program_path: str, format: str) -> None:
     """Calculates the configuration for a build and prints it out.
 
-    Each build of an Mbed project requires calculating the combined configuration
+    Each build of an Mbed program requires calculating the combined configuration
     taken from the target definition in targets.json and mbed_lib.json files in
-    Mbed OS library and the project's own mbed_config.json config overrides file.
+    Mbed OS library and the program's own mbed_config.json config overrides file.
 
     This command prints out the combined config taking all these sources into account.
 
     Args:
         mbed_target: the build target you are wanting to run your app (eg. K64F)
-        project_path: the path to the Mbed project
+        program_path: the path to the Mbed program
         format: the format to print the resulting config data
 
     """
-    config = assemble_config(mbed_target, pathlib.Path(project_path))
+    config = assemble_config(mbed_target, pathlib.Path(program_path))
     output_builders = {
         "table": _build_tabular_output,
         "json": _build_json_output,
@@ -111,7 +111,7 @@ def _build_legacy_output(config: Config) -> str:
 
     macro_list = ""
     for macro in _config_macros_sorted_by_name(config):
-        if macro.value:
+        if macro.value is not None:
             macro_list += f"{macro.name}={macro.value}\n"
         else:
             macro_list += f"{macro.name}\n"
@@ -128,13 +128,9 @@ def _build_legacy_output(config: Config) -> str:
     return output_template
 
 
-def _extract_values_from_dict(items: ItemsView[str, Any]) -> Iterator[Any]:
-    return map(lambda item: item[1], items)
-
-
 def _config_options_sorted_by_key(config: Config) -> List[Option]:
-    return sorted(_extract_values_from_dict(config.options.items()), key=lambda item: item.key)
+    return sorted(config.options.values(), key=lambda item: item.key)
 
 
 def _config_macros_sorted_by_name(config: Config) -> List[Macro]:
-    return sorted(_extract_values_from_dict(config.macros.items()), key=lambda item: item.name)
+    return sorted(config.macros.values(), key=lambda item: item.name)

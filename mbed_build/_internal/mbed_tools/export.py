@@ -7,7 +7,8 @@ import pathlib
 
 import click
 
-from mbed_build.mbed_build import generate_cmakelists_file, write_cmakelists_file
+from mbed_build._internal.cmake_file import generate_cmakelists_file
+from mbed_build._internal.write_files import write_file
 
 
 @click.command(
@@ -27,15 +28,15 @@ from mbed_build.mbed_build import generate_cmakelists_file, write_cmakelists_fil
     required=True,
     help="The toolchain you are using to build your app.",
 )
-@click.option("-m", "--mbed_target", required=True, help="A build target for an Mbed-enabled device, eg. K64F")
+@click.option("-m", "--mbed-target", required=True, help="A build target for an Mbed-enabled device, eg. K64F")
 @click.option(
     "-p",
-    "--project-path",
+    "--program-path",
     type=click.Path(),
     default=".",
-    help="Path to local Mbed project. By default is the current working directory.",
+    help="Path to local Mbed program. By default is the current working directory.",
 )
-def export(output_directory: str, toolchain: str, mbed_target: str, project_path: str) -> None:
+def export(output_directory: str, toolchain: str, mbed_target: str, program_path: str) -> None:
     """Exports a top-level CMakeLists.txt file to the specified directory.
 
     The parameters set in the CMake file will be dependent on the combination of
@@ -46,11 +47,11 @@ def export(output_directory: str, toolchain: str, mbed_target: str, project_path
         output_directory: where the top-level CMakeLists.txt should be exported to
         toolchain: the toolchain you are using to build your app (eg. GCC, ARM5 etc.)
         mbed_target: the build target you are wanting to run your app (eg. K64F)
-        project_path: the path to the local Mbed project
+        program_path: the path to the local Mbed program
 
     Raises:
         InvalidExportOutputDirectory: it's not possible to export to the output directory provided
     """
-    cmake_file_contents = generate_cmakelists_file(mbed_target, project_path, toolchain)
-    write_cmakelists_file(pathlib.Path(output_directory), cmake_file_contents)
+    cmake_file_contents = generate_cmakelists_file(mbed_target, program_path, toolchain)
+    write_file(pathlib.Path(output_directory), "CMakeLists.txt", cmake_file_contents)
     click.echo(f"The program-level CMake file has been successfully exported to directory '{str(output_directory)}'")

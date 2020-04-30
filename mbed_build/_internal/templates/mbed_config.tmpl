@@ -1,0 +1,27 @@
+/*
+* Copyright (C) 2020 Arm Mbed. All rights reserved.
+* SPDX-License-Identifier: Apache-2.0
+*/
+
+// Automatically generated configuration file.
+// DO NOT EDIT, content will be overwritten.
+
+#ifndef __MBED_CONFIG_DATA__
+#define __MBED_CONFIG_DATA__
+
+{% if options -%}// Configuration parameters {% endif %}
+{% for option in options -%}
+{% if option.value is not none -%}
+#define {{ option.macro_name | ljust(max_name_length) }} {{ option.value | ljust(max_value_length) }} // set by {{ option.set_by }}
+{% endif %}
+{%- endfor %}
+
+
+{% if macros %}// Macros {% endif %}
+{% for macro in macros -%}
+{% if macro.value is not none -%}
+#define {{ macro.name | ljust(max_name_length) }} {{ macro.value | ljust(max_value_length) }} // set by {{ macro.set_by }}
+{% else -%}
+#define {{ macro.name | ljust(max_name_length + max_value_length + 1)}} // set by {{ macro.set_by }}
+{% endif %}
+{%- endfor %}
