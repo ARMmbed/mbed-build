@@ -20,7 +20,6 @@ class TestWriteFile(TestCase):
             write_file(export_path, file_name, content)
 
             created_file = pathlib.Path(export_path, pathlib.Path(export_path, file_name))
-            self.assertTrue(created_file.is_file())
             self.assertEqual(created_file.read_text(), content)
 
     def test_output_dir_is_file(self):
