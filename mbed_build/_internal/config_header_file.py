@@ -7,8 +7,8 @@ import pathlib
 
 import jinja2
 
-from typing import List
-from mbed_build._internal.config.config import Config, Option, Macro
+from typing import Iterable
+from mbed_build._internal.config.config import Config
 from mbed_build._internal.config.assemble_build_config import assemble_config
 
 TEMPLATES_DIRECTORY = pathlib.Path("_internal", "templates")
@@ -43,15 +43,17 @@ def _render_config_header_template(config: Config) -> str:
     context = {
         "options": sorted([(option.macro_name, str(option.value), option.set_by) for option in options]),
         "macros": sorted([(m.name, str(m.value or ""), m.set_by) for m in macros]),
-        "max_name_length": _max_field_length(options, "macro_name", macros, "name"),
-        "max_value_length": _max_field_length(options, "value", macros, "value"),
+        "max_name_length": max(_max_attribute_length(options, "macro_name"), _max_attribute_length(macros, "name")),
+        "max_value_length": max(_max_attribute_length(options, "value"), _max_attribute_length(macros, "value")),
     }
     env = jinja2.Environment(loader=jinja2.PackageLoader("mbed_build", str(TEMPLATES_DIRECTORY)))
     template = env.get_template(TEMPLATE_NAME)
     return template.render(context)
 
 
-def _max_field_length(options: List[Option], option_field: str, macros: List[Macro], macro_field: str) -> int:
-    option_elements = [str(getattr(o, option_field)) for o in options if getattr(o, option_field) is not None]
-    macro_elements = [str(getattr(m, macro_field)) for m in macros if getattr(m, macro_field) is not None]
-    return max([len(o) for o in option_elements + macro_elements] + [0])
+def _max_attribute_length(objects: Iterable[object], attribute: str) -> int:
+    attrs = (getattr(o, attribute) for o in objects)
+    try:
+        return max(len(attr) for attr in attrs if attr is not None)
+    except ValueError:  # no attrs found
+        return 0

@@ -8,7 +8,7 @@ from unittest import TestCase, mock
 from mbed_build._internal.config_header_file import (
     generate_config_header_file,
     _render_config_header_template,
-    _max_field_length,
+    _max_attribute_length,
 )
 from tests._internal.config.factories import ConfigFactory, OptionFactory, MacroFactory
 
@@ -40,15 +40,13 @@ class TestRendersConfigHeaderFile(TestCase):
 
 class TestMaxFieldLength(TestCase):
     def test_correct_max_lengths(self):
-        options = [OptionFactory(macro_name="not max"), OptionFactory(macro_name="not max but a bit longer")]
         macros = [MacroFactory(name="not max"), MacroFactory(name="I am the longest name with a length of 41")]
 
-        result = _max_field_length(options, "macro_name", macros, "name")
+        result = _max_attribute_length(macros, "name")
         self.assertEqual(result, 41)
 
     def test_correct_length_with_none(self):
-        options = [OptionFactory(value=None), OptionFactory(value=None)]
         macros = [MacroFactory(value=None), MacroFactory(value="foo")]
 
-        result = _max_field_length(options, "value", macros, "value")
+        result = _max_attribute_length(macros, "value")
         self.assertEqual(result, 3)
