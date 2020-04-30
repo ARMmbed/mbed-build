@@ -12,6 +12,21 @@ beta releases are not included in this history. For a full list of all releases,
 
 [//]: # (begin_release_notes)
 
+"1.1.0" (2020-04-30)
+====================
+
+Features
+--------
+
+- Add build command with option to only export config. (#20200429)
+
+
+Bugfixes
+--------
+
+- Stop ignoring config directory for flake8 (#20200429)
+
+
 "1.0.0" (2020-04-29)
 ====================
 

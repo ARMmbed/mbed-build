@@ -1,1 +1,0 @@
-Add build command with option to only export config.
