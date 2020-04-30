@@ -10,7 +10,7 @@ from mbed_build._internal.config_header_file import (
     _render_config_header_template,
     _max_attribute_length,
 )
-from tests._internal.config.factories import ConfigFactory, OptionFactory, MacroFactory
+from tests._internal.config.factories import ConfigFactory, MacroFactory
 
 
 class TestGenerateConfigHeaderFile(TestCase):
