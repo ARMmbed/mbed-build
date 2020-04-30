@@ -7,7 +7,7 @@ import pathlib
 
 import jinja2
 
-from typing import Iterable
+from typing import Iterable, Any
 from mbed_build._internal.config.config import Config
 from mbed_build._internal.config.assemble_build_config import assemble_config
 
@@ -29,6 +29,11 @@ def generate_config_header_file(mbed_target: str, program_path: str) -> str:
     return _render_config_header_template(config)
 
 
+def ljust(value: Any, width: int) -> str:
+    """Returns the string representation of a value left justified in a string of specified length."""
+    return str(value).ljust(width)
+
+
 def _render_config_header_template(config: Config) -> str:
     """Renders the mbed_config.h template with the correct config definitions.
 
@@ -41,12 +46,13 @@ def _render_config_header_template(config: Config) -> str:
     options = list(config.options.values())
     macros = list(config.macros.values())
     context = {
-        "options": sorted([(option.macro_name, str(option.value), option.set_by) for option in options]),
-        "macros": sorted([(m.name, str(m.value or ""), m.set_by) for m in macros]),
+        "options": sorted(options, key=lambda option: option.macro_name),
+        "macros": sorted(macros, key=lambda macro: macro.name),
         "max_name_length": max(_max_attribute_length(options, "macro_name"), _max_attribute_length(macros, "name")),
         "max_value_length": max(_max_attribute_length(options, "value"), _max_attribute_length(macros, "value")),
     }
     env = jinja2.Environment(loader=jinja2.PackageLoader("mbed_build", str(TEMPLATES_DIRECTORY)))
+    env.filters['ljust'] = ljust
     template = env.get_template(TEMPLATE_NAME)
     return template.render(context)
 
@@ -54,6 +60,6 @@ def _render_config_header_template(config: Config) -> str:
 def _max_attribute_length(objects: Iterable[object], attribute: str) -> int:
     attrs = (getattr(o, attribute) for o in objects)
     try:
-        return max(len(attr) for attr in attrs if attr is not None)
+        return max(len(str(attr)) for attr in attrs if attr is not None)
     except ValueError:  # no attrs found
         return 0

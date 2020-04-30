@@ -10,18 +10,18 @@
 #define __MBED_CONFIG_DATA__
 
 {% if options -%}// Configuration parameters {% endif %}
-{% for name, value, set_by in options -%}
-{% if value is not none -%}
-#define {{ name.ljust(max_name_length) }} {{ value.ljust(max_value_length) }} // set by {{ set_by }}
+{% for option in options -%}
+{% if option.value is not none -%}
+#define {{ option.macro_name | ljust(max_name_length) }} {{ option.value | ljust(max_value_length) }} // set by {{ option.set_by }}
 {% endif %}
 {%- endfor %}
 
 
 {% if macros %}// Macros {% endif %}
-{% for name, value, set_by in macros -%}
-{% if value is not none -%}
-#define {{ name.ljust(max_name_length) }} {{ value.ljust(max_value_length) }} // set by {{ set_by }}
-{% else %}
-#define {{ name.ljust(max_name_length + max_value_length + 1)}} // set by {{ set_by }}
+{% for macro in macros -%}
+{% if macro.value is not none -%}
+#define {{ macro.name | ljust(max_name_length) }} {{ macro.value | ljust(max_value_length) }} // set by {{ macro.set_by }}
+{% else -%}
+#define {{ macro.name | ljust(max_name_length + max_value_length + 1)}} // set by {{ macro.set_by }}
 {% endif %}
 {%- endfor %}
