@@ -52,7 +52,7 @@ def _render_config_header_template(config: Config) -> str:
         "max_value_length": max(_max_attribute_length(options, "value"), _max_attribute_length(macros, "value")),
     }
     env = jinja2.Environment(loader=jinja2.PackageLoader("mbed_build", str(TEMPLATES_DIRECTORY)))
-    env.filters['ljust'] = ljust
+    env.filters["ljust"] = ljust
     template = env.get_template(TEMPLATE_NAME)
     return template.render(context)
 

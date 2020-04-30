@@ -55,4 +55,4 @@ class TestMaxFieldLength(TestCase):
         macros = [MacroFactory(value=None), MacroFactory(value=None)]
 
         result = _max_attribute_length(macros, "value")
-        self. assertEqual(result, 0)
+        self.assertEqual(result, 0)
