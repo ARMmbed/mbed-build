@@ -6,8 +6,8 @@
 // Automatically generated configuration file.
 // DO NOT EDIT, content will be overwritten.
 
-#ifndef __MBED_CONFIG_DATA__
-#define __MBED_CONFIG_DATA__
+#ifndef __MBED_CONFIG_H__
+#define __MBED_CONFIG_H__
 
 {% if options -%}// Configuration parameters {% endif %}
 {% for option in options -%}
@@ -15,7 +15,6 @@
 #define {{ option.macro_name | ljust(max_name_length) }} {{ option.value | ljust(max_value_length) }} // set by {{ option.set_by }}
 {% endif %}
 {%- endfor %}
-
 
 {% if macros %}// Macros {% endif %}
 {% for macro in macros -%}
@@ -25,3 +24,5 @@
 #define {{ macro.name | ljust(max_name_length + max_value_length + 1)}} // set by {{ macro.set_by }}
 {% endif %}
 {%- endfor %}
+
+#endif // __MBED_CONFIG_H__
