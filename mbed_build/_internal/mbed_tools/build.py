@@ -8,6 +8,7 @@ import pathlib
 import click
 
 from mbed_build._internal.config_header_file import generate_config_header_file
+from mbed_build._internal.cmake_file import generate_cmakelists_file
 from mbed_build._internal.write_files import write_file
 
 
@@ -41,6 +42,11 @@ def build(mbed_target: str, program_path: str, config_only: bool) -> None:
     if not config_only:
         click.echo("Full build is not yet supported.")
     else:
+        cmakelists_file_contents = generate_cmakelists_file(mbed_target, program_path, "GCC_ARM")
+        write_file(pathlib.Path(program_path), "CMakeLists.txt", cmakelists_file_contents)
         header_file_contents = generate_config_header_file(mbed_target, program_path)
         write_file(pathlib.Path(program_path), "mbed_config.h", header_file_contents)
-        click.echo(f"The mbed_config.h file has been generated and successfully written to '{program_path}'.")
+        click.echo(
+            "The mbed_config.h and CMakeLists.txt files have been generated and successfully "
+            f"written to '{program_path}'."
+        )

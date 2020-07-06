@@ -17,18 +17,26 @@ class TestBuild(TestCase):
 
         self.assertEqual(result.output, "Full build is not yet supported.\n")
 
+    @mock.patch("mbed_build._internal.mbed_tools.build.generate_cmakelists_file")
     @mock.patch("mbed_build._internal.mbed_tools.build.generate_config_header_file")
     @mock.patch("mbed_build._internal.mbed_tools.build.write_file")
-    def test_config_only(self, write_file, generate_config_header_file):
+    def test_config_only(self, write_file, generate_config_header_file, generate_cmakelists_file):
         mbed_target = "K64F"
         program_path = "somewhere"
+        toolchain = "GCC_ARM"
         runner = CliRunner()
         result = runner.invoke(build, ["-m", mbed_target, "-p", program_path, "--config-only"])
 
         self.assertEqual(
-            result.output, f"The mbed_config.h file has been generated and successfully written to '{program_path}'.\n"
+            result.output,
+            "The mbed_config.h and CMakeLists.txt files have been generated and successfully written to "
+            f"'{program_path}'.\n",
         )
         generate_config_header_file.assert_called_once_with(mbed_target, program_path)
-        write_file.assert_called_once_with(
-            pathlib.Path(program_path), "mbed_config.h", generate_config_header_file.return_value
+        generate_cmakelists_file.assert_called_once_with(mbed_target, program_path, toolchain)
+        write_file.assert_has_calls(
+            [
+                mock.call(pathlib.Path(program_path), "CMakeLists.txt", generate_cmakelists_file.return_value),
+                mock.call(pathlib.Path(program_path), "mbed_config.h", generate_config_header_file.return_value),
+            ]
         )
