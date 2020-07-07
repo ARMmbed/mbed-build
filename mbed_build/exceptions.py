@@ -7,7 +7,7 @@ from mbed_tools_lib.exceptions import ToolsError
 
 
 class MbedBuildError(ToolsError):
-    """Base public exception for the mbed-devices package."""
+    """Base public exception for the mbed-build package."""
 
 
 class InvalidExportOutputDirectory(MbedBuildError):
