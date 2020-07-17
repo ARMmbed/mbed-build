@@ -1,28 +1,59 @@
-/*
-* Copyright (C) 2020 Arm Mbed. All rights reserved.
-* SPDX-License-Identifier: Apache-2.0
-*/
+# Copyright (C) 2020 Arm Mbed. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
 
-// Automatically generated configuration file.
-// DO NOT EDIT, content will be overwritten.
+# Automatically generated configuration file.
+# DO NOT EDIT. Content may be overwritten.
 
-#ifndef __MBED_CONFIG_H__
-#define __MBED_CONFIG_H__
+add_library(gen_config INTERFACE)
 
-{% if options -%}// Configuration parameters {% endif %}
+set(MBED_TOOLCHAIN "{{toolchain_name}}" CACHE STRING "")
+set(MBED_TARGET "{{target_name}}" CACHE STRING "")
+set(MBED_CPU_CORE "{{core}}" CACHE STRING "")
+
+set_property(GLOBAL APPEND PROPERTY MBED_TARGET_LABELS{% for label in labels %}
+    {{label}};
+{%- endfor %}
+)
+
+# target
+add_definitions({% for component in components %}
+    -DCOMPONENT_{{component.upper()}}=1
+{%- endfor %}
+{% for feature in features %}
+    -DFEATURE_{{feature.upper()}}=1
+{%- endfor %}
+{% for device in device_has %}
+    -DDEVICE_{{device.upper()}}=1
+{%- endfor %}
+{% for label in labels %}
+    -DTARGET_{{label}}
+{%- endfor %}
+{% for macro in target_macros %}
+    -D{{macro.upper()}}
+{%- endfor %}
+{% for form_factor in supported_form_factors %}
+    -DTARGET_FF_{{form_factor.upper()}}
+{%- endfor %}
+    -DMBED_BUILD_TIMESTAMP={{timestamp}}
+    -DTARGET_LIKE_MBED
+    -D__MBED__=1
+)
+
+# config
+add_definitions(
+# options
 {% for option in options -%}
 {% if option.value is not none -%}
-#define {{ option.macro_name | ljust(max_name_length) }} {{ option.value | ljust(max_value_length) }} // set by {{ option.set_by }}
+   {%if '{' in option.value|string or '(' in option.value|string %}"{% endif %}-D{{option.macro_name}}={{option.value}}{% if '}' in option.value|string or ')' in option.value|string %}"{% endif %}
 {% endif %}
 {%- endfor %}
-
-{% if macros %}// Macros {% endif %}
+# macros
 {% for macro in macros -%}
 {% if macro.value is not none -%}
-#define {{ macro.name | ljust(max_name_length) }} {{ macro.value | ljust(max_value_length) }} // set by {{ macro.set_by }}
+    {%if '{' in macro.value|string or '(' in macro.value|string %}"{% endif %}-D{{macro.name}}={{macro.value}}{% if '}' in macro.value|string or ')' in macro.value|string %}"{% endif %}
 {% else -%}
-#define {{ macro.name | ljust(max_name_length + max_value_length + 1)}} // set by {{ macro.set_by }}
+    -D{{macro.name}}
 {% endif %}
-{%- endfor %}
+{%- endfor %})
 
-#endif // __MBED_CONFIG_H__
+

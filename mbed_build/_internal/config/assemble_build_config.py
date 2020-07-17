@@ -32,7 +32,7 @@ def _assemble_config_from_sources_and_lib_files(
 ) -> Config:
     previous_cumulative_data = None
     current_cumulative_data = CumulativeData.from_sources([target_source])
-    while True:
+    while previous_cumulative_data != current_cumulative_data:
         filtered_files = _filter_files(mbed_lib_files, current_cumulative_data)
         mbed_lib_sources = [Source.from_mbed_lib(file, current_cumulative_data.labels) for file in filtered_files]
         all_sources = [target_source] + mbed_lib_sources
@@ -40,9 +40,6 @@ def _assemble_config_from_sources_and_lib_files(
             all_sources = all_sources + [Source.from_mbed_app(mbed_app_file, current_cumulative_data.labels)]
         previous_cumulative_data = current_cumulative_data
         current_cumulative_data = CumulativeData.from_sources(all_sources)
-
-        if previous_cumulative_data == current_cumulative_data:
-            break
 
     return Config.from_sources(all_sources)
 

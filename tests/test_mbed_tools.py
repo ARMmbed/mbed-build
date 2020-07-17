@@ -4,10 +4,10 @@
 #
 from unittest import TestCase
 
-from mbed_build._internal.mbed_tools.export import export
+from mbed_build._internal.mbed_tools.configure import configure
 from mbed_build import mbed_tools
 
 
 class TestExport(TestCase):
     def test_aliases_export(self):
-        self.assertEqual(mbed_tools.export, export)
+        self.assertEqual(mbed_tools.configure, configure)

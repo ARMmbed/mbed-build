@@ -5,7 +5,7 @@
 """Entrypoint for development purposes."""
 import click
 
-from mbed_build.mbed_tools import export
+from mbed_build.mbed_tools import configure
 
 
 @click.group()
@@ -14,6 +14,6 @@ def cli() -> None:
     pass
 
 
-cli.add_command(export)
+cli.add_command(configure)
 
 cli()
