@@ -12,6 +12,15 @@ beta releases are not included in this history. For a full list of all releases,
 
 [//]: # (begin_release_notes)
 
+"1.2.3" (2020-07-20)
+====================
+
+Bugfixes
+--------
+
+- Update mbed-targets dependency (#20200720153405)
+
+
 "1.2.2" (2020-07-20)
 ====================
 
