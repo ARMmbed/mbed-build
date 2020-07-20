@@ -29,7 +29,7 @@ from mbed_build._internal.write_files import write_file
 @click.option(
     "-t",
     "--toolchain",
-    type=click.Choice(["ARMC6", "GCC_ARM"]),
+    type=click.Choice(["ARM", "GCC_ARM"]),
     required=True,
     help="The toolchain you are using to build your app.",
 )
@@ -53,7 +53,7 @@ def configure(output_directory: Any, toolchain: str, mbed_target: str, program_p
 
     Args:
         output_directory: the path where .mbedbuild/mbed_config.cmake will be written
-        toolchain: the toolchain you are using (eg. GCC_ARM, ARM6)
+        toolchain: the toolchain you are using (eg. GCC_ARM, ARM)
         mbed_target: the target you are building for (eg. K64F)
         program_path: the path to the local Mbed program
     """
