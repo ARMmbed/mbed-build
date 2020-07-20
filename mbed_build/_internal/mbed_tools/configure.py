@@ -29,7 +29,7 @@ from mbed_build._internal.write_files import write_file
 @click.option(
     "-t",
     "--toolchain",
-    type=click.Choice(["ARM6", "GCC_ARM"]),
+    type=click.Choice(["ARMC6", "GCC_ARM"]),
     required=True,
     help="The toolchain you are using to build your app.",
 )
