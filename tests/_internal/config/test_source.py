@@ -7,7 +7,7 @@ import pathlib
 import tempfile
 from unittest import TestCase, mock
 
-from mbed_build._internal.config.source import Source, _namespace_data, _filter_target_overrides
+from mbed_build._internal.config.source import Source, _namespace_data, _filter_target_overrides, _decode_json_file
 
 
 class TestSource(TestCase):
@@ -121,3 +121,17 @@ class TestNamespaceData(TestCase):
         }
 
         self.assertEqual(_namespace_data(data, "my-prefix"), {"my-prefix.foo": True, "hat.bar": 123})
+
+
+class TestDecodeJSONFile(TestCase):
+    def test_logs_path_and_raises_when_decode_fails(self):
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            text = "This is not valid JSON<>>"
+            tmp_file = pathlib.Path(tmp_dir, "mbed_lib.json")
+            tmp_file.write_text(text)
+
+            with self.assertRaises(json.JSONDecodeError):
+                with self.assertLogs(level="ERROR") as logger:
+                    _decode_json_file(tmp_file)
+
+                    self.assertIn(str(tmp_file), logger.output)

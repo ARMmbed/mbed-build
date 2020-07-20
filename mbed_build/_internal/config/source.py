@@ -3,12 +3,16 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 """Configuration source abstraction."""
-from dataclasses import dataclass
 import json
+import logging
+
+from dataclasses import dataclass
 from pathlib import Path
-from typing import Iterable
+from typing import Iterable, Any
 
 from mbed_targets import get_target_by_board_type
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -29,31 +33,31 @@ class Source:
     macros: Iterable[str]
 
     @classmethod
-    def from_mbed_lib(cls, file: Path, target_labels: Iterable[str]) -> "Source":
+    def from_mbed_lib(cls, mbed_lib_path: Path, target_labels: Iterable[str]) -> "Source":
         """Build Source from mbed_lib.json file.
 
         Args:
-            file: Path to mbed_lib.json file
+            mbed_lib_path: Path to mbed_lib.json file
             target_labels: Labels for which "target_overrides" should apply
         """
-        file_contents = json.loads(file.read_text())
+        file_contents = _decode_json_file(mbed_lib_path)
         namespace = file_contents["name"]
 
         return cls.from_file_contents(
-            file_name=str(file), file_contents=file_contents, namespace=namespace, target_labels=target_labels
+            file_name=str(mbed_lib_path), file_contents=file_contents, namespace=namespace, target_labels=target_labels
         )
 
     @classmethod
-    def from_mbed_app(cls, file: Path, target_labels: Iterable[str]) -> "Source":
+    def from_mbed_app(cls, mbed_app_path: Path, target_labels: Iterable[str]) -> "Source":
         """Build Source from mbed_app.json file.
 
         Args:
-            file: Path to mbed_app.json file
+            mbed_app_path: Path to mbed_app.json file
             target_labels: Labels for which "target_overrides" should apply
         """
-        file_contents = json.loads(file.read_text())
+        file_contents = _decode_json_file(mbed_app_path)
         return cls.from_file_contents(
-            file_name=str(file), file_contents=file_contents, namespace="app", target_labels=target_labels
+            file_name=str(mbed_app_path), file_contents=file_contents, namespace="app", target_labels=target_labels
         )
 
     @classmethod
@@ -125,3 +129,11 @@ def _namespace_data(data: dict, namespace: str) -> dict:
             key = f"{namespace}.{key}"
         namespaced[key] = value
     return namespaced
+
+
+def _decode_json_file(path: Path) -> Any:
+    try:
+        return json.loads(path.read_text())
+    except json.JSONDecodeError:
+        logger.error(f"Failed to decode JSON data in the file located at '{path}'")
+        raise

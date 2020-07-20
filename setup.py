@@ -44,7 +44,7 @@ setup(
         "Click==7.0",
         "Jinja2",
         "mbed-project~=2.0",
-        "mbed-targets~=1.0",
+        "mbed-targets~=1.1",
         "mbed-tools-lib~=1.2",
         "tabulate",
     ],

@@ -12,6 +12,64 @@ beta releases are not included in this history. For a full list of all releases,
 
 [//]: # (begin_release_notes)
 
+"1.2.3" (2020-07-20)
+====================
+
+Bugfixes
+--------
+
+- Update mbed-targets dependency (#20200720153405)
+
+
+"1.2.2" (2020-07-20)
+====================
+
+Bugfixes
+--------
+
+- Remove version information from ARM compiler (#20200720142241)
+
+
+"1.2.1" (2020-07-20)
+====================
+
+Bugfixes
+--------
+
+- Fix ARMC6 name (#20200720101418)
+- Add default develop profile (#20200720102434)
+
+
+"1.2.0" (2020-07-17)
+====================
+
+Features
+--------
+
+- Generate mbed_config.cmake from configure command (#20200717105848)
+
+
+Bugfixes
+--------
+
+- Declare zipp MIT license (#20200702)
+- Remove `assert-news` from pre-commit checks (#20200707)
+- Fix include guard in config header template (#20200708184705)
+- Log a more useful error message if JSON decoding fails (#20200708205257)
+
+
+Improved Documentation
+----------------------
+
+- Fix docstring in exceptions.py (#20200706)
+
+
+Misc
+----
+
+- #20200710155229, #20200713101727
+
+
 "1.1.0" (2020-04-30)
 ====================
 
