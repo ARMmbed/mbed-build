@@ -12,6 +12,15 @@ beta releases are not included in this history. For a full list of all releases,
 
 [//]: # (begin_release_notes)
 
+"1.2.4" (2020-07-21)
+====================
+
+Bugfixes
+--------
+
+- Add components and features to MBED_TARGET_LABELS (#20200721101119)
+
+
 "1.2.3" (2020-07-20)
 ====================
 
